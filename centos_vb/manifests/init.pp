@@ -16,5 +16,5 @@ class centos_vb {
     ensure  =>  present,
     content => "Welcome to the development environment!",
   }
-  
+  notify{'in the init.pp':}
 }
