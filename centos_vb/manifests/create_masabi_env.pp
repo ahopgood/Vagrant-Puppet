@@ -18,7 +18,7 @@ user {
 file {
     '/test-conf.properties':
     ensure  =>  file,
-    source  =>  ['puppet:///files/test.properties'],
+    source  =>  ['puppet:///configuration_files/test.properties'],
 #'/configuration_files/test.properties'],
 }
 
