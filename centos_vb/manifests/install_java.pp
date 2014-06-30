@@ -1,8 +1,23 @@
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir  = "${local_install_path}installers/"
+  $puppet_file_dir    = "installer_files/"
+  
+#Check file exists either in the puppet file server or locally in a vagrant shared folder
+$jdk = "jdk-6u45-linux-amd64.rpm"
+file {
+    "${jdk}":
+#    require     =>  File["${local_install_dir}"],
+    path        =>  "${local_install_dir}${jdk}",
+    ensure      =>  present,
+    source      =>  ["puppet:///${puppet_file_dir}${jdk}"],
+}
+
 package	{
 	'jdk':
 	ensure      =>  present,
   provider    =>  'rpm',
-  source      =>  '/installers/jdk-6u45-linux-amd64.rpm',
+  source      =>  "${local_install_dir}${jdk}",
+  require     =>  File["${jdk}"],
 }
 
 #It might be worth setting up an alternatives type instead of relying on the exec command.
