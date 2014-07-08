@@ -8,6 +8,6 @@ file {
 file {
   '/etc/puppet/installers/':
   ensure      =>  directory,
-  mode        =>  0644,
+  mode        =>  0666,
 #  owner       =>  'installer',
 }

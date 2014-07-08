@@ -1,3 +1,5 @@
+#Modify this into a class that we can pass args into, e.g. mysql version number, os speciic installer classes etc.
+#NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_path = "/etc/puppet/"
   $local_install_dir  = "${local_install_path}installers"
   $puppet_file_dir    = "installer_files"
@@ -79,32 +81,37 @@ package {
   source      =>  "${local_install_dir}/${MySQL_client}",
   require     =>  File["${MySQL_client}"],
 }
-
+ 
 #Need to check the service is running first
 exec {
   "Stop mysql":
-  refreshonly =>  true,
-  subscribe   =>  [Package['MySQL-client'], Package['MySQL-server'], Package['MySQL-shared']],
-  unless      =>  "/usr/bin/mysqladmin status",
+  #refreshonly =>  true,
+  #subscribe   =>  [Package['MySQL-client'], Package['MySQL-server'], Package['MySQL-shared']],
+  unless      =>  "/usr/bin/mysqladmin -uroot -p${password} status",
   path        =>  "/usr/bin/mysql",
   command     =>  "/etc/init.d/mysql stop",
 #  before      =>  Exec['Skip grant tables'],  
 }
-#Start the service in safe mode
 
+#Start the service in safe mode
 exec {
   "Skip grant tables":
   path        =>  "/usr/bin/",
   unless      =>  "/usr/bin/mysqladmin status",
   command     =>  "sudo mysqld_safe --skip-grant-tables &", 
   #before      =>  Exec['Set MySQL root password'],
+  refreshonly =>  true,
+  subscribe   =>  Exec['Stop mysql'],
   require     =>  Exec['Stop mysql'],
 }
 
+#Set the root password
 exec {
   "Set MySQL root password":
   path        =>  "/usr/bin/",
-  command     =>  "sudo sleep 10 && mysql mysql -e \"update user set password=PASSWORD('$password') where user='root';\"",
+  command     =>  "sudo sleep 5 && mysql mysql -e \"update user set password=PASSWORD('$password') where user='root'; flush privileges;\"",
+  refreshonly =>  true,
+  subscribe   =>  Exec['Skip grant tables'],
   require     =>  Exec['Skip grant tables'],  
 }
 
@@ -113,6 +120,8 @@ exec {
   "Stop mysqld_safe":
   path        =>  "/usr/sbin/mysqld",
   command     =>  "/etc/init.d/mysql stop",
+  refreshonly =>  true,
+  subscribe   =>  Exec['Set MySQL root password'],
   require     =>  Exec['Set MySQL root password'],
 }
 
@@ -121,8 +130,21 @@ exec {
   "Start mysql":
   path        =>  "/usr/bin/mysql",
   command     =>  "/etc/init.d/mysql start",
+  refreshonly =>  true,
+  subscribe   =>  Exec['Stop mysqld_safe'],
   require     =>  Exec["Stop mysqld_safe"],
+} 
+
+#Now confirm the password, as the one issued in the --skip-grant-tables will be marked as expired
+exec {
+  "Confirm password":
+  path        =>  "/usr/bin/",
+  command     =>  "mysql -uroot -p${password} --connect-expired-password -e\"SET PASSWORD = PASSWORD(\'${password}\');\"",
+  refreshonly =>  true,
+  subscribe   =>  Exec['Start mysql'],
+  require     =>  Exec["Start mysql"],
 }
 
+#It seems that we are still being asked to SET PASSWORD
 #Perform the chkconfig to ensure the service loads on startup?
 

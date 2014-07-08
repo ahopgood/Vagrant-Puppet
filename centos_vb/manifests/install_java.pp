@@ -5,8 +5,14 @@
 #Check file exists either in the puppet file server or locally in a vagrant shared folder
 $jdk = "jdk-6u45-linux-amd64.rpm"
 file {
+    "${local_install_dir}":
+    path    =>  "${local_install_dir}",
+    ensure  =>  directory,
+}
+
+file {
     "${jdk}":
-#    require     =>  File["${local_install_dir}"],
+    require     =>  File["${local_install_dir}"],
     path        =>  "${local_install_dir}${jdk}",
     ensure      =>  present,
     source      =>  ["puppet:///${puppet_file_dir}${jdk}"],
