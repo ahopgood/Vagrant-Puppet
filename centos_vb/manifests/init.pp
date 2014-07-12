@@ -11,10 +11,26 @@
 # Sample Usage:
 #
 class centos_vb {
+  $module_path        = "/etc/puppet/modules/"
+  $fileserver_module  = "fileserver/"
+  $manifests          = "manifests/"
+
+  #Create module folders for fileserver
+
   file {
-    '/etc/motd':
-    ensure  =>  present,
-    content => "Welcome to the development environment!",
+    [ "${module_path}${fileserver_module}",
+      "${module_path}${fileserver_module}${manifests}" ]:
+    ensure    =>  directory,
+    mode      =>  0664,
+    owner     =>  'vagrant',    
   }
-  notify{'in the init.pp':}
+
+  #Install the setup_fileserver as a module
+  exec {
+    "Install setup_fileserver module":
+    path      =>  "/bin/",
+    command   =>  "mv /vagrant/fileserver.conf ${module_path}${fileserver_module}${manifests}"
+  }
 }
+
+include centos_vb
