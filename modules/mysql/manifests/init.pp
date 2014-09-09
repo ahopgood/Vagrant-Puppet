@@ -170,4 +170,4 @@ class mysql {
 
   #Perform the chkconfig to ensure the service loads on startup?
 }
-#include mysql
+include mysql
