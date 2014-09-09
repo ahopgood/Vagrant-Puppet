@@ -1,4 +1,4 @@
-name    'development-centos_vb'
+name    'development-fileserver'
 version '0.1.0'
 source ''
 author 'Alexander'

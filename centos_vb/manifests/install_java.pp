@@ -1,16 +1,20 @@
 class install_java{
+  include fileserver
+  
   $local_install_path = "/etc/puppet/"
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "installer_files/"
   
   #Check file exists either in the puppet file server or locally in a vagrant shared folder
   $jdk = "jdk-6u45-linux-amd64.rpm"
+#Setup already in filerserver
+/*
 	file {
 	  "${local_install_dir}":
 	  path       =>  "${local_install_dir}",
 	  ensure     =>  directory,
 	}
-	
+	*/
 	file {
     "${jdk}":
 	  require    =>  File["${local_install_dir}"],
