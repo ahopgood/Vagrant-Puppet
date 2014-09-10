@@ -18,13 +18,12 @@ class java {
   #Check file exists either in the puppet file server or locally in a vagrant shared folder
   $jdk = "jdk-6u45-linux-amd64.rpm"
 #Setup already in filerserver
-/*
   file {
     "${local_install_dir}":
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
   }
-  */
+  
   file {
     "${jdk}":
     require    =>  File["${local_install_dir}"],
@@ -108,5 +107,5 @@ class java {
   
   #  subscribe   =>  Package['java-sdk'],
   #  require     =>  Package['java-sdk'],
-
 }
+include java
