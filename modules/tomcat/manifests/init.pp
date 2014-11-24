@@ -11,16 +11,16 @@
 # Sample Usage:
 #
 
-class tomcat ($local_install_dir = '/etc/puppet/installers/') {
+class tomcat {#($local_install_dir = '/etc/puppet/installers/') {
 require java
   notify {
-    "Tomcat installation test ${module_name}":
+    "${name} installation completed":
   }
   
-  $vagrant_share      = "/installers/"
+#  $vagrant_share      = "/installers/"
 #  $local_install_path = "/etc/puppet/"
 #  $local_install_dir  = "${local_install_path}installers/"
-  $puppet_file_dir    = "modules/tomcat/"
+  $puppet_file_dir    = "modules/${name}/"
   
   $tomcat_install_dir = "/var/hosting/"
   $tomcat_full_ver    = "apache-tomcat-7.0.54"
@@ -29,8 +29,8 @@ require java
   $tomcat_file        = "${tomcat_tar}.gz"
   $tomcat_users       = "${tomcat_install_dir}${tomcat_short_ver}/conf/tomcat-users.xml"
 
-  $tomcat_installer   = "unpack_tomcat.sh"
-  $tomcat_password    = "tomcat"
+#  $tomcat_installer   = "unpack_tomcat.sh"
+#  $tomcat_password    = "tomcat"
   
   user { 'tomcat':
     ensure      =>  present,
@@ -66,8 +66,8 @@ require java
     ensure  =>  present,
     mode    =>  0777,
     owner   =>  ['tomcat','vagrant'],      
-    source  =>  ["puppet:///${puppet_file_dir}${tomcat_file}",
-                    "${vagrant_share}${tomcat_file}"],
+    source  =>  ["puppet:///${puppet_file_dir}${tomcat_file}"],
+#                    "${vagrant_share}${tomcat_file}"],
     require =>  File["${tomcat_install_dir}"],
   } 
   
@@ -170,7 +170,7 @@ require java
   
   file {
     "${tomcat_users}":
-    content => template('tomcat/tomcat-users.xml.erb'),
+    content => template("${name}/tomcat-users.xml.erb"),
     require =>  File["Set CATALINA_HOME"]
   }
 
@@ -192,6 +192,7 @@ require java
 
 #include java
 #include tomcat ('/etc/puppet/installers/')
-class { 'tomcat' :
-  local_install_dir => '/etc/puppet/installers/'
-}
+#class { 'tomcat' :
+#  local_install_dir => '/etc/puppet/installers/'
+#}
+include tomcat
