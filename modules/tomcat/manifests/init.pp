@@ -11,7 +11,7 @@
 # Sample Usage:
 #
 
-class tomcat {#($local_install_dir = '/etc/puppet/installers/') {
+class tomcat ($tomcat_manager_password = "manager") {#($local_install_dir = '/etc/puppet/installers/') {
 require java
   notify {
     "${name} installation completed":
@@ -22,12 +22,15 @@ require java
 #  $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/${name}/"
   
-  $tomcat_install_dir = "/var/hosting/"
-  $tomcat_full_ver    = "apache-tomcat-7.0.54"
-  $tomcat_short_ver   = "tomcat7"
-  $tomcat_tar         = "${tomcat_full_ver}.tar"
-  $tomcat_file        = "${tomcat_tar}.gz"
-  $tomcat_users       = "${tomcat_install_dir}${tomcat_short_ver}/conf/tomcat-users.xml"
+  $tomcat_install_dir   = "/var/hosting/"
+  $tomcat_full_ver      = "apache-tomcat-7.0.54"
+  $tomcat_short_ver     = "tomcat7"
+  $tomcat_tar           = "${tomcat_full_ver}.tar"
+  $tomcat_file          = "${tomcat_tar}.gz"
+  $tomcat_users         = "${tomcat_install_dir}${tomcat_short_ver}/conf/tomcat-users.xml"
+  $tomcat_service_file  = "tomcat"
+
+  $catalina_home        ="${$tomcat_install_dir}${tomcat_short_ver}"
 
 #  $tomcat_installer   = "unpack_tomcat.sh"
 #  $tomcat_password    = "tomcat"
@@ -72,17 +75,6 @@ require java
   } 
   
  /*
-  file {
-    "${tomcat_installer}":
-    path    =>  "${local_install_dir}${$tomcat_installer}",
-    ensure  =>  present,
-    mode    =>  0774,
-    owner   =>  'tomcat',    
-    source  =>  ["puppet:///${puppet_file_dir}${$tomcat_installer}",
-                  "${vagrant_share}${tomcat_installer}"],
-    require =>  File["${tomcat_file}"],
-  }
-
   exec {
     "Uncompress tomcat archive":
     path      =>  "/bin/",
@@ -107,7 +99,7 @@ require java
     "Rename to tomcat7":
     path      =>  "/bin/",
     cwd       =>  "${tomcat_install_dir}",
-    command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver} ${tomcat_short_ver}",
+    command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver} ${catalina_home}",
     user      =>  "tomcat",
     require   =>  Exec["Unpack tomcat archive"],
   }
@@ -130,21 +122,21 @@ require java
   exec {
     "Set folder permissions":
     path      =>  "/bin/",
-    command   =>  "chmod -R 777 ${tomcat_install_dir}${tomcat_short_ver}",
+    command   =>  "chmod -R 777 ${catalina_home}",
     require   =>  Exec["Rename to tomcat7"],
   }
    
   file {
     "Set JAVA_HOME":
     path      =>  "/etc/profile.d/java.sh",
-    content   =>  "export JAVA_HOME=/usr/java/default",
+    content   =>  "#!/bin/bash export JAVA_HOME=/usr/java/default",
     require   =>  Exec["Unpack tomcat archive"],
   }
 
   file {
     "Set CATALINA_HOME":
     path      =>  "/etc/profile.d/catalina-home.sh",
-    content   =>  "export CATALINA_HOME=${$tomcat_install_dir}${tomcat_short_ver}",
+    content   =>  "export CATALINA_HOME=${catalina_home}",
     require   =>  File["Set JAVA_HOME"],
   }
 /*  
@@ -165,8 +157,6 @@ require java
     ensure  => stopped,
     require => File["Set CATALINA_HOME"]
   }  
-
-  $tomcat_manager_password = "manager"
   
   file {
     "${tomcat_users}":
@@ -174,19 +164,29 @@ require java
     require =>  File["Set CATALINA_HOME"]
   }
 
-  exec {
-    "Start tomcat":
-    path      =>  "/usr/bin/",
-    command   =>  "${$tomcat_install_dir}${tomcat_short_ver}/bin/startup.sh",
-    #require   =>  File["Logging Directory"],
-    require   =>  [File["Set CATALINA_HOME"],Service["iptables"],File["$tomcat_users"]],
-    user      =>  "tomcat",
-  }
-  
+#Tomcat service startup script
+  file {
+    [ "${tomcat_service_file}" ]:
+    path    =>  "/etc/init.d/${tomcat_service_file}",
+    content =>  template("${name}/${tomcat_service_file}.erb"),
+    ensure  =>  present,
+    mode    =>  0777,
+    owner   =>  ['tomcat','vagrant'],      
+    require =>  File["${tomcat_install_dir}"],
+  } 
+
+
+  #set the service to start at boot, to verify you can run chkconfig --list tomcat
+  service {
+    ["${tomcat_service_file}"]:
+    ensure  =>  running,
+    enable  =>  true,
+  }  
 
   #Create a user template?
   #Create a start up script
   #Set the startup script as a service
+  #Delete old files and folders if present
   
 }
 
