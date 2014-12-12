@@ -22,6 +22,7 @@ class tomcat {
 #include tomcat::tomcat7 ('admin','/var/log/tomcat7')
 
   class { 'tomcat::tomcat7':
-    tomcat_manager_password => 'admin',
-    logging_directory =>  '/var/tomcat7/logs',
+    tomcat_manager_username =>  'admin',
+    tomcat_manager_password =>  'adminadmin',
+    logging_directory =>  '/var/log/tomcat7',
   }  

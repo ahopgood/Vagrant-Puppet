@@ -11,16 +11,18 @@
 # Sample Usage:
 #
 
-class tomcat::tomcat7 ($tomcat_manager_password = "manager", $logging_directory = "/var/log/tomcat") {#($local_install_dir = '/etc/puppet/installers/') {
+class tomcat::tomcat7 (
+  $tomcat_manager_username = "manager",
+  $tomcat_manager_password = "manager", 
+  $logging_directory = "/var/log/tomcat") {
+
 require java
   notify {
     "${module_name} installation completed":
   }
   
-#  $vagrant_share      = "/installers/"
-#  $local_install_path = "/etc/puppet/"
-#  $local_install_dir  = "${local_install_path}installers/"
-  $puppet_file_dir    = "modules/${module_name}/"
+
+  $puppet_file_dir      = "modules/${module_name}/"
   
   $tomcat_install_dir   = "/var/hosting/"
   $tomcat_full_ver      = "apache-tomcat-7.0.54"
@@ -28,9 +30,10 @@ require java
   $tomcat_file          = "${tomcat_tar}.gz"
   $tomcat_short_ver     = "tomcat7"
  
-  $tomcat_service_file  = "${$tomcat_short_ver}"
-  $tomcat_group         = "${$tomcat_short_ver}"
-  $catalina_home        = "${$tomcat_install_dir}${tomcat_short_ver}"
+  $tomcat_service_file  = "${tomcat_short_ver}"
+  $tomcat_group         = "${tomcat_short_ver}"
+  $tomcat_user          = "${tomcat_short_ver}"
+  $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
   
   if $::operatingsystem == 'CentOS' {
@@ -45,9 +48,9 @@ require java
 #    members   => ["tomcat"],
   }
   
-  user { 'tomcat':
+  user { "${tomcat_user}":
     ensure      =>  present,
-    home        =>  "/home/tomcat",
+    home        =>  "/home/${tomcat_user}",
     managehome  =>  true,
     shell       =>  '/bin/bash',
     groups      =>  ["${tomcat_group}"],
@@ -56,64 +59,57 @@ require java
   }
 
   #Create the directory we will install tomcat into.
-  file {
-    [ "${tomcat_install_dir}"  ]:
+  file {  [ "${tomcat_install_dir}"  ]:
     ensure    =>  directory,
     mode      =>  0777,
-    owner     =>  'tomcat',
+    owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
-    require   =>  User['tomcat']
+    require   =>  User["${tomcat_user}"]
   }
   
-  file {
-    [ "${tomcat_file}" ]:
+  file { [ "${tomcat_file}" ]:
     path    =>  "${tomcat_install_dir}${tomcat_file}",
     ensure  =>  present,
     mode    =>  0777,
-    owner   =>  ['tomcat','vagrant'],      
+    owner   =>  "${tomcat_user}",      
     source  =>  ["puppet:///${puppet_file_dir}${tomcat_file}"],
 #                    "${vagrant_share}${tomcat_file}"],
     require =>  File["${tomcat_install_dir}"],
   }
 
-  exec {
-    "Unpack tomcat archive":
+  exec {  "Unpack tomcat archive":
     path      =>  "/bin/",
     cwd       =>  "${tomcat_install_dir}",
     command   =>  "/bin/tar xfvz ${tomcat_install_dir}${tomcat_file}",
-    user      =>  "tomcat",
+    user      =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     require   =>  File[ "${tomcat_file}" ],
   }
 
 #Fails on rerun if move has already happened, need to make it 
-  exec {
-    "Rename to tomcat7":
+  exec {  "Rename to tomcat7":
     path      =>  "/bin/",
     cwd       =>  "${tomcat_install_dir}",
     command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver} ${catalina_home}",
-    user      =>  "tomcat",
+    user      =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     require   =>  Exec["Unpack tomcat archive"],
   }
 
-  exec {
-    "Set folder permissions":
+  exec {  "Set folder permissions":
     path      =>  "/bin/",
     command   =>  "chmod -R 755 ${catalina_home}",
     require   =>  Exec["Rename to tomcat7"],
   }
    
-  file {
-    "Set JAVA_HOME":
+  file {  "Set JAVA_HOME":
     path      =>  "/etc/profile.d/java.sh",
     content   =>  "#!/bin/bash export JAVA_HOME=/usr/java/default",
     require   =>  Exec["Unpack tomcat archive"],
   }
 
-  file {
-    "Set CATALINA_HOME":
-    owner     =>  "tomcat",
+  file {  "Set CATALINA_HOME":
+    owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     path      =>  "/etc/profile.d/catalina-home.sh",
     content   =>  "export CATALINA_HOME=${catalina_home}",
@@ -121,11 +117,11 @@ require java
   }
   
   #Link a specified folder to the tomcat/log folder
-
+  #Hpw to ensure the link can be created when the parent folder(s) doesn't exist.
   file { $logging_directory:
     ensure  =>  link,
     target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
-    require => File["$logging_directory"],
+    #require => File["$logging_directory"],
   }
 
 /*  
@@ -141,37 +137,36 @@ require java
 */
  
   #If the service iptables is running then tomcat won't be accessible from a browser
-  service {
-    "iptables":
+  service { "iptables":
     enable  =>  false,
     ensure  => stopped,
     require => File["Set CATALINA_HOME"]
   }  
   
-  file {
-    "${tomcat_users}":
+  file {  "${tomcat_users}":
     content => template("${module_name}/tomcat-users.xml.erb"),
-    require =>  File["Set CATALINA_HOME"]
+    require =>  File["Set CATALINA_HOME"],
+    notify  =>  Service["${tomcat_service_file}"]
   }
 
   #Tomcat service startup script
-  file {
-    [ "${tomcat_service_file}" ]:
+  file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
     content =>  template("${module_name}/${tomcat_service_file}.erb"),
     ensure  =>  present,
     mode    =>  0755,
-    owner   =>  ['tomcat','vagrant'],
+    owner   =>  ["${tomcat_user}",'vagrant'],
     group   =>  ["${tomcat_group}"],      
     require =>  File["${tomcat_install_dir}"],
+    notify  =>  Service["${tomcat_service_file}"],
   } 
 
   #set the service to start at boot, to verify you can run chkconfig --list tomcat
-  service {
-    ["${tomcat_service_file}"]:
+  service { ["${tomcat_service_file}"]:
     ensure  =>  running,
     enable  =>  true,
     require =>  [File["${tomcat_service_file}"],File["Set CATALINA_HOME"]]
+    
   }  
 
   #Create a user template x
@@ -181,7 +176,7 @@ require java
   #Set the ownership for the tomcat service to be the tomcat group? x
   #Set the ownership for the tomcat folder to be tomcat group 
   #Set the logging directory as a symbolic link, ensure the directory exists first
-  #Create a tomcat user variable
+  #Create a tomcat user variable x 
   #Add a manager username parameter
   #Pass in vm args into a setenv.sh file
   #Set the file permissions to be 755 throughout

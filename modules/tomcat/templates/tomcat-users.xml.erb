@@ -35,7 +35,7 @@
 -->
 	<role rolename="manager-gui"/>
 	<role rolename="manager-script"/>
-	<role rolename="manager-script"/>
+	<role rolename="manager-jmx"/>
 	
-	<user username="manager" password="<%= @tomcat_manager_password %>" roles="manager-gui"/>
+	<user username="<%= @tomcat_manager_username %>" password="<%= @tomcat_manager_password %>" roles="manager-gui"/>
 </tomcat-users>
