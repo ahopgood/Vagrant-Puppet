@@ -5,7 +5,12 @@ class agentweb {
     tomcat_manager_password =>  'adminadmin',
     logging_directory =>  '/var/log/tomcat7',
   }
-  */ 
+  */
+  
+  service { "iptables":
+    ensure    =>  stopped,
+    enable    =>  false,
+  } 
 }
 
 include agentweb

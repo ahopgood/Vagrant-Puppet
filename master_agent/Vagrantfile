@@ -11,11 +11,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	
 	config.vm.define "puppet" do |puppet|
 		puppet.vm.network "private_network", ip: "192.168.33.10"
-		puppet.vm.hostname = "master.vm"
+		puppet.vm.hostname = "puppet.vm"
 		puppet.vm.synced_folder "../modules",	"/etc/puppet/modules"
+		puppet.vm.synced_folder "manifests",	"/etc/puppet/manifests"
 		puppet.vm.provision "puppet" do |puppet|
 			puppet.manifests_path	= "manifests"
-			puppet.manifest_file	= "site.pp"
+			puppet.manifest_file	= "init.pp"
 		end
 	end
 
@@ -36,7 +37,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #		agentweb.vm.network "forwarded_port", guest: 8080, host: 8081	#Required for tomcat 8080 port forwarding
 #		agentweb.vm.provision "puppet" do |puppet|
 #			puppet.manifests_path	= "manifests"
-#			puppet.manifest_file	= "site.pp"
+#			puppet.manifest_file	= "agent.pp"
 #		end
 #	end
 	

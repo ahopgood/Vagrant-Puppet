@@ -1,3 +1,4 @@
+ 
 node 'agentdb' {
   notify { 'Configuring the management of the database server': }
 
@@ -13,18 +14,14 @@ node 'agentweb' {
     tomcat_manager_username =>  'admin',
     tomcat_manager_password =>  'adminadmin',
     logging_directory       =>  '/var/log/tomcat7',
-  }   
-}
-
-node 'agent' {
-  notify { 'Started agent node!' : }
-}
-
-node 'localhost'{
-  notify { 'Running in localhost mode' : }
-}
-
-  service { "iptables":
-    enable  =>  false,
-    ensure  => stopped,
   }
+   
+}
+
+node 'agent.vm' {
+  notify { 'Started agent.vm node!' : }
+}
+
+#node 'localhost'{
+#  notify { 'Running in localhost mode' : }
+#}
