@@ -13,6 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		puppet.vm.network "private_network", ip: "192.168.33.10"
 		puppet.vm.hostname = "puppet.vm"
 		puppet.vm.synced_folder "../modules",	"/etc/puppet/modules"
+		puppet.vm.synced_folder ".",			"/tmp/vagrant-puppet-3/files"
 		puppet.vm.synced_folder "manifests",	"/etc/puppet/manifests"
 		puppet.vm.provision "puppet" do |puppet|
 			puppet.manifests_path	= "manifests"

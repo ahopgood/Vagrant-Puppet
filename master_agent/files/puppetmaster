@@ -1,0 +1,44 @@
+#!/bin/bash  
+# description: Puppet master Start Stop Restart  
+# processname: puppet master
+# chkconfig: 234 20 80  
+# I suspect that the chkconfig configuration to be erroneous
+  
+PATH=/usr/bin:/sbin:/bin:/usr/sbin
+export PATH
+ 
+#Load global variables from file
+#[ -f /etc/sysconfig/puppet ] && . /etc/sysconfig/puppet
+puppetd=${PUPPETD-/usr/bin/puppet}
+#pidopts=${} 
+RETVAL=0
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+PUPPET_OPTS="master "
+
+case $1 in  
+start)
+	echo -n $"Starting puppet master: "
+	daemon $puppetd ${PUPPET_OPTS}
+;;
+
+stop)
+	echo -n $"Stopping puppet master: "
+	killproc $puppetd
+;;
+
+restart)
+	echo -n $"Restarting puppet master: "
+	killproc $puppetd -HUP
+;;
+
+  
+status)
+	echo -n $"Puppet master status:"
+	status $puppetd
+   
+esac      
+exit 0  
+ 
