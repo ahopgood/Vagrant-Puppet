@@ -21,6 +21,7 @@ class java (
   $local_install_path = "/etc/puppet/"
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/java/"
+  $package_name  = "jdk1.${version}.0_${updateVersion}"
   
   #Check file exists either in the puppet file server or locally in a vagrant shared folder
   
@@ -49,9 +50,12 @@ class java (
     source     =>  ["puppet:///${puppet_file_dir}${jdk}"]
   }
   
+  #How to uninstall via rpm -e package name
+  #Perhaps we need to clear out any other jdk versions? Perhaps a flag could be set?
   package {
-    "${jdk}":
-    ensure      =>  present,
+	"${package_name}":
+	#ensure		=> present,
+	ensure		=> "1.${version}.0_${updateVersion}-fcs",
     provider    =>  'rpm',
     source      =>  "${local_install_dir}${jdk}",
     require     =>  File["${jdk}"],
@@ -63,7 +67,7 @@ class java (
     command     =>  "alternatives --install /usr/bin/java java /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/java 20000",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
-    require     =>  Package["${jdk}"],
+    require     =>  Package["${package_name}"],
     before      =>  Exec['java-set-alternative']
   }
   
@@ -72,7 +76,7 @@ class java (
     command     =>  "alternatives --install /usr/bin/jar jar /usr/java/jdk1.${version}.0_${updateVersion}/bin/jar 20000",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
-    require     =>  Package["${jdk}"],
+    require     =>  Package["${package_name}"],
     before      =>  Exec['jar-set-alternative']  
   }
   
@@ -81,7 +85,7 @@ class java (
     command     =>  "alternatives --install /usr/bin/javac javac /usr/java/jdk1.${version}.0_${updateVersion}/bin/javac 20000",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
-    require     =>  Package["${jdk}"],
+    require     =>  Package["${package_name}"],
     before      =>  Exec['javac-set-alternative']
   }
     
@@ -90,7 +94,7 @@ class java (
     command     =>  "alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/javaws 20000",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
-    require     =>  Package["${jdk}"],
+    require     =>  Package["${package_name}"],
     before      =>  Exec['javaws-set-alternative']
   }
   

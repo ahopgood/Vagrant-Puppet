@@ -1,4 +1,4 @@
 class {'java':
-  version => '7',
-  updateVersion => '71'
+  version => '8',
+  updateVersion => '25'
 }
