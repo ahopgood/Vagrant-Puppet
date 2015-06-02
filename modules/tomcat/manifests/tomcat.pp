@@ -17,5 +17,6 @@ class { 'tomcat':
     logging_directory =>  '/var/log/tomcat7',
 	major_version => '7',
     minor_version => '44',
-    port => '8080'
+    port => '8080',
+    java_opts => "-Xms128m"
 }

@@ -32,10 +32,10 @@ Features to be implemented:
 * Support multiple major versions of tomcat
 ** Cannot support multiple minor versions of tomcat on same install
 * Have vm args set in the setenv.sh file
-* Enable proxying via tomcat
-** Http version as a module parameter
+* Enable proxying via tomcat args
+** Http address as a module parameter
 ** Not set if not a module parameter
-** Https version
+** Https address as a module parameter
 ** Not set if not a module parameter
 * Tidy up of expanded zip file
 * Tidy up of zip file

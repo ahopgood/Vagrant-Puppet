@@ -17,7 +17,8 @@ class tomcat (
   $logging_directory = "/var/log/tomcat",
   $major_version = "7",
   $minor_version = "54",
-  $port = null ) {
+  $port = null,
+  $java_opts = null ) {
 
 require java
   notify {
@@ -38,6 +39,7 @@ require java
   $tomcat_user          = "${tomcat_short_ver}"
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
+  $tomcat_env_file		= "setenv.sh" 
   
   if $::operatingsystem == 'CentOS' {
     notify {    "Using operating system:$::operatingsystem": }
@@ -128,7 +130,8 @@ require java
     target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
   }
   
-  if ("${port}" != null){
+  if ("${port}" != null){ 
+  	#Create an iptables (firewall) exception, persist and restart iptables 
 	service { "iptables":
     	enable  =>  true,
     	ensure  => running,
@@ -164,8 +167,20 @@ require java
     group   =>  ["${tomcat_group}"],      
     require =>  File["${tomcat_install_dir}"],
     notify  =>  Service["${tomcat_service_file}"],
-  } 
+  }
 
+if (  "${java_opts}" != null ){  
+  file { ["${tomcat_env_file}"] :
+  	path	=>	"${catalina_home}/bin/${tomcat_env_file}",
+  	content	=>	template("${module_name}/${tomcat_env_file}.erb"),
+	ensure  =>  present,
+    mode    =>  0755,
+    owner   =>  ["${tomcat_user}",'vagrant'],
+    group   =>  ["${tomcat_group}"],      
+    require =>  File["${tomcat_install_dir}"],
+    notify  =>  Service["${tomcat_service_file}"],
+  }
+}
   #set the service to start at boot, to verify you can run chkconfig --list tomcat
   service { ["${tomcat_service_file}"]:
     ensure  =>  running,
