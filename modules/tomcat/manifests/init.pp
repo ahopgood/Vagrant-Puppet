@@ -18,7 +18,8 @@ class tomcat (
   $major_version = "7",
   $minor_version = "54",
   $port = null,
-  $java_opts = null ) {
+  $java_opts = null,
+  $catalina_opts = null ) {
 
 require java
   notify {
