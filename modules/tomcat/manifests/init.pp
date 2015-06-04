@@ -93,7 +93,7 @@ require java
   }
 
 #Fails on rerun if move has already happened, need to make it 
-  exec {  "Rename to tomcat7":
+  exec {  "Rename to ${tomcat_short_ver}":
     path      =>  "/bin/",
     cwd       =>  "${tomcat_install_dir}",
     command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver} ${catalina_home}",
@@ -105,7 +105,7 @@ require java
   exec {  "Set folder permissions":
     path      =>  "/bin/",
     command   =>  "chmod -R 755 ${catalina_home}",
-    require   =>  Exec["Rename to tomcat7"],
+    require   =>  Exec["Rename to ${tomcat_short_ver}"],
   }
    
   file {  "Set JAVA_HOME":
