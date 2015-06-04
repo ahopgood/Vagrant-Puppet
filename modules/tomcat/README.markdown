@@ -18,6 +18,7 @@ This is the tomcat module. It provides...
 * Supports only tomcat 7.0.54
 
 Features to be implemented:
+* Upgrade of existing installation needed
 * GUI manager user
 ** Remove the default script manager user
 ** If username is not present then no user is created

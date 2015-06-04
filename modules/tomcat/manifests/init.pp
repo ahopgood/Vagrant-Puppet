@@ -92,20 +92,30 @@ require java
     require   =>  File[ "${tomcat_file}" ],
   }
 
-#Fails on rerun if move has already happened, need to make it 
+  file {  "Create ${tomcat_short_ver} directory":
+    path      =>  "${catalina_home}",
+    ensure    =>  directory,
+    mode	  =>  0777,
+    owner     =>  "${tomcat_user}",
+    group     =>  "${tomcat_group}",
+    require   =>  Exec["Unpack tomcat archive"],
+  }
+
   exec {  "Rename to ${tomcat_short_ver}":
     path      =>  "/bin/",
     cwd       =>  "${tomcat_install_dir}",
-    command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver} ${catalina_home}",
+    command   =>  "cp -R ${tomcat_install_dir}${tomcat_full_ver}/* ${catalina_home}",
     user      =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
-    require   =>  Exec["Unpack tomcat archive"],
+    #require   =>  Exec["Unpack tomcat archive"],
+    require   =>  File["Create ${tomcat_short_ver} directory"],
   }
 
   exec {  "Set folder permissions":
     path      =>  "/bin/",
     command   =>  "chmod -R 755 ${catalina_home}",
     require   =>  Exec["Rename to ${tomcat_short_ver}"],
+    notify	  =>  Service["${tomcat_service_file}"],
   }
    
   file {  "Set JAVA_HOME":
@@ -161,7 +171,7 @@ require java
   #Tomcat service startup script
   file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
-    content =>  template("${module_name}/${tomcat_service_file}.erb"),
+    content =>  template("${module_name}/tomcat.erb"),
     ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],
