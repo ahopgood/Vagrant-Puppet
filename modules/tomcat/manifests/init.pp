@@ -18,8 +18,8 @@ class tomcat (
   $major_version = "7",
   $minor_version = "54",
   $port = null,
-  $java_opts = null,
-  $catalina_opts = null ) {
+  $java_opts = "",
+  $catalina_opts = "" ) {
 
 require java
   notify {
@@ -30,7 +30,7 @@ require java
   $puppet_file_dir      = "modules/${module_name}/"
   
   $tomcat_install_dir   = "/var/hosting/"
-  $tomcat_full_ver      = "apache-tomcat-${major_version}.0.54"
+  $tomcat_full_ver      = "apache-tomcat-${major_version}.0.${minor_version}"
   $tomcat_tar           = "${tomcat_full_ver}.tar"
   $tomcat_file          = "${tomcat_tar}.gz"
   $tomcat_short_ver     = "tomcat7"
@@ -170,7 +170,7 @@ require java
     notify  =>  Service["${tomcat_service_file}"],
   }
 
-if (  "${java_opts}" != null ){  
+#if (  "${java_opts}" != "" && "${catalina_opts}" !="" ){  
   file { ["${tomcat_env_file}"] :
   	path	=>	"${catalina_home}/bin/${tomcat_env_file}",
   	content	=>	template("${module_name}/${tomcat_env_file}.erb"),
@@ -181,7 +181,7 @@ if (  "${java_opts}" != null ){
     require =>  File["${tomcat_install_dir}"],
     notify  =>  Service["${tomcat_service_file}"],
   }
-}
+#}
   #set the service to start at boot, to verify you can run chkconfig --list tomcat
   service { ["${tomcat_service_file}"]:
     ensure  =>  running,

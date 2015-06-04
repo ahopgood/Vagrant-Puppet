@@ -16,7 +16,7 @@ class { 'tomcat':
     tomcat_manager_password =>  'adminadmin',
     logging_directory =>  '/var/log/tomcat7',
 	major_version => '7',
-    minor_version => '44',
+    minor_version => '54',
     port => '8080',
-    java_opts => "-Xms128m"
+    java_opts => "-Xms512m -Xmx1024m -XX:MaxPermSize=512m -Xss128k"
 }
