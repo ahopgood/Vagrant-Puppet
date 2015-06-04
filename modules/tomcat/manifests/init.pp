@@ -33,7 +33,7 @@ require java
   $tomcat_full_ver      = "apache-tomcat-${major_version}.0.${minor_version}"
   $tomcat_tar           = "${tomcat_full_ver}.tar"
   $tomcat_file          = "${tomcat_tar}.gz"
-  $tomcat_short_ver     = "tomcat7"
+  $tomcat_short_ver     = "tomcat${major_version}"
  
   $tomcat_service_file  = "${tomcat_short_ver}"
   $tomcat_group         = "${tomcat_short_ver}"
@@ -188,6 +188,15 @@ require java
     enable  =>  true,
     require =>  [File["${tomcat_service_file}"],File["Set CATALINA_HOME"]]
   }  
+
+  file { ["uninstall-tomcat-${major_version}-${minor_version}.sh"]:
+	path	=>	"${tomcat_install_dir}uninstall-tomcat-${major_version}-${minor_version}.sh",
+	ensure	=> 	present,
+	content => template("${module_name}/uninstall.sh.erb"),
+    mode    =>  0755,
+    owner   =>  ["${tomcat_user}",'vagrant'],
+    group   =>  ["${tomcat_group}"],      	
+  }
 
   #Create a user template x
   #Create a start up script x
