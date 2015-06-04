@@ -1,0 +1,15 @@
+#stop service
+sudo /etc/init.d/<%= @tomcat_short_ver %> stop
+
+#remove service
+sudo rm /etc/init.d/<%= @tomcat_short_ver %>
+
+#remove archive
+rm <%= @tomcat_install_dir %><%= @tomcat_file%>
+
+#remove expanded archive
+sudo rm -rf <%= @tomcat_install_dir %><%= @tomcat_full_ver%>
+#remove install directory
+sudo rm -rf <%= @tomcat_short_ver %>
+
+
