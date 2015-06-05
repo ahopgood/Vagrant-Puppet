@@ -12,8 +12,8 @@
 #
 
 class tomcat (
-  $tomcat_manager_username = "manager",
-  $tomcat_manager_password = "manager",
+  $tomcat_manager_username = "",
+  $tomcat_manager_password = "",
   $tomcat_script_manager_username = "",
   $tomcat_script_manager_password = "",
   
@@ -25,10 +25,10 @@ class tomcat (
   $catalina_opts = "" ) {
 
 require java
+  
   notify {
     "${module_name} installation completed":
-  }
-  
+  }  
 
   $puppet_file_dir      = "modules/${module_name}/"
   
@@ -139,11 +139,16 @@ require java
   
   #Link a specified folder to the tomcat/log folder
   #How to ensure the link can be created when the parent folder(s) doesn't exist.
-  file { $logging_directory:
+  file { "/var/log/${tomcat_short_ver}":
     ensure  =>  link,
     target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
   }
-  
+
+  file { "/usr/bin/${tomcat_short_ver}":
+    ensure  =>  link,
+    target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/bin",
+  }
+
   if ("${port}" != null){ 
   	#Create an iptables (firewall) exception, persist and restart iptables 
 	service { "iptables":
@@ -182,8 +187,7 @@ require java
     require =>  File["${tomcat_install_dir}"],
     notify  =>  Service["${tomcat_service_file}"],
   }
-
-#if (  "${java_opts}" != "" && "${catalina_opts}" !="" ){  
+  
   file { ["${tomcat_env_file}"] :
   	path	=>	"${catalina_home}/bin/${tomcat_env_file}",
   	content	=>	template("${module_name}/${tomcat_env_file}.erb"),
@@ -194,7 +198,7 @@ require java
     require =>  File["${tomcat_install_dir}"],
     notify  =>  Service["${tomcat_service_file}"],
   }
-#}
+
   #set the service to start at boot, to verify you can run chkconfig --list tomcat
   service { ["${tomcat_service_file}"]:
     ensure  =>  running,
@@ -212,16 +216,10 @@ require java
   }
 
   #Create a user template x
-  #Create a start up script x
-  #Set the startup script as a service x
   #Have the startup script initiated by either a user or a group with su permissions x
   #Set the ownership for the tomcat service to be the tomcat group? x
   #Set the ownership for the tomcat folder to be tomcat group x
-  #Set the logging directory as a symbolic link, ensure the directory exists first
   #Create a tomcat user variable x 
-  #Add a manager username parameter x
-  #Add a script-manager username and password
-  #Default to no users if the username or password values are null/empty
   #Pass in vm args into a setenv.sh file
   #Set the file permissions to be 755 throughout
   #Delete old files and folders if present
