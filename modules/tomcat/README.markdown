@@ -15,19 +15,22 @@ This is the tomcat module. It provides...
 * A port number can be passed as a module parameter.
 * Create an iptables firewall rule for a specified port parameter
 * Only tested to work on CentOS
-* Supports only tomcat 7.0.54
-
-Features to be implemented:
-* Upgrade of existing installation needed
-* GUI manager user
-** Remove the default script manager user
-** If username is not present then no user is created
-** If password is not present then no user is created
+* Supports only tomcat 6.0.xx and 7.0.xx
+* Performs upgrades of minor versions of existing installations 
 * Script manager user
 ** Username passed as a module parameter
+*** If username is not present then no user is created
 ** Password passed as a module parameter
-** If username is not present then no user is created
-** If password is not present then no user is created
+*** If password is not present then no user is created
+
+
+Features to be implemented:
+* GUI manager user
+** Username passed as a module parameter
+*** If username is not present then no user is created
+** Password passed as a module parameter
+*** If password is not present then no user is created
+
 * Pass in the install location as a module parameter
 ** Default to /var/hosting/tomcat7 if parameter is not present
 * Support multiple major versions of tomcat
@@ -38,5 +41,5 @@ Features to be implemented:
 ** Not set if not a module parameter
 ** Https address as a module parameter
 ** Not set if not a module parameter
-* Tidy up of expanded zip file
+* Tidy up of expanded zip file -> place in /usr dir and not in main filesystem
 * Tidy up of zip file

@@ -13,7 +13,10 @@
 
 class tomcat (
   $tomcat_manager_username = "manager",
-  $tomcat_manager_password = "manager", 
+  $tomcat_manager_password = "manager",
+  $tomcat_script_manager_username = "",
+  $tomcat_script_manager_password = "",
+  
   $logging_directory = "/var/log/tomcat",
   $major_version = "7",
   $minor_version = "54",
