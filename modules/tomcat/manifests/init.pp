@@ -24,12 +24,23 @@ class tomcat (
   $java_opts = "",
   $catalina_opts = "" ) {
 
-require java
+#require java
+   if ("${major_version}" == "8"){
+	  class { 'java': 
+	  	version => '7',
+	  	updateVersion => '71',
+	  }
+  } else {
+  	  class { 'java': 
+  	  	#default	  
+  	  }
+  }
   
   notify {
     "${module_name} installation completed":
   }  
 
+  #global vars
   $puppet_file_dir      = "modules/${module_name}/"
   
   $tomcat_install_dir   = "/var/hosting/"

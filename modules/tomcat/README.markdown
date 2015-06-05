@@ -18,7 +18,8 @@ This is the tomcat module. It provides...
 * A port number can be passed as a module parameter.
 * Create an iptables firewall rule for a specified port parameter
 * Only tested to work on CentOS
-* Supports only tomcat 6.0.xx and 7.0.xx
+* Supports multiple major versions of tomcat 
+	* 6.0.xx, 7.0.xx and 8.0.xx
 	* Cannot support multiple minor versions of tomcat on same install
 * Performs upgrades of minor versions of existing installations 
 * Script manager user
@@ -32,7 +33,6 @@ This is the tomcat module. It provides...
 	* Symbolic link from /usr/bin/tomcatx to /var/hosting/tomcatx/bin
 
 Features to be implemented:
-* Support multiple major versions of tomcat
 * Have vm args set in the setenv.sh file
 * Enable proxying via tomcat args
 ** Http address as a module parameter
