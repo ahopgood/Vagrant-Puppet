@@ -12,4 +12,6 @@ sudo rm -rf <%= @tomcat_install_dir %><%= @tomcat_full_ver%>
 #remove install directory
 sudo rm -rf <%= @tomcat_short_ver %>
 
-
+#Remove logging and bin symbolic links
+sudo rm /var/log/<%= @tomcat_short_ver %>
+sudo rm /usr/bin/<%= @tomcat_short_ver %>
