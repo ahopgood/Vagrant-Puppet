@@ -1,12 +1,12 @@
-#!/bin/bash  
-# description: Tomcat Start Stop Restart  
-# processname: tomcat  
-# chkconfig: 234 20 80  
-#JAVA_HOME=/usr/java/jdk1.7.0_05  
-#export JAVA_HOME  
-#PATH=$JAVA_HOME/bin:$PATH  
-#export PATH  
-CATALINA_HOME=<%= @catalina_home%>  
+#!/bin/bash
+# description: Tomcat Start Stop Restart
+# processname: tomcat
+# chkconfig: 234 20 80
+#JAVA_HOME=/usr/java/jdk1.7.0_05
+#export JAVA_HOME
+#PATH=$JAVA_HOME/bin:$PATH
+#export PATH
+CATALINA_HOME=<%= @catalina_home%>
 export CATALINA_HOME
  
  #Load global variables from file
@@ -15,21 +15,21 @@ export CATALINA_HOME
 	echo "CATALINA_HOME is not set"
 	exit 1
  fi
- 
-case $1 in  
-start)  
+  
+case $1 in
+start)
 echo $CATALINA_HOME
 echo Post Catalina home printout
 echo $JAVA_HOME
 echo Post Java home printout
-sh $CATALINA_HOME/bin/startup.sh  
-;;   
-stop)     
-sh $CATALINA_HOME/bin/shutdown.sh  
-;;   
-restart)  
-sh $CATALINA_HOME/bin/shutdown.sh  
-sh $CATALINA_HOME/bin/startup.sh  
-;;   
-esac      
-exit 0  
+sh $CATALINA_HOME/bin/startup.sh
+;;
+stop)
+sh $CATALINA_HOME/bin/shutdown.sh
+;;
+restart)
+sh $CATALINA_HOME/bin/shutdown.sh
+sh $CATALINA_HOME/bin/startup.sh
+;;
+esac
+exit 0

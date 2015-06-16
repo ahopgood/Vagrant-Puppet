@@ -11,6 +11,13 @@ CATALINA_HOME=<%= @catalina_home%>
 export CATALINA_HOME
 
 tomcat=<%= @tomcat_user%>
+
+ #Load global variables from file
+#[-f/etc/profile.d/catalina-home.sh]&&./etc/profile.d/catalina-home.sh
+# if[-z "$CATALINA_HOME"]; then
+#	echo "CATALINA_HOME is not set"
+#	exit 1
+# fi
   
 case $1 in  
 start)  
