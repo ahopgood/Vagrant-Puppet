@@ -91,10 +91,21 @@ class java (
   #jdk-1.7.0_71-fcs.x86_64
   #jdk-1.6.0_45-fcs.x86_64
   #jdk-1.5.0_22-fcs.x86_64
+  #32-bit
+  #jdk1.8.0_25-1.8.0_25-fcs.i586
+  #jdk-1.7.0_71-fcs.i586
+  #jdk-1.6.0_45-fcs.i586
+  #jdk-1.5.0_22-fcs.i586
   
   
+  #Puppet package names
   #annoyingly the package name for 1.8 is jdk1.8.0_25
-  #then more annoyingly the package name for 1.7 is jdk
+  #then more annoyingly the package names for 1.7, 1.6 and 1.5 are jdk
+  #Ensure vale:
+  #1.8 is 1.8.0_25-fcs
+  #1.7 is 1.7.0_71-fcs
+  #1.6 is 1.6.0_45-fcs
+  #1.5 is 1.5.0_22-fcs
   #this means java 8 will not replace 6 or 7 due to the differing packaging names
   
   package {
