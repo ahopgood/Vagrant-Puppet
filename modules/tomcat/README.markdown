@@ -39,3 +39,9 @@ Features to be implemented:
 ** Not set if not a module parameter
 ** Https address as a module parameter
 ** Not set if not a module parameter
+
+
+##Errors##
+###Tomcat script cannot be found, bash code 127###
+This is due to the tomcat.erb file not being formatted in the unix filesystem.
+Run a utility such as dos2unix to fix this.
