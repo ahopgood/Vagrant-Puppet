@@ -162,6 +162,12 @@ class tomcat (
 
   if ("${port}" != null){ 
   	#Create an iptables (firewall) exception, persist and restart iptables 
+  class { 'iptables':
+    port => "${port}",
+    require => File["Set CATALINA_HOME"]
+  }
+
+	/* 
 	service { "iptables":
     	enable  =>  true,
     	ensure  => running,
@@ -178,7 +184,8 @@ class tomcat (
   		command		=> "service iptables save",
   		notify   	=>  Service["iptables"],
   		require		=> Exec["tomcat-port"]
-  	}
+  	}  	
+  	*/
   }
 
   file {  "${tomcat_users}":

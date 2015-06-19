@@ -39,7 +39,7 @@ Features to be implemented:
 ** Not set if not a module parameter
 ** Https address as a module parameter
 ** Not set if not a module parameter
-
+* Have the tomcat service file start and stop tomcat as the tomcat user
 
 ##Errors##
 ###Tomcat script cannot be found, bash code 127###
