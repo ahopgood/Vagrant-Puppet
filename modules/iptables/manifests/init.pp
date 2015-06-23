@@ -25,26 +25,25 @@ class iptables (
     $protocol = "udp"
   }
   
-  $iptableRule = "INPUT 1 -m state --state NEW -p ${protocol} --dport ${port} -j ACCEPT"
-  
-  service { "iptables":
-      enable  =>  true,
-      ensure  => running,
-  }  
+  $iptableRule = "INPUT 1 -m state --state NEW -p ${protocol} --dport ${port} -j ACCEPT" 
  
-  notify {"Found protocol ${protocol}":}
+  notify {"Found protocol ${protocol} and port ${port}":}
     
   exec { "add-port-exception":
     path    =>  "/sbin/",
     command   =>  "iptables -I ${iptableRule}",
     onlyif => "iptables -C ${iptableRule}", #check the rules doesn't already exist
-    require => Service["iptables"],
   }
   
   exec { "save-ports":
     path    =>  "/sbin/",
     command   => "service iptables save",
     notify    =>  Service["iptables"],
-    require   => Exec["add-ort-exception"]
+    require   => Exec["add-port-exception"]
   }
+  
+  service { "iptables":
+      enable  =>  true,
+      ensure  => running,
+  } 
 }
