@@ -32,7 +32,7 @@ class iptables (
   exec { "add-port-exception":
     path    =>  "/sbin/",
     command   =>  "iptables -I ${iptableRule}",
-    onlyif => "iptables -C ${iptableRule}", #check the rules doesn't already exist
+    onlyif => "iptables -C ${iptableRule}", #check the rule doesn't already exist
   }
   
   exec { "save-ports":

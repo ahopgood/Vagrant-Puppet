@@ -18,26 +18,49 @@ RETVAL=0
 
 PUPPET_OPTS="master "
 
+function getPid() {
+	echo `ps aux | grep 'puppet master' | grep -v 'grep' | awk '{ print $2 }'`
+}
+
 case $1 in  
 start)
 	echo -n $"Starting puppet master: "
-	daemon $puppetd ${PUPPET_OPTS}
+	/usr/bin/puppet master
+	echo "Pid $(getPid)"
 ;;
 
 stop)
-	echo -n $"Stopping puppet master: "
-	killproc $puppetd
+	echo "Stopping puppet master $(getPid):"
+#	killproc $puppetd
+	if [ -n $(getPid) ]; then
+		echo "Trying to kill pid $(getPid)"
+		kill -9 $(getPid)
+	fi
+	if [ -z $(getPid) ]; then
+		echo "Puppet master successfully killed"
+	fi		
 ;;
 
 restart)
-	echo -n $"Restarting puppet master: "
-	killproc $puppetd -HUP
+	echo "Restarting puppet master $(getPid): "
+#	killproc $puppetd -HUP
+	if [ -n $(getPid) ]; then
+		echo "Trying to kill pid $(getPid)"
+		kill -9 $(getPid)
+	fi
+	if [ -z $(getPid) ]; then
+		echo "Puppet master successfully killed"
+	fi	
+	echo -n $"Starting puppet master: "
+	/usr/bin/puppet master
+	echo "Pid $(getPid)"
 ;;
 
   
 status)
 	echo -n $"Puppet master status:"
 	status $puppetd
+;;
    
 esac      
 exit 0  

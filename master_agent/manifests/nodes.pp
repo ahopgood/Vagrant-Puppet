@@ -10,12 +10,11 @@ node 'agentdb' {
 node 'agentweb' {
   notify {  'Configuring the management of the web application server': }
   
-  class { 'tomcat::tomcat7':
+  class { 'tomcat':
     tomcat_manager_username =>  'admin',
     tomcat_manager_password =>  'adminadmin',
     logging_directory       =>  '/var/log/tomcat7',
   }
-   
 }
 
 node 'agent.vm' {
