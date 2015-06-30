@@ -25,6 +25,8 @@ class tomcat (
   $catalina_opts = "" ) {
 
 #require java
+  Class['java'] -> Class['tomcat']
+/**
    if ("${major_version}" == "8"){
 	  class { 'java': 
 	  	version => '7',
@@ -35,7 +37,8 @@ class tomcat (
   	  	#default	  
   	  }
   }
-  
+  */
+   
   notify {
     "${module_name} installation completed":
   }  

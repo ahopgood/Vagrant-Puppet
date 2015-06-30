@@ -11,6 +11,11 @@
 # Sample Usage:
 #
 
+class { 'java':
+  version => '7',
+  updateVersion => '71'
+}
+
 class { 'tomcat':
 	tomcat_manager_username =>  'admin',
     tomcat_manager_password =>  'adminadmin',
