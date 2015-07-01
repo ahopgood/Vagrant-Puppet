@@ -24,21 +24,9 @@ class tomcat (
   $java_opts = "",
   $catalina_opts = "" ) {
 
-#require java
+  #Java required
   Class['java'] -> Class['tomcat']
-/**
-   if ("${major_version}" == "8"){
-	  class { 'java': 
-	  	version => '7',
-	  	updateVersion => '71',
-	  }
-  } else {
-  	  class { 'java': 
-  	  	#default	  
-  	  }
-  }
-  */
-   
+     
   notify {
     "${module_name} installation completed":
   }  
@@ -57,7 +45,7 @@ class tomcat (
   $tomcat_user          = "${tomcat_short_ver}"
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
-  $tomcat_env_file		= "setenv.sh" 
+  $tomcat_env_file		  = "setenv.sh" 
   
   if $::operatingsystem == 'CentOS' {
     notify {    "Using operating system:$::operatingsystem": }
@@ -165,36 +153,28 @@ class tomcat (
 
   if ("${port}" != null){ 
   	#Create an iptables (firewall) exception, persist and restart iptables 
-  class { 'iptables':
-    port => "${port}",
-    require => File["Set CATALINA_HOME"]
-  }
-
-	/* 
-	service { "iptables":
-    	enable  =>  true,
-    	ensure  => running,
-    	require => File["Set CATALINA_HOME"]
-  	}  
- 
-  	exec { "tomcat-port":
-    	path		=>  "/sbin/",
-    	command		=>  "iptables -I INPUT 1 -m state --state NEW -p tcp --dport ${port} -j ACCEPT",
-  	}
-  
-  	exec { "save-ports":
-  		path		=>	"/sbin/",
-  		command		=> "service iptables save",
-  		notify   	=>  Service["iptables"],
-  		require		=> Exec["tomcat-port"]
-  	}  	
-  	*/
+    class { 'iptables':
+      port => "${port}",
+      require => File["Set CATALINA_HOME"]
+    }
   }
 
   file {  "${tomcat_users}":
     content => template("${module_name}/tomcat-users.xml.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"]
+  }
+  
+  if ("${java_opts}" == '') {
+    $setenv_java_opts     = "" 
+  } else {
+    $setenv_java_opts     = "export JAVA_OPTS=\"${java_opts}\""
+  }
+  
+  if ("${catalina_opts}" == '') {
+    $setenv_catalina_opts = ""    
+  } else {
+    $setenv_catalina_opts = "export CATALINA_OPTS=\"${catalina_opts}\""
   }
 
   #Tomcat service startup script
@@ -212,7 +192,7 @@ class tomcat (
   file { ["${tomcat_env_file}"] :
   	path	=>	"${catalina_home}/bin/${tomcat_env_file}",
   	content	=>	template("${module_name}/${tomcat_env_file}.erb"),
-	ensure  =>  present,
+	  ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],
     group   =>  ["${tomcat_group}"],      
@@ -228,12 +208,12 @@ class tomcat (
   }  
 
   file { ["uninstall-tomcat-${major_version}-${minor_version}.sh"]:
-	path	=>	"${tomcat_install_dir}uninstall-tomcat-${major_version}-${minor_version}.sh",
-	ensure	=> 	present,
-	content => template("${module_name}/uninstall.sh.erb"),
-    mode    =>  0755,
-    owner   =>  ["${tomcat_user}",'vagrant'],
-    group   =>  ["${tomcat_group}"],      	
+	   path	=>	"${tomcat_install_dir}uninstall-tomcat-${major_version}-${minor_version}.sh",
+	   ensure	=> 	present,
+	   content => template("${module_name}/uninstall.sh.erb"),
+     mode    =>  0755,
+     owner   =>  ["${tomcat_user}",'vagrant'],
+     group   =>  ["${tomcat_group}"],      	
   }
 
   #Create a user template x
