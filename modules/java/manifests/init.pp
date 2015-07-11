@@ -17,7 +17,7 @@
 # Sample Usage:
 #
 class java (
-	$is64bit = true,
+#	$is64bit = true,
 	#$isJdk = true,
 	$version = "6",
 	$updateVersion = "45") {
@@ -27,7 +27,7 @@ class java (
   $puppet_file_dir    = "modules/java/"
   
   #Check file exists either in the puppet file server or locally in a vagrant shared folder   
-
+  $is64bit = true
   #package names are a pain
   #puppet resource package | grep -A10 packagename
   #Will help to identify the title and ensures values of a package
