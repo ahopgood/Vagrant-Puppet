@@ -12,17 +12,17 @@
 #
 
 class tomcat (
-  $tomcat_manager_username = "",
-  $tomcat_manager_password = "",
-  $tomcat_script_manager_username = "",
-  $tomcat_script_manager_password = "",
+  $tomcat_manager_username = '',
+  $tomcat_manager_password = '',
+  $tomcat_script_manager_username = '',
+  $tomcat_script_manager_password = '',
   
-  $logging_directory = "/var/log/tomcat",
+  $logging_directory = '/var/log/tomcat',
   $major_version = "7",
   $minor_version = "54",
   $port = null,
-  $java_opts = "",
-  $catalina_opts = "" ) {
+  $java_opts = '',
+  $catalina_opts = '' ) {
 
   #Java required
   Class['java'] -> Class['tomcat']

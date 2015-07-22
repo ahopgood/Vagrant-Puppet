@@ -23,7 +23,7 @@ class { 'tomcat':
 	  major_version => '7',
     minor_version => '54',
     port => '8080',
-    #java_opts => "-Xms512m -Xmx1024m -XX:MaxPermSize=512m"
+    java_opts => "-Xms512m -Xmx1024m -XX:MaxPermSize=512m",
     #Notes
     # Java_Opts are causing issues with service shutdown
     # -Xss128k invalid stack thread stack size error when used and running service stop
