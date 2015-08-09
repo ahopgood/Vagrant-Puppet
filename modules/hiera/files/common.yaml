@@ -1,0 +1,15 @@
+java::version: 6
+java::updateVersion: 45
+java::is64bit: true
+
+#tomcat::tomcat_manager_username: ''
+#tomcat::tomcat_manager_password: '',
+#tomcat::tomcat_script_manager_username: '',
+#tomcat::tomcat_script_manager_password: '',
+  
+#tomcat::logging_directory: '/var/log/tomcat',
+#tomcat::major_version: "7",
+#tomcat::minor_version: "54",
+#tomcat::port: null,
+#tomcat::java_opts: '',
+#tomcat::catalina_opts: ''
