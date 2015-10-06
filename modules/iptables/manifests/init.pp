@@ -25,14 +25,17 @@ class iptables (
     $protocol = "udp"
   }
   
-  $iptableRule = "INPUT 1 -m state --state NEW -p ${protocol} --dport ${port} -j ACCEPT" 
+  $iptableInputLevel = "INPUT 1 "
+  $iptableRule = "-p ${protocol} -m state --state NEW --dport ${port} -j ACCEPT" 
  
   notify {"Found protocol ${protocol} and port ${port}":}
     
   exec { "add-port-exception":
     path    =>  "/sbin/",
-    command   =>  "iptables -I ${iptableRule}",
-    onlyif => "iptables -C ${iptableRule}", #check the rule doesn't already exist
+    command   =>  "iptables -I ${iptableInputLevel}${iptableRule}",
+    #No proof the onlyif bit works
+    #onlyif => "iptables --list-rules | /bin/grep -- ${port}", #check the rule doesn't already exist
+    unless => "iptables --list-rules | /bin/grep -- ${port}", #check the rule doesn't already exist
   }
   
   exec { "save-ports":
