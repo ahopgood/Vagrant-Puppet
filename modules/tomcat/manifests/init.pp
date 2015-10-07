@@ -45,6 +45,7 @@ class tomcat (
   $tomcat_user          = "${tomcat_short_ver}"
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
+  $tomcat_server_config = "${catalina_home}/conf/server.xml"
   $tomcat_env_file		  = "setenv.sh" 
   
   if $::operatingsystem == 'CentOS' {
@@ -163,6 +164,12 @@ class tomcat (
     content => template("${module_name}/tomcat-users.xml.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"]
+  }
+  
+  file { "${tomcat_server_config}":
+    content => template("${module_name}/server.xml.erb"),
+    require =>  File["Set CATALINA_HOME"],
+    notify  =>  Service["${tomcat_service_file}"] 
   }
   
   if ("${java_opts}" == '') {
