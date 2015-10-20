@@ -1,1 +1,4 @@
+class {'mysql':}
+
 class {'kanboard':}
+

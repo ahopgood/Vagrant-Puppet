@@ -15,9 +15,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.network "private_network", ip: "192.168.33.10", auto_config: true
     
   # config.vm.synced_folder "../data", "/vagrant_data"
+#	config.vm.synced_folder ".", 	"/var/www"
 	config.vm.synced_folder "../", 	"/etc/puppet/modules"
-#	config.vm.synced_folder ".", 	"/var/www"  	
-#	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
+	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
+
+
 
 # 	config.vm.provision :shell, :path => "files/install.sh"    
   # Enable provisioning with Puppet stand alone.  Puppet manifests
@@ -25,9 +27,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # You will need to create the manifests directory and a manifest in
   # the file default.pp in the manifests_path directory.
 
-#  config.vm.provision "puppet" do |puppet|
-#  	puppet.manifests_path = "manifests"
-#  	puppet.manifest_file  = "init.pp"
-#  	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
-#  end
+  config.vm.provision "puppet" do |puppet|
+  	puppet.manifests_path = "manifests"
+  	puppet.manifest_file  = "init.pp"
+  	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
+  end
 end
