@@ -53,7 +53,7 @@ class mysql {
   }
   
   package {
-    'mysql-libs-5.1.71-1.el6.x86_64':
+    'mysql-libs':
     ensure      =>  absent,
     provider    =>  'rpm',
     require     =>  Package['MySQL-shared-compat'],
