@@ -10,14 +10,40 @@
 #
 # Sample Usage:
 #
-class kanboard {
-  #mysql
+class kanboard (
+  $backup_path="/vagrant/files/") {
+  
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+  $puppet_file_dir = "modules/kanboard/"
+  $httpd_file = "httpd-2.2.15-47.el6.centos.x86_64.rpm"
   
   Class['mysql'] -> Class['kanboard']
      
-  package {"httpd":
+  Package["httpd"] -> Package["php"] ->
+  Package["php-mbstring"] -> Package["php-pdo"] ->
+  Package["php-gd"] -> Package["php-mysql"]-> 
+  Package["unzip"] -> Package["wget"] ->
+  Exec["install"] -> Augeas["php.ini"]
+  
+  file {
+    "${local_install_dir}":
+    path       =>  "${local_install_dir}",
+    ensure     =>  directory,
+  }
+    
+  file{"${httpd_file}":
+#    require => File["${local_install_dir}"],
+    path => "${local_install_dir}${httpd_file}",
     ensure => present,
-    provider => 'yum'
+    source => ["puppet:///${puppet_file_dir}${httpd_file}"]
+  }
+   
+  package {"httpd":
+    ensure => present, #will require the yum / puppet resource package name
+    provider => 'yum',
+    source => "${local_install_dir}${httpd_file}",
+    require => File["${httpd_file}"],
     #version 2.2.15
   }
   package {"php":
@@ -54,7 +80,6 @@ class kanboard {
     #1.12
   }
   
-  $puppet_file_dir    = "modules/kanboard/"
   file{"install.sh":
     ensure => present,
     path => "/usr/local/bin/install.sh",
@@ -74,6 +99,45 @@ class kanboard {
     "httpd":
     ensure => running,
     enable => true
+  }
+  
+  augeas { 
+    "php.ini":
+    context => "/files/etc/php.ini/PHP/",
+    changes => [
+      "set short_open_tag On",      
+    ],
+    notify => Service["httpd"],
+    require => Package["php"],
+  }
+  
+  $dbtype = "mysql"
+  $dbusername = "root"
+  $dbpassword = "root"
+  $dbname = "kanboard" 
+  
+#  file{"config.php":
+#    path => "/var/www/html/kanboard/config.php",
+#    content => template("${module_name}/config.default.php.erb"),
+#    ensure => present,
+#    mode => 0755,
+#    owner => "apache",
+#    group => "apache",
+#    notify => service["httpd"]
+#  }
+
+  
+  #Need to add date and time to the backup scripts.
+  #Need to have the script run on a cron tab
+  #/usr/bin/crontab
+  # DATE=$(date +"%d-%m-%Y-%H-%M")
+  #$(date +"%Y-%m-%d-%H-%M").sql
+  
+  exec{"Schedule_db_backup":
+    require => Exec["install"],
+    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
+    command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}test.sql",
+    path => "/usr/bin/", 
   }
   
   notify {
