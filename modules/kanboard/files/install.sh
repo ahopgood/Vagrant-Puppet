@@ -15,7 +15,10 @@ chown -R apache:apache kanboard/data
 # Use the iptable module here
 sudo /etc/init.d/iptables stop
 
-sudo mysql-uroot -proot < create database kanboard;
+#sudo mysql -uroot -proot < "create database kanboard"
+#echo "create database kanboard" | mysql -uroot -proot;
+
+#mysql -uroot -proot kanboard < /vagrant/files/2015-10-25-kanboardbackup.sql
 
 #Create a config.php.erb file.
 #cp kanboard/default.config.php kanboard/config.php
