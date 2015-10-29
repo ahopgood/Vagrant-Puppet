@@ -11,8 +11,11 @@
 # Sample Usage:
 #
 class kanboard (
-  $backup_path="/vagrant/files/") {
+  $backup_path="/vagrant/files/backups/") {
   
+  #1. Have unzip operate as an exec call
+  #2. Have chown operate as an exec call
+
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/kanboard/"
@@ -24,12 +27,14 @@ class kanboard (
   $php_pdo_file = "php-pdo-5.3.3-46.el6_6.x86_64.rpm"
   $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
   $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
-
+  $patch_file = "patch-2.6-6.el6.x86_64.rpm"
+ 
   
   Package["httpd"] -> Package["php"] ->
   Package["php-mbstring"] -> Package["php-pdo"] ->
   Package["php-gd"] -> Package["php-mysql"]-> 
   Package["unzip"] -> Package["wget"] ->
+  Package["patch"] ->
   Exec["install"] -> Augeas["php.ini"]
   
 #  file {
@@ -46,7 +51,8 @@ class kanboard (
     "${local_install_dir}${$php_mysql_file}",
     "${local_install_dir}${php_pdo_file}",
     "${local_install_dir}${unzip_file}",
-    "${local_install_dir}${wget_file}"]:
+    "${local_install_dir}${wget_file}",
+    "${local_install_dir}${patch_file}"]:
 #    require => File["${local_install_dir}"],
 #    path => "${local_install_dir}",
     ensure => present,
@@ -57,7 +63,8 @@ class kanboard (
       "puppet:///${puppet_file_dir}${$php_mysql_file}",
       "puppet:///${puppet_file_dir}${php_pdo_file}",
       "puppet:///${puppet_file_dir}${unzip_file}",
-      "puppet:///${puppet_file_dir}${wget_file}"]
+      "puppet:///${puppet_file_dir}${wget_file}",
+      "puppet:///${puppet_file_dir}${patch_file}"]
   }
    
   package {"httpd":
@@ -114,7 +121,13 @@ class kanboard (
     require => File["${local_install_dir}${httpd_file}"],
     #1.12
   }
-  
+  package {"patch":
+    ensure => present,
+    provider => 'yum',
+    source => "${local_install_dir}${patch_file}",
+    require => File["${local_install_dir}${patch_file}"],
+    #1.12
+  }
   file{"install.sh":
     ensure => present,
     path => "/usr/local/bin/install.sh",
@@ -166,31 +179,30 @@ class kanboard (
     path => "/usr/bin/", 
   }
 
-  exec{"Update_db_table":
-    require => Exec["Create_db_table"],
-    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
-    command => "mysql -uroot -proot kanboard < ${backup_path}2015-10-25-kanboardbackup.sql",
-    path => "/usr/bin/",
-    notify => Service["httpd"],
-  }
+#  exec{"Update_db_table":
+#    require => Exec["Create_db_table"],
+#    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
+#    command => "mysql -uroot -proot kanboard < ${backup_path}2015-10-25-kanboardbackup.sql",
+#    path => "/usr/bin/",
+#    notify => Service["httpd"],
+#  }
   
   file{"config.php":
-    require => Exec["Update_db_table"],
+#    require => Exec["Update_db_table"],
     path => "/var/www/html/kanboard/config.php",
     content => template("${module_name}/config.default.php.erb"),
     ensure => present,
     mode => 0755,
     owner => "apache",
     group => "apache",
-    notify => service["httpd"]
+    notify => Service["httpd"]
   }
   
-  exec{"Schedule_db_backup":
-    require => Exec["Update_db_table"],
-    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
-    command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}test.sql",
-    path => "/usr/bin/", 
-  }
+#  exec{"Schedule_db_backup":
+#    require => Exec["Update_db_table"],
+#    command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql",
+#    path => "/usr/bin/", 
+#  }
   
 
   notify {
