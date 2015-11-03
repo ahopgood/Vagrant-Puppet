@@ -125,6 +125,35 @@ class kanboard (
     ensure => running,
     enable => true
   }
+
+  $freetype_file = "freetype-2.3.11-15.el6_6.1.x86_64.rpm"
+  file{
+    "${local_install_dir}${$freetype_file}":
+    ensure => present,
+    source => ["puppet:///${puppet_file_dir}${freetype_file}",]
+  }  
+  package {"freetype":
+    ensure => present,
+    provider => 'rpm',
+    source => "${local_install_dir}${freetype_file}",
+    require => File["${local_install_dir}${freetype_file}"],
+    #version 5.3.3
+  }
+  
+  $libxpm_file = "libXpm-3.5.10-2.el6.x86_64.rpm"
+  file{
+    "${local_install_dir}${libxpm_file}":
+    ensure => present,
+    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
+  }
+  package {"libXpm":
+    ensure => present,
+    provider => 'rpm',
+    source => "${local_install_dir}${libxpm_file}",
+#    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
+    require => File["${local_install_dir}${libxpm_file}"],
+    #version 5.3.3
+  }
   
   $php_file = "php-5.3.3-46.el6_6.x86_64.rpm"
   $php_cli_file = "php-cli-5.3.3-46.el6_6.x86_64.rpm"
@@ -145,7 +174,7 @@ class kanboard (
     source => "${local_install_dir}${php_cli_file}",
     require => File["${local_install_dir}${php_cli_file}"],
     #version 5.3.3
-  }  
+  } 
   file{
     "${local_install_dir}${php_common_file}":
     ensure => present,
@@ -170,7 +199,6 @@ class kanboard (
     require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Package["httpd"]],
     #version 5.3.3
   }
-/* 
   file{
     "${local_install_dir}${php_mbstring_file}":
     ensure => present,
@@ -182,7 +210,6 @@ class kanboard (
     source => "${local_install_dir}${php_mbstring_file}",
     require => [File["${local_install_dir}${php_mbstring_file}"], Package["php-common"]],
   }  
-
   file{
     "${local_install_dir}${php_pdo_file}":
     ensure => present,
@@ -194,7 +221,6 @@ class kanboard (
     source => "${local_install_dir}${php_pdo_file}",
     require => [File["${local_install_dir}${php_pdo_file}"],Package["php-common"]],
   }
-
   file{
     "${local_install_dir}${php_gd_file}":
     ensure => present,
@@ -204,10 +230,9 @@ class kanboard (
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${php_gd_file}",
-    require => [File["${local_install_dir}${php_gd_file}"],Package["php-common"]],
+    require => [File["${local_install_dir}${php_gd_file}"], Package["php-common"], Package["freetype"], Package["libXpm"]],
     #2.0.34
-  } */
-/*
+  }
   file{
     "${local_install_dir}${php_mysql_file}":
     ensure => present,
@@ -220,7 +245,7 @@ class kanboard (
     require => [File["${local_install_dir}${php_mysql_file}"], Class["mysql"]],
     #5.1.73
   }
- */
+
 /*
   file{
     "${local_install_dir}${unzip_file}":
