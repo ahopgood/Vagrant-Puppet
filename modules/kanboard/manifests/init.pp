@@ -242,11 +242,10 @@ class kanboard (
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${php_mysql_file}",
-    require => [File["${local_install_dir}${php_mysql_file}"], Class["mysql"]],
+    require => [File["${local_install_dir}${php_mysql_file}"], Class["mysql"], Package["php-pdo"]],
     #5.1.73
   }
 
-/*
   file{
     "${local_install_dir}${unzip_file}":
     ensure => present,
@@ -285,7 +284,7 @@ class kanboard (
     require => File["${local_install_dir}${patch_file}"],
     #1.12
   }
-
+/*
   #Installers
   file{"install.sh":
     ensure => present,
