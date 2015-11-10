@@ -1,7 +1,7 @@
-class agent {
+class agent(
+  $master_name = "puppet",
+  $master_addr = "192.168.33.10") {
   #required to allow us to identify and communicate with the master node
-    $master_name = "puppet"
-    $master_addr = "192.168.33.10"
 
   host { "${master_name}":
     ip            =>  "${master_addr}",
@@ -11,6 +11,8 @@ class agent {
   service { "iptables":
     enable  =>  false,
     ensure  => stopped,
-  }  
+  }
+  
+  
 }
 include agent

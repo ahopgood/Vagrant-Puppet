@@ -25,11 +25,11 @@ class master_agent {
   host { "agent.vm":
     ip            =>  "192.168.33.13",
   }
-
+/*
   host { "agentweb.vm":
     ip            =>  "192.168.33.12",
   }
-  
+  */
   file {  "Set puppet ownership":
     path      =>  "/usr/bin/puppet",
     owner     =>  "vagrant",
