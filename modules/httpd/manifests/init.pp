@@ -12,16 +12,7 @@
 #
 class httpd {
 
-  $local_install_path = "/etc/puppet/"
-  $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/httpd/"
-
-  file {
-    "${local_install_dir}":
-    path       =>  "${local_install_dir}",
-    ensure     =>  directory,
-  } 
-
   
 #  Package["httpd"] -> Package["httpd-tools"] -> Package["mailcap"] ->
 #  Package["apr-util-ldap"] -> Package["apr-util"] -> Package["apr"] 
