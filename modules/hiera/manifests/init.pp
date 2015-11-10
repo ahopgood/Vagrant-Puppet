@@ -42,38 +42,4 @@ class hiera {
     source    =>  ["puppet:///${puppet_file_dir}${hiera_common}"],
     require   =>  File["${hiera_data}"],
   }
-  
-/*
-  exec {
-    "Setup hiera file":
-    command   =>  "ln -s /vagrant/hiera/hiera.yaml /etc/puppet/hiera.yaml",
-    path      =>  '/bin/',
-    cwd       =>  '/bin/',
-    onlyif    =>  "echo 1",
-#    onlyif    =>  "ls -l /etc/puppet | grep -c hiera.yaml",
-    before    =>  Exec['Setup hiera data folder']
-  }
- */
-/*  
-  exec {
-    "Setup hiera data folder":
-    command   =>  "mkdir /etc/puppet/hieradata",
-    path      =>  '/bin/',
-    cwd       =>  '/bin/',
-    before    =>  Exec['Setup hiera common file'],
-#    onlyif    =>  "mkdir /etc/puppet/hieradata",
-    onlyif    =>  "ls -l /etc/puppet | grep -c hieradata",
-  }
-   */
-   
-   /*
-  exec {
-    "Setup hiera common file":
-    command   =>  "ln -s /vagrant/hiera/common.yaml /etc/puppet/hieradata/common.yaml",
-    path      =>  '/bin/',
-    cwd       =>  '/bin/',
-#    onlyif    =>  "ln -s /vagrant/hiera/common.yaml /etc/puppet/hieradata/common.yaml",
-    onlyif    =>  "ls -l /etc/puppet/hieradata EEEEEEEEEa nk,,mmm| grep -c common.yaml",
-  }
-  */
 }
