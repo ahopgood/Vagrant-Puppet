@@ -17,7 +17,7 @@
 # Sample Usage:
 #
 class java (
-#	$is64bit = true,
+#	$is64bit = true, 
 	#$isJdk = true,
 	$version = "6",
 	$updateVersion = "45") {
@@ -33,7 +33,8 @@ class java (
   #Will help to identify the title and ensures values of a package
   #rpm -qa jdk
   #Will help to identify the names as far as rpm sees them
-
+  notify{"Java version from hiera ${version}":}
+   
 	#Derive rpm file from verion number, update number and platform type
   if ("${is64bit}" == 'true'){
   	if ("${version}" > 6){
@@ -61,10 +62,10 @@ class java (
   } elsif ("${version}" == 8){
   	$package_name  = "jdk1.${version}.0_${updateVersion}"
   	$uninstall_package = "jdk"
-	package {
+	 package {
   		"${uninstall_package}":
- 		ensure 	=> absent,
-  		provider => 'rpm'
+        ensure 	=> absent,
+  		  provider => 'rpm'
   	}
   } 
 
