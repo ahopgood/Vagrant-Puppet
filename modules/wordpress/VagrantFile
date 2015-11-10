@@ -6,8 +6,22 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "precise64"
+  	config.ssh.insert_key = false	#uses default insecure public key
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-  config.vm.network :private_network, ip: "192.168.33.21"
+  #config.vm.network :private_network, ip: "192.168.33.21"
+  #config.vm.network "public_network", ip: "192.168.0.27", mac: "5CA1AB1E0001"
+  config.vm.network "public_network", ip: "192.168.0.27"
   config.vm.provision :shell, :path => "files/install.sh"
   config.vm.synced_folder ".", "/var/www"
+  
+	config.vm.define "box" do |box|
+    	box.vm.box = "precise64"
+  		box.ssh.insert_key = false	#uses default insecure public key
+  		box.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  		#box.vm.network :private_network, ip: "192.168.33.21"
+  		#box.vm.network "public_network", ip: "192.168.0.27", mac: "5CA1AB1E0001"
+  		box.vm.network "public_network", ip: "192.168.0.27"
+  		box.vm.provision :shell, :path => "files/install.sh"
+  		box.vm.synced_folder ".", "/var/www"
+	end
 end
