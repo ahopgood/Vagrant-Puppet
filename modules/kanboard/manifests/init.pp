@@ -284,7 +284,7 @@ class kanboard (
     require => File["${local_install_dir}${patch_file}"],
     #1.12
   }
-/*
+
   #Installers
   file{"install.sh":
     ensure => present,
@@ -355,7 +355,6 @@ class kanboard (
 #    path => "/usr/bin/", 
 #  }
   
- */
   notify {
     "Kanboard":
   }
