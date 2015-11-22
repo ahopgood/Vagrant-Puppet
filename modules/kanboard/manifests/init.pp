@@ -285,10 +285,15 @@ class kanboard (
     #1.12
   }
 
+  $dbtype = "mysql"
+  $dbusername = "root"
+  $dbpassword = "root"
+  $dbname = "kanboard" 
+
   #Installers
   file{"install.sh":
     ensure => present,
-    path => "/usr/local/bin/install.sh",
+    path => "/usr/local/bin/${dbname}-install.sh",
     source => ["puppet:///${puppet_file_dir}install.sh"],
   }
 
@@ -297,7 +302,7 @@ class kanboard (
   exec{
     "install":
     require => [Class["mysql"],File["install.sh"],Package["httpd"]],
-    command => "/usr/local/bin/install.sh",
+    command => "/usr/local/bin/${dbname}-install.sh",
     cwd => "/home/vagrant",
   }
     
@@ -310,12 +315,7 @@ class kanboard (
     notify => Service["httpd"],
     require => Package["php"],
   }
-  
-  $dbtype = "mysql"
-  $dbusername = "root"
-  $dbpassword = "root"
-  $dbname = "kanboard" 
-    
+      
   #Need to add date and time to the backup scripts.
   #Need to have the script run on a cron tab
   #/usr/bin/crontab
@@ -324,12 +324,41 @@ class kanboard (
   
   exec{"Create_db_table":
     require => Exec["install"],
-    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
-    command => "/bin/echo \"create database kanboard\" | mysql -uroot -proot",
-    unless => "/bin/echo \"use kanboard\" | mysql -uroot -proot",
+    command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
+    unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/", 
   }
 
+  #DB restoration
+  file{"db-${dbname}-restore.sh":
+    ensure => present,
+    path => "/usr/local/bin/db-${dbname}-restore.sh",
+    source => ["puppet:///${puppet_file_dir}db-restore.sh"],
+  }
+
+/*  
+  exec{
+    "db-restore":
+    require => [Exec["Create_db_table"],File["db-restore.sh"]],
+    command => "/usr/local/bin/db-restore.sh",
+    cwd => "/home/vagrant",
+  }
+ */
+ #DB backup
+   file{"db-${dbname}-backup.sh":
+    ensure => present,
+    path => "/usr/local/bin/db-${dbname}-backup.sh",
+    source => ["puppet:///${puppet_file_dir}db-backup.sh"],
+  }
+/*  
+  cron{"${dbname}-backup-cron":
+    command => "/usr/local/bin/db-${dbname}-backup.sh",
+    user => vagrant,
+    hour => *,
+    minute => *,
+    require => File["db-${dbname}-backup.sh"],
+  }
+  */
 #  exec{"Update_db_table":
 #    require => Exec["Create_db_table"],
 #    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
