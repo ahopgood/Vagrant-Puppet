@@ -13,17 +13,18 @@
 class kanboard (
   $backup_path="/vagrant/files/backups/") {
   
+  $dbtype = "mysql"
+  $dbusername = "root"
+  $dbpassword = "root"
+  $dbname = "kanboard" 
+  
   #1. Have unzip operate as an exec call
   #2. Have chown operate as an exec call
 
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/kanboard/"
-  
- $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
-  $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
-  $patch_file = "patch-2.6-6.el6.x86_64.rpm"
- 
+   
   Class["mysql"] -> Class["kanboard"]
   /*
   Package["httpd"] -> Package["php"] ->
@@ -246,6 +247,7 @@ class kanboard (
     #5.1.73
   }
 
+  $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
   file{
     "${local_install_dir}${unzip_file}":
     ensure => present,
@@ -258,7 +260,8 @@ class kanboard (
     require => File["${local_install_dir}${unzip_file}"],
     #6.00
   }
-
+  
+  $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
   file{
     "${local_install_dir}${wget_file}":
     ensure => present,
@@ -272,6 +275,7 @@ class kanboard (
     #1.12
   }
 
+  $patch_file = "patch-2.6-6.el6.x86_64.rpm"
   file{
     "${local_install_dir}${patch_file}":
     ensure => present,
@@ -284,11 +288,6 @@ class kanboard (
     require => File["${local_install_dir}${patch_file}"],
     #1.12
   }
-
-  $dbtype = "mysql"
-  $dbusername = "root"
-  $dbpassword = "root"
-  $dbname = "kanboard" 
 
   #Installers
   file{"install.sh":
@@ -333,7 +332,11 @@ class kanboard (
   file{"db-${dbname}-restore.sh":
     ensure => present,
     path => "/usr/local/bin/db-${dbname}-restore.sh",
-    source => ["puppet:///${puppet_file_dir}db-restore.sh"],
+    content => template("${module_name}/db-restore.sh.erb"),
+    mode => 0777,
+    owner => "vagrant",
+    group => "vagrant",
+    
   }
 
 /*  
@@ -348,7 +351,10 @@ class kanboard (
    file{"db-${dbname}-backup.sh":
     ensure => present,
     path => "/usr/local/bin/db-${dbname}-backup.sh",
-    source => ["puppet:///${puppet_file_dir}db-backup.sh"],
+    content => template("${module_name}/db-backup.sh.erb"),
+    mode => 0777,
+    owner => "vagrant",
+    group => "vagrant",
   }
 /*  
   cron{"${dbname}-backup-cron":
