@@ -345,15 +345,6 @@ class kanboard (
     command => "/usr/local/bin/db-${dbname}-restore.sh",
     cwd => "/home/vagrant",
   }
-/*   
-  exec{"Update_db_table":
-    require => Exec["db-restore"],
-    command => "mysql -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
-    #command => "mysql -uroot -proot kanboard < ${backup_path}2015-10-25-kanboardbackup.sql",
-    path => "/usr/bin/",
-    notify => Service["httpd"],
-  }
-*/  
 
  #DB backup
   file{"db-${dbname}-backup.sh":
@@ -365,7 +356,7 @@ class kanboard (
     group => "vagrant",
     require => Exec["db-restore"]
   }
-/*  
+ 
   cron{"${dbname}-backup-cron":
     command => "/usr/local/bin/db-${dbname}-backup.sh",
     user => vagrant,
@@ -373,8 +364,6 @@ class kanboard (
     minute => "*",
     require => File["db-${dbname}-backup.sh"]
   }
-*/
-
   
   file{"config.php":
     require => Exec["install"],
