@@ -2,9 +2,8 @@
 
 #Dump followed by a diff
 mysqldump --net_buffer_length=4096 -u<%= @dbusername %> -p<%= @dbpassword %> <%= @dbname %> > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql
-#mysqldump --net_buffer_length=4096 -uroot -proot kanboard > /vagrant/files/backups/$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql
 diff -c --suppress-common-lines $(ls -1 <%= @backup_path %>*kanboardbackup.sql | tail -2) > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql.diff
-#diff -c --suppress-common-lines $(ls -1 /vagrant/files/backups/*kanboardbackup.sql | tail -2) > /vagrant/files/backups/$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql.diff
+
 
  
 

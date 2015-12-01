@@ -339,39 +339,42 @@ class kanboard (
     
   }
 
-/*  
   exec{
     "db-restore":
-    require => [Exec["Create_db_table"],File["db-restore.sh"]],
-    command => "/usr/local/bin/db-restore.sh",
+    require => [Exec["Create_db_table"],File["db-${dbname}-restore.sh"]],
+    command => "/usr/local/bin/db-${dbname}-restore.sh",
     cwd => "/home/vagrant",
   }
- */
+/*   
+  exec{"Update_db_table":
+    require => Exec["db-restore"],
+    command => "mysql -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
+    #command => "mysql -uroot -proot kanboard < ${backup_path}2015-10-25-kanboardbackup.sql",
+    path => "/usr/bin/",
+    notify => Service["httpd"],
+  }
+*/  
+
  #DB backup
-   file{"db-${dbname}-backup.sh":
+  file{"db-${dbname}-backup.sh":
     ensure => present,
     path => "/usr/local/bin/db-${dbname}-backup.sh",
     content => template("${module_name}/db-backup.sh.erb"),
     mode => 0777,
     owner => "vagrant",
     group => "vagrant",
+    require => Exec["db-restore"]
   }
 /*  
   cron{"${dbname}-backup-cron":
     command => "/usr/local/bin/db-${dbname}-backup.sh",
     user => vagrant,
-    hour => *,
-    minute => *,
-    require => File["db-${dbname}-backup.sh"],
+    hour => "*",
+    minute => "*",
+    require => File["db-${dbname}-backup.sh"]
   }
-  */
-#  exec{"Update_db_table":
-#    require => Exec["Create_db_table"],
-#    #command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(date +\"%Y-%m-%d-%H-%M\").sql",
-#    command => "mysql -uroot -proot kanboard < ${backup_path}2015-10-25-kanboardbackup.sql",
-#    path => "/usr/bin/",
-#    notify => Service["httpd"],
-#  }
+*/
+
   
   file{"config.php":
     require => Exec["install"],
