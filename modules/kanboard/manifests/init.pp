@@ -332,7 +332,7 @@ class kanboard (
   file{"db-${dbname}-restore.sh":
     ensure => present,
     path => "/usr/local/bin/db-${dbname}-restore.sh",
-    content => template("${module_name}/db-restore.sh.erb"),
+    content => template("${module_name}/db-diff-restore.sh.erb"),
     mode => 0777,
     owner => "vagrant",
     group => "vagrant",
@@ -350,7 +350,7 @@ class kanboard (
   file{"db-${dbname}-backup.sh":
     ensure => present,
     path => "/usr/local/bin/db-${dbname}-backup.sh",
-    content => template("${module_name}/db-backup.sh.erb"),
+    content => template("${module_name}/db-diff-backup.sh.erb"),
     mode => 0777,
     owner => "vagrant",
     group => "vagrant",
