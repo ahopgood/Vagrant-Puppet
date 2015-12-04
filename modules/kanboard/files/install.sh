@@ -10,7 +10,7 @@
 
 #cd /var/www/html
 #unzip /vagrant/files/kanboard-1-0-19.zip
-chown -R apache:apache kanboard/data
+#chown -R apache:apache kanboard/data
 
 # Use the iptable module here
 sudo /etc/init.d/iptables stop

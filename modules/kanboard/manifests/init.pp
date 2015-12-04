@@ -298,10 +298,27 @@ class kanboard (
 
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
+  $kanboard_file = "kanboard-1-0-19.zip"
+
+  file{
+    "${kanboard_file}":
+    require => Package["httpd"],
+    ensure => present,
+    path => "/var/www/html/${kanboard_file}",
+    source => ["puppet:///${puppet_file_dir}${kanboard_file}"],
+  }
+
   exec{
     "unzip":
-    require => [Class["mysql"],Package["httpd"], Package["unzip"]],
-    command => "unzip -u /vagrant/files/kanboard-1-0-19.zip",
+    require => [Class["mysql"],Package["httpd"],Package["unzip"],File["${kanboard_file}"]],
+    command => "unzip -u /var/www/html/${kanboard_file}",
+    cwd => "/var/www/html",
+  }
+  
+  exec{
+    "chown":
+    require => Exec["unzip"],
+    command => "chown -R apache:apache kanboard/data",
     cwd => "/var/www/html",
   }
   
