@@ -297,10 +297,17 @@ class kanboard (
   }
 
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
+
+  exec{
+    "unzip":
+    require => [Class["mysql"],Package["httpd"], Package["unzip"]],
+    command => "unzip -u /vagrant/files/kanboard-1-0-19.zip",
+    cwd => "/var/www/html",
+  }
   
   exec{
     "install":
-    require => [Class["mysql"],File["install.sh"],Package["httpd"]],
+    require => [Class["mysql"],File["install.sh"],Package["httpd"], Exec["unzip"]],
     command => "/usr/local/bin/${dbname}-install.sh",
     cwd => "/home/vagrant",
   }
