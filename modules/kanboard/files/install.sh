@@ -13,7 +13,7 @@
 #chown -R apache:apache kanboard/data
 
 # Use the iptable module here
-sudo /etc/init.d/iptables stop
+#sudo /etc/init.d/iptables stop
 
 #sudo mysql -uroot -proot < "create database kanboard"
 #echo "create database kanboard" | mysql -uroot -proot;
