@@ -19,6 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #	config.vm.synced_folder ".", 	"/var/www"
 	config.vm.synced_folder "../", 	"/etc/puppet/modules"
 	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
+	config.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup", "/vagrant/backups" 
 
 
 

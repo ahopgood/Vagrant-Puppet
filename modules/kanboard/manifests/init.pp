@@ -17,9 +17,6 @@ class kanboard (
   $dbusername = "root"
   $dbpassword = "root"
   $dbname = "kanboard" 
-  
-  #1. Have unzip operate as an exec call
-  #2. Have chown operate as an exec call
 
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"

@@ -4,5 +4,7 @@ Package{
 
 class {'mysql':}
 
-class {'kanboard':}
+class {'kanboard':
+  backup_path => "/vagrant/backups/"
+}
 
