@@ -20,9 +20,12 @@ class kanboard (
 
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
-  $puppet_file_dir = "modules/kanboard/"
+  #$puppet_file_dir = "modules/kanboard/"
+  $puppet_file_dir = "modules/${module_name}/"
    
-  Class["mysql"] -> Class["kanboard"]
+  Class["mysql"] -> 
+  #Class["httpd"] -> 
+  Class["kanboard"]
   /*
   Package["httpd"] -> Package["php"] ->
   Package["php-mbstring"] -> Package["php-pdo"] ->
@@ -36,7 +39,8 @@ class kanboard (
 #    "${local_install_dir}":
 #    path       =>  "${local_install_dir}",
 #    ensure     =>  directory,
-#  } 
+#  }
+  
   $apr_file = "apr-1.3.9-5.el6_2.x86_64.rpm"
   file{
     "${local_install_dir}${apr_file}":
@@ -152,7 +156,9 @@ class kanboard (
     require => File["${local_install_dir}${libxpm_file}"],
     #version 5.3.3
   }
-  
+/**/
+
+    
   $php_file = "php-5.3.3-46.el6_6.x86_64.rpm"
   $php_cli_file = "php-cli-5.3.3-46.el6_6.x86_64.rpm"
   $php_common_file = "php-common-5.3.3-46.el6_6.x86_64.rpm"
@@ -287,12 +293,13 @@ class kanboard (
   }
 
   #Installers
+/*
   file{"install.sh":
     ensure => present,
     path => "/usr/local/bin/${dbname}-install.sh",
     source => ["puppet:///${puppet_file_dir}install.sh"],
   }
-
+*/
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
   $kanboard_file = "kanboard-1-0-19.zip"
@@ -318,14 +325,7 @@ class kanboard (
     command => "chown -R apache:apache kanboard/data",
     cwd => "/var/www/html",
   }
-  
-  exec{
-    "install":
-    require => [Class["mysql"],File["install.sh"],Package["httpd"], Exec["unzip"]],
-    command => "/usr/local/bin/${dbname}-install.sh",
-    cwd => "/home/vagrant",
-  }
-    
+
   augeas { 
     "php.ini":
     context => "/files/etc/php.ini/PHP/",
@@ -343,7 +343,7 @@ class kanboard (
   #$(date +"%Y-%m-%d-%H-%M").sql
   
   exec{"Create_db_table":
-    require => Exec["install"],
+    require => Exec["chown"],
     command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/", 
@@ -387,7 +387,7 @@ class kanboard (
   }
   
   file{"config.php":
-    require => Exec["install"],
+    require => Exec["chown"],
     path => "/var/www/html/kanboard/config.php",
     content => template("${module_name}/config.default.php.erb"),
     ensure => present,
@@ -406,13 +406,7 @@ class kanboard (
       notify => Service["httpd"]
     }
   }
-  
-#  exec{"Schedule_db_backup":
-#    require => Exec["Update_db_table"],
-#    command => "mysqldump -u${dbusername} -p${dbpassword} ${dbname} > ${backup_path}$(/bin/date +%Y-%m-%d-%H-%M)-kanboardbackup.sql",
-#    path => "/usr/bin/", 
-#  }
-  
+    
   notify {
     "Kanboard":
   }
