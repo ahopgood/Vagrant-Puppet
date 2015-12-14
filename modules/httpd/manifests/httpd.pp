@@ -7,4 +7,7 @@
     ensure     =>  directory,
   } 
 
-  class { "httpd": } 
+
+  class { "httpd": }
+  
+  class { "iptables": port => "80" }

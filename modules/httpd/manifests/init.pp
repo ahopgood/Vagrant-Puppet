@@ -1,6 +1,9 @@
 # Class: httpd
 #
-# This module manages httpd
+# This module manages httpd.
+# Note that there are folder hierarchy dependencies on /etc/puppt/installers.
+# Also requires port 80 to be open or else navigating to the ip address will fail, if open you will see the apache welcome page.
+# Use of the iptables class is recommended.
 #
 # Parameters: none
 #
@@ -13,10 +16,14 @@
 class httpd {
 
   $puppet_file_dir = "modules/httpd/"
+  $local_install_dir = "${local_install_path}installers/"
+  #$local_install_dir = "${local_install_path}installers/httpd"  
   #$puppet_file_dir = "modules/${module_name}"
   
 #  Package["httpd"] -> Package["httpd-tools"] -> Package["mailcap"] ->
 #  Package["apr-util-ldap"] -> Package["apr-util"] -> Package["apr"] 
+
+  Class["httpd"] -> Class["iptables"]
 
   $apr_file = "apr-1.3.9-5.el6_2.x86_64.rpm"
   file{
