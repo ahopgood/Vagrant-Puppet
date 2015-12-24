@@ -284,16 +284,6 @@ class kanboard (
     group => "apache",
     notify => Service["httpd"]
   }
-
-  $port = "80"
-  if ("${port}" != null){ 
-    #Create an iptables (firewall) exception, persist and restart iptables 
-    class { 'iptables':
-      port => "${port}",
-      require => Exec["chown"],
-      notify => Service["httpd"]
-    }
-  }
     
   notify {
     "Kanboard":

@@ -14,7 +14,9 @@ Package{
 class {'mysql':}
 ->
 class {'httpd':}
-
+->
+class { "iptables": port => "80" }
+  
 class {'kanboard':
   backup_path => "/vagrant/backups/"
 }
