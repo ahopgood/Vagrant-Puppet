@@ -101,7 +101,8 @@ class httpd {
     ensure => present, #will require the yum / puppet resource package name
     provider => 'rpm',
     source => "${local_install_dir}${httpd_file}",
-    require => [File["${local_install_dir}${httpd_file}"], Package["apr-util-ldap"], 
+    require => [File["${local_install_dir}${httpd_file}"],
+    Package["apr-util-ldap"], 
     Package["mailcap"], Package["httpd-tools"], Package["apr-util"]],
     #version 2.2.15
   }
