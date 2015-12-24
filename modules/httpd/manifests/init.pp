@@ -113,32 +113,4 @@ class httpd {
     enable => true
   }
 
-  $freetype_file = "freetype-2.3.11-15.el6_6.1.x86_64.rpm"
-  file{
-    "${local_install_dir}${$freetype_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${freetype_file}",]
-  }  
-  package {"freetype":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${freetype_file}",
-    require => File["${local_install_dir}${freetype_file}"],
-    #version 5.3.3
-  }
-  
-  $libxpm_file = "libXpm-3.5.10-2.el6.x86_64.rpm"
-  file{
-    "${local_install_dir}${libxpm_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
-  }
-  package {"libXpm":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${libxpm_file}",
-#    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
-    require => File["${local_install_dir}${libxpm_file}"],
-    #version 5.3.3
-  }
 }
