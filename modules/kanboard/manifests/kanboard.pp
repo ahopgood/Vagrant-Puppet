@@ -15,9 +15,12 @@ class {'mysql':}
 ->
 class {'httpd':}
 ->
-class { "iptables": port => "80" }
-  
+class {"iptables": port => "80" }
+->
+class {"php":}
+
 class {'kanboard':
-  backup_path => "/vagrant/backups/"
+  backup_path => "/vagrant/backups/",
+  patch_version => "22"
 }
 

@@ -11,7 +11,11 @@
 # Sample Usage:
 #
 class kanboard (
-  $backup_path="/vagrant/files/backups/") {
+  $backup_path="/vagrant/files/backups/",
+  $major_version = "1",
+  $minor_version = "0",
+  $patch_version = "19"  
+  ) {
   
   $dbtype = "mysql"
   $dbusername = "root"
@@ -20,9 +24,8 @@ class kanboard (
 
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
-  #$puppet_file_dir = "modules/kanboard/"
   $puppet_file_dir = "modules/${module_name}/"
-   
+     
   notify {
     "${module_name} installation completed":
   }  
@@ -47,97 +50,6 @@ class kanboard (
 #    ensure     =>  directory,
 #  }
     
-  $php_file = "php-5.3.3-46.el6_6.x86_64.rpm"
-  $php_cli_file = "php-cli-5.3.3-46.el6_6.x86_64.rpm"
-  $php_common_file = "php-common-5.3.3-46.el6_6.x86_64.rpm"
-  $php_mbstring_file = "php-mbstring-5.3.3-46.el6_6.x86_64.rpm"
-  $php_pdo_file = "php-pdo-5.3.3-46.el6_6.x86_64.rpm"
-  $php_gd_file = "php-gd-5.3.3-46.el6_6.x86_64.rpm"
-  $php_mysql_file = "php-mysql-5.3.3-46.el6_6.x86_64.rpm"
-
-  file{
-    "${local_install_dir}${php_cli_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_cli_file}",]
-  }  
-  package {"php-cli":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_cli_file}",
-    require => File["${local_install_dir}${php_cli_file}"],
-    #version 5.3.3
-  } 
-  file{
-    "${local_install_dir}${php_common_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_common_file}",]
-  }
-  package {"php-common":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_common_file}",
-    require => File["${local_install_dir}${php_common_file}"],
-    #version 5.3.3
-  }
-  file{
-    "${local_install_dir}${php_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_file}",]
-  }
-  package {"php":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_file}",
-    require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Package["httpd"]],
-    #version 5.3.3
-  }
-  file{
-    "${local_install_dir}${php_mbstring_file}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_mbstring_file}",]
-  }
-  package {"php-mbstring":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_mbstring_file}",
-    require => [File["${local_install_dir}${php_mbstring_file}"], Package["php-common"]],
-  }  
-  file{
-    "${local_install_dir}${php_pdo_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_pdo_file}",
-  }
-  package {"php-pdo":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_pdo_file}",
-    require => [File["${local_install_dir}${php_pdo_file}"],Package["php-common"]],
-  }
-  file{
-    "${local_install_dir}${php_gd_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_gd_file}",
-  }
-  package {"php-gd":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_gd_file}",
-    require => [File["${local_install_dir}${php_gd_file}"], Package["php-common"], Package["freetype"], Package["libXpm"]],
-    #2.0.34
-  }
-  file{
-    "${local_install_dir}${php_mysql_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_mysql_file}",
-  }
-  package {"php-mysql":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${php_mysql_file}",
-    require => [File["${local_install_dir}${php_mysql_file}"], Class["mysql"], Package["php-pdo"]],
-    #5.1.73
-  }
-
   $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
   file{
     "${local_install_dir}${unzip_file}":
@@ -181,16 +93,9 @@ class kanboard (
   }
 
   #Installers
-/*
-  file{"install.sh":
-    ensure => present,
-    path => "/usr/local/bin/${dbname}-install.sh",
-    source => ["puppet:///${puppet_file_dir}install.sh"],
-  }
-*/
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
-  $kanboard_file = "kanboard-1-0-19.zip"
+  $kanboard_file = "kanboard-${major_version}-${minor_version}-${patch_version}.zip"
 
   file{
     "${kanboard_file}":
@@ -221,7 +126,8 @@ class kanboard (
       "set short_open_tag On",      
     ],
     notify => Service["httpd"],
-    require => Package["php"],
+    #require => Package["php"], 
+    #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
   }
       
   #Need to add date and time to the backup scripts.
