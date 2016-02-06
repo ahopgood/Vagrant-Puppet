@@ -17,9 +17,9 @@ class php {
   ->
   Class["php"]
   
-  Class["httpd"]
-  ->
-  Class["php"]
+#  Class["httpd"]
+#  ->
+#  Class["php"]
   
   $puppet_file_dir = "modules/${module_name}/"
   $local_install_dir = "${local_install_path}installers/"
@@ -65,7 +65,7 @@ class php {
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${php_file}",
-    require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"]]#, Package["httpd"]],
+    require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Class["httpd"]],
     #version 5.3.3
   }
   file{
@@ -145,3 +145,26 @@ class php {
     #5.1.73
   }
 }
+
+  /*
+   * Definition for modifying the php ini file using augeas.
+   */
+  define php::php_ini_file (
+    $changes = undef,
+  ) {
+      include ::php
+      if ($changes == undef){
+        fail("You must supply the changes parameter to php::php_ini_file")
+      } 
+      augeas { 
+        "php.ini":
+        context => "/files/etc/php.ini/PHP/",
+        changes => $changes,
+#      [
+#        "set short_open_tag On",      
+#      ],
+        notify => Service["httpd"],
+      #require => Package["php"], 
+      #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
+      }
+    }
