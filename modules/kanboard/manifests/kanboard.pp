@@ -11,12 +11,14 @@ Package{
 #  } 
 
 
-class {'mysql':}
-->
-class {'httpd':}
-->
+
+
 class {"iptables": port => "80" }
-->
+
+class {'httpd':}
+
+class {'mysql':}
+
 class {"php":}
 
 class {'kanboard':

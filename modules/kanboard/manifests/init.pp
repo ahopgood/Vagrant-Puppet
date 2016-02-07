@@ -30,26 +30,26 @@ class kanboard (
     "${module_name} installation completed":
   }  
 
+#  Class["php"]
+#  ->  
+#  Class["kanboard"]
+  
 
-  Class["mysql"] 
-  -> 
-  Class["httpd"]
-  #Class["kanboard"]
-  /*
-  Package["httpd"] -> Package["php"] ->
-  Package["php-mbstring"] -> Package["php-pdo"] ->
+#  Package["httpd"] -> Package["php"] ->
+#  Package["php-mbstring"] -> Package["php-pdo"] ->
 #  Package["php-gd"] -> Package["php-mysql"] ->
-  Package["php-gd"] -> 
-  Package["unzip"] -> Package["wget"] ->
-  Package["patch"] ->
-  Exec["install"] -> Augeas["php.ini"]
-  */
+#  Package["php-gd"] -> 
+#  Package["unzip"] -> Package["wget"] ->
+#  Package["patch"] ->
+#  Exec["install"] -> Augeas["php.ini"]
+
 #  file {
 #    "${local_install_dir}":
 #    path       =>  "${local_install_dir}",
 #    ensure     =>  directory,
 #  }
-    
+#  -> Package["unzip"]
+ 
   $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
   file{
     "${local_install_dir}${unzip_file}":
@@ -99,15 +99,16 @@ class kanboard (
 
   file{
     "${kanboard_file}":
-    require => Package["httpd"],
+#    require => Package["httpd"],
     ensure => present,
     path => "/var/www/html/${kanboard_file}",
     source => ["puppet:///${puppet_file_dir}${kanboard_file}"],
+    require => Class["php"],
   }
 
   exec{
     "unzip":
-    require => [Class["mysql"],Package["httpd"],Package["unzip"],File["${kanboard_file}"]],
+    require => [Package["unzip"],File["${kanboard_file}"]],
     command => "unzip -u /var/www/html/${kanboard_file}",
     cwd => "/var/www/html",
   }
@@ -119,23 +120,20 @@ class kanboard (
     cwd => "/var/www/html",
   }
 
-  augeas { 
-    "php.ini":
-    context => "/files/etc/php.ini/PHP/",
-    changes => [
-      "set short_open_tag On",      
-    ],
-    notify => Service["httpd"],
-    #require => Package["php"], 
-    #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
+  php::php_ini_file{"php.ini":
+    changes => ["set short_open_tag On"],
   }
-      
-  #Need to add date and time to the backup scripts.
-  #Need to have the script run on a cron tab
-  #/usr/bin/crontab
-  # DATE=$(date +"%d-%m-%Y-%H-%M")
-  #$(date +"%Y-%m-%d-%H-%M").sql
-  
+#  augeas { 
+#    "php.ini":
+#    context => "/files/etc/php.ini/PHP/",
+#    changes => [
+#      "set short_open_tag On",      
+#    ],
+#    notify => Service["httpd"],
+#    #require => Package["php"], 
+#    #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
+#  }
+        
   exec{"Create_db_table":
     require => Exec["chown"],
     command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
@@ -180,18 +178,26 @@ class kanboard (
     require => File["db-${dbname}-backup.sh"]
   }
   
-  file{"config.php":
+#  file{"httpd_hosted_content":
+#      path => "/var/www/html/kanboard/config.php",
+#      content => template("${module_name}/config.default.php.erb"),
+#      ensure => present,
+#      mode => 0755,
+#      owner => "apache",
+#      group => "apache",
+#      require => Exec["chown"]
+#  }
+  
+  exec {
+    "restart_apache_for_kanban":
     require => Exec["chown"],
-    path => "/var/www/html/kanboard/config.php",
-    content => template("${module_name}/config.default.php.erb"),
-    ensure => present,
-    mode => 0755,
-    owner => "apache",
-    group => "apache",
-    notify => Service["httpd"]
-  }
-    
+    command => "/etc/init.d/httpd restart",
+    cwd => "/usr/bin/",
+  } 
+  
+  
   notify {
     "Kanboard":
   }
 }
+
