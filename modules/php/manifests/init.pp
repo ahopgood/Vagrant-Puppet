@@ -21,6 +21,8 @@ class php {
 #  ->
 #  Class["php"]
   
+#  include ::httpd
+  
   $puppet_file_dir = "modules/${module_name}/"
   $local_install_dir = "${local_install_path}installers/"
 
@@ -66,8 +68,16 @@ class php {
     provider => 'rpm',
     source => "${local_install_dir}${php_file}",
     require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Class["httpd"]],
+#    notify => Service["httpd"],
     #version 5.3.3
   }
+  exec {
+    "restart_apache_for_php":
+    require => Package["php"],
+    command => "/etc/init.d/httpd restart",
+    cwd => "/usr/bin/",
+  } 
+  
   file{
     "${local_install_dir}${php_mbstring_file}":
     ensure => present,
