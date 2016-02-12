@@ -187,10 +187,20 @@ class kanboard (
 #      group => "apache",
 #      require => Exec["chown"]
 #  }
+
+  file{"config.php":
+    require => Exec["db-restore"],
+    path => "/var/www/html/kanboard/config.php",
+    content => template("${module_name}/config.default.php.erb"),
+    ensure => present,
+    mode => 0755,
+    owner => "apache",
+    group => "apache",
+  }
   
   exec {
     "restart_apache_for_kanban":
-    require => Exec["chown"],
+    require => File["config.php"],
     command => "/etc/init.d/httpd restart",
     cwd => "/usr/bin/",
   } 
