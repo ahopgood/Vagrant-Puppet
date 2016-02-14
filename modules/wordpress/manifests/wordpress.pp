@@ -1,17 +1,20 @@
-# Class: wordpress
-#
-# This module manages a wordpress installation
-#
-# Parameters: none
-#
-# Actions:
-#
-# Requires: see Modulefile
-#
-# Sample Usage:
-#
- 
-class {'mysql':}
+Package{
+  allow_virtual => false
+}
+
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+
+  #root dbusername
+  #root dbpassword
+  #dbname
+  #restricted db username
+  #restricted db password
+
+  class {"iptables": port => "80"}
+  class {"httpd":}
+  class {"mysql":}
+  class {"php":}
   
 class { 'wordpress':
   major_version => '4',
