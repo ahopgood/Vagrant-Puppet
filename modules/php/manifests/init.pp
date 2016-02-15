@@ -140,7 +140,6 @@ class php {
     require => File["${local_install_dir}${libxpm_file}"],
     #version 5.3.3
   }
-
   
   file{
     "${local_install_dir}${php_mysql_file}":

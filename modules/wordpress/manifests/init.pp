@@ -50,11 +50,20 @@ class wordpress (
     command => "rm /var/www/html/${wordpress_file_tar}",
   }
   
-  mysql::create_table{
+  mysql::create_database{
     "create_wordpress_database":
-    databasename => "wordpress",
+    dbname => "wordpress",
     dbusername => "root",
     dbpassword => "root",
+  }
+  
+  mysql::create_user {
+    "create_restricted_wordpress_db_user":
+    dbname => "${database_name}",
+    rootusername => "root",
+    rootpassword => "root",
+    dbusername => "${database_username}",
+    dbpassword => "${database_password}",
   }
 
 /**

@@ -16,6 +16,10 @@ Package{
   class {"mysql":}
   class {"php":}
   
+  $database_name = "wordpress"
+  $database_username = "wordpress"
+  $database_password = "wordpress"
+  
 class { 'wordpress':
   major_version => '4',
   minor_version => '3',
