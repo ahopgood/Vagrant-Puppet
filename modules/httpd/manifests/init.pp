@@ -112,5 +112,4 @@ class httpd {
     ensure => running,
     enable => true
   }
-
 }

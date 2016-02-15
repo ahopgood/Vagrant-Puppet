@@ -110,8 +110,8 @@ class java (
   #this means java 8 will not replace 6 or 7 due to the differing packaging names
   
   package {
-	"${package_name}":
-	ensure		=> "1.${version}.0_${updateVersion}-fcs",
+	  "${package_name}":
+	  ensure		=> "1.${version}.0_${updateVersion}-fcs",
     provider    =>  'rpm',
     source      =>  "${local_install_dir}${jdk}",
     require     =>  File["${jdk}"],

@@ -1,5 +1,9 @@
-class {'java':
+Package{
+  allow_virtual => false,
+}
+
+class { 'java':
   version => '8',
-  updateVersion => '25',
+  updateVersion => '31'
 #  is64bit => 'false'
 }
