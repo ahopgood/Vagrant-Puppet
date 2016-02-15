@@ -171,3 +171,100 @@ class mysql {
   #Perform the chkconfig to ensure the service loads on startup?
 }
 include mysql
+
+define mysql::create_user(
+  $dbname = undef,
+  $rootusername = undef,
+  $rootpassword = undef,
+  $dbusername = undef,
+  $dbpassword = undef){
+  if ($dbname == undef) {
+    fail("You must define a database name in order to create a database user")
+  }
+  if ($rootusername == undef) {
+    fail("You must define a root username with admin privileges for the database in order to create a database user")
+  }
+  if ($rootpassword == undef) {
+    fail("You must define a root password with admin privileges for the database in order to create a database user")
+  }
+  if ($dbusername == undef) {
+    fail("You must define a username for the database in order to create a database user")
+  }
+  if ($dbpassword == undef) {
+    fail("You must define a password for the database in order to create a database user")
+  }
+
+  exec{"Create_database_user":
+    command => "/bin/echo \"CREATE USER '${dbusername}'@'localhost' IDENTIFIED BY '${dbpassword}';\" | mysql -u${rootusername} -p${rootpassword}",
+    unless => "mysql -u${dbusername} -p${dbpassword}",
+    path => "/usr/bin/", 
+  }
+  ->
+  exec{"Grant_privileges_for_user":
+    command => "/bin/echo \"GRANT ALL PRIVILEGES ON ${dbname}.* TO '${dbusername}'@'localhost' WITH GRANT OPTION;\" | mysql -u${rootusername} -p${rootpassword}",
+    unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
+    path => "/usr/bin",
+  }  
+}
+
+define mysql::create_database(
+  $dbname = undef,
+  $dbusername = undef,
+  $dbpassword = undef,
+){
+  if ($dbname == undef) {
+    fail("You must define a database name in order to create a database")
+  }
+  if ($dbusername == undef) {
+    fail("You must define a username for the database in order to create a database")
+  }
+  if ($dbpassword == undef) {
+    fail("You must define a password for the database in order to create a database")
+  }
+  
+  exec{"Create_database":
+    command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
+    unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
+    path => "/usr/bin/", 
+  }
+}
+
+/**
+ * Definition for a mysql differential back up call.
+ */
+define mysql::differential_backup (
+  $dbname = undef,
+  $dbusername = undef,
+  $dbpassword = undef,
+  $backup_path = undef,
+) {
+  if ($dbname == undef) {
+    fail("You must define a database name in order to do a differential backup")
+  }
+  if ($dbusername == undef) {
+    fail("You must define a username for the database in order to do a differential backup")
+  }
+  if ($dbpassword == undef) {
+    fail("You must define a password for the database in order to do a differential backup")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location in order to do a differential backup")
+  }
+  
+  file{"db-${dbname}-backup.sh":
+    ensure => present,
+    path => "/usr/local/bin/db-${dbname}-backup.sh",
+    content => template("${module_name}/db-diff-backup.sh.erb"),
+    mode => 0777,
+    owner => "vagrant",
+    group => "vagrant",
+  }
+ 
+  cron{"${dbname}-backup-cron":
+    command => "/usr/local/bin/db-${dbname}-backup.sh",
+    user => vagrant,
+    hour => "*",
+    minute => "*",
+    require => File["db-${dbname}-backup.sh"]
+  }
+}
