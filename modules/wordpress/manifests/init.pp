@@ -50,6 +50,8 @@ class wordpress (
     command => "rm /var/www/html/${wordpress_file_tar}",
   }
   
+  #Change ownership to the apache user on the /var/www/html/wordpress 
+  
   mysql::create_database{
     "create_wordpress_database":
     dbname => "wordpress",
@@ -66,17 +68,21 @@ class wordpress (
     dbpassword => "${database_password}",
   }
 
-/**
+  mysql::differential_restore{
+    "wordpress_database_restore":
+    dbname => "wordpress",
+    dbusername => "${database_username}",
+    dbpassword => "${database_username}",
+    backup_path => "/vagrant/backups/",
+  }
+  
   mysql::differential_backup{
     "wordpress_database_backup":
     dbname => "wordpress",
-    dbusername => "root",
-    dbpassword => "root",
-    backup_path => "/vagrant/backups",
-    module_name => "${module_name}"
-  }
- */
-   
+    dbusername => "${database_username}",
+    dbpassword => "${database_username}",
+    backup_path => "/vagrant/backups/",
+  } 
   #Install mysql
   #Setup wordpress database
   #Setup root user and password on mysql
@@ -85,4 +91,21 @@ class wordpress (
   #Set firewall port in iptables
   #generate a wp-config.php with the database values inside
   #Backup 
+  #<%= @dbname %> wordpress
+  #<%= @dbusername %> wordpress
+  #<%= @dbpassword %> wordpress
+  #<%= @dbhost %> localhost
+  #<%= @tableprefix %> wp_
+  $database_name = "wordpress"
+  $tableprefix = "wp_"
+  $database_host = "localhost"
+
+  file{"wp-config.php":
+    path => "/var/www/html/wordpress/wp-config.php",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    content => template("${module_name}/wp-config.php.erb"),
+  }
 }
