@@ -268,3 +268,41 @@ define mysql::differential_backup (
     require => File["db-${dbname}-backup.sh"]
   }
 }
+
+define mysql::differential_restore(
+  $dbname = undef,
+  $dbusername = undef,
+  $dbpassword = undef,
+  $backup_path = undef,
+){
+  if ($dbname == undef) {
+    fail("You must define a database name in order to do a differential backup restore")
+  }
+  if ($dbusername == undef) {
+    fail("You must define a username for the database in order to do a differential backup restore")
+  }
+  if ($dbpassword == undef) {
+    fail("You must define a password for the database in order to do a differential backup restore")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location in order to do a differential backup restore")
+  }
+  
+  #DB restoration
+  file{"db-${dbname}-restore.sh":
+    ensure => present,
+    path => "/usr/local/bin/db-${dbname}-restore.sh",
+    content => template("${module_name}/db-diff-restore.sh.erb"),
+    mode => 0777,
+    owner => "vagrant",
+    group => "vagrant",
+    
+  }
+
+  exec{
+    "db-restore":
+    require => File["db-${dbname}-restore.sh"],
+    command => "/usr/local/bin/db-${dbname}-restore.sh",
+    cwd => "/home/vagrant",
+  }
+}
