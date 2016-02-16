@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#Dump followed by a diff
+mysqldump --net_buffer_length=4096 -u<%= @dbusername %> -p<%= @dbpassword %> <%= @dbname %> > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-<%= @module_name%>backup.sql
+diff -c --suppress-common-lines $(ls -1 <%= @backup_path %>*<%= @module_name%>backup.sql | head -1) $(ls -1 <%= @backup_path %>*<%= @module_name%>backup.sql | tail -1) > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-<%= @module_name%>backup.sql.diff
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
