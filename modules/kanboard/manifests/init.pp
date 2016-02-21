@@ -123,16 +123,6 @@ class kanboard (
   php::php_ini_file{"php.ini":
     changes => ["set short_open_tag On"],
   }
-#  augeas { 
-#    "php.ini":
-#    context => "/files/etc/php.ini/PHP/",
-#    changes => [
-#      "set short_open_tag On",      
-#    ],
-#    notify => Service["httpd"],
-#    #require => Package["php"], 
-#    #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
-#  }
         
   exec{"Create_db_table":
     require => Exec["chown"],
@@ -174,20 +164,10 @@ class kanboard (
     command => "/usr/local/bin/db-${dbname}-backup.sh",
     user => vagrant,
     hour => "*",
-    minute => "*",
+    minute => "0",
     require => File["db-${dbname}-backup.sh"]
   }
   
-#  file{"httpd_hosted_content":
-#      path => "/var/www/html/kanboard/config.php",
-#      content => template("${module_name}/config.default.php.erb"),
-#      ensure => present,
-#      mode => 0755,
-#      owner => "apache",
-#      group => "apache",
-#      require => Exec["chown"]
-#  }
-
   file{"config.php":
     require => Exec["db-restore"],
     path => "/var/www/html/kanboard/config.php",
@@ -204,7 +184,6 @@ class kanboard (
     command => "/etc/init.d/httpd restart",
     cwd => "/usr/bin/",
   } 
-  
   
   notify {
     "Kanboard":
