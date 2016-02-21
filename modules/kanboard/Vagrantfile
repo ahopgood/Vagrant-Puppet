@@ -22,8 +22,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
 	config.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup", "/vagrant/backups" 
 
-
-
 # 	config.vm.provision :shell, :path => "files/install.sh"    
   # Enable provisioning with Puppet stand alone.  Puppet manifests
   # are contained in a directory path relative to this Vagrantfile.
@@ -34,5 +32,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   	puppet.manifests_path = "manifests"
   	puppet.manifest_file  = "kanboard.pp"
   	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
+  end
+  
+  
+  config.vm.define "server" do |server|
+	server.vm.synced_folder "D:\Dropbox\Projects\kanboard\backup", "/vagrant/backups" 
   end
 end
