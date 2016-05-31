@@ -2,12 +2,12 @@
 
 ### Restore ###
 #Create a concatenated diff file of all the diff files.
-#cat <%= @backup_path %>*-<%= @module_name %>backup.sql.diff > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-compiled-<%= @module_name %>backup.diff
+#cat <%= @backup_path %>*-<%= @dbname %>backup.sql.diff > <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-compiled-<%= @dbname %>backup.diff
 
 #Copy the original db dump script to work on
-cp $(find <%= @backup_path %> -name '*-<%= @module_name %>backup.sql'|head -1) <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-<%= @module_name %>-restore.sql
+cp $(find <%= @backup_path %> -name '*-<%= @dbname %>backup.sql'|head -1) <%= @backup_path %>$(/bin/date +%Y-%m-%d-%H-%M)-<%= @dbname %>-restore.sql
 
 #Apply the diff file to the copy of the first db dump script
-patch $(find <%= @backup_path %> -name '*-<%= @module_name %>-restore.sql'|tail -1) < $(ls -1 <%= @backup_path %>*-<%= @module_name %>backup.sql.diff | tail -1)
+patch $(find <%= @backup_path %> -name '*-<%= @dbname %>-restore.sql'|tail -1) < $(ls -1 <%= @backup_path %>*-<%= @dbname %>backup.sql.diff | tail -1)
 
-mysql -u<%= @dbusername %> -p<%= @dbpassword %> <%= @dbname %> < $(ls -1 <%= @backup_path %>*-<%= @module_name %>-restore.sql |tail -1)
+mysql -u<%= @dbusername %> -p<%= @dbpassword %> <%= @dbname %> < $(ls -1 <%= @backup_path %>*-<%= @dbname %>-restore.sql |tail -1)
