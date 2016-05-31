@@ -30,7 +30,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     	box.vm.box_version = "1.0.1"
   		box.ssh.insert_key = false	#uses default insecure public key
  		box.vm.network :private_network, ip: "192.168.33.21", auto_config: true
-  		#box.vm.provision :shell, :path => "files/install.sh"
   		box.vm.synced_folder "../", 	"/etc/puppet/modules"
 		box.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/wordpress/backups", "/vagrant/backups"
 		box.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
