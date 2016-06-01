@@ -51,10 +51,10 @@ class wordpress (
   }
   
   #Change ownership to the apache user on the /var/www/html/wordpress 
-  
+    
   mysql::create_database{
     "create_wordpress_database":
-    dbname => "wordpress",
+    dbname => "${database_name}",
     dbusername => "root",
     dbpassword => "root",
   }
@@ -70,7 +70,7 @@ class wordpress (
 
   mysql::differential_restore{
     "wordpress_database_restore":
-    dbname => "wordpress",
+    dbname => "${database_name}",
     dbusername => "${database_username}",
     dbpassword => "${database_username}",
     backup_path => "/vagrant/backups/",
@@ -78,7 +78,7 @@ class wordpress (
   
   mysql::differential_backup{
     "wordpress_database_backup":
-    dbname => "wordpress",
+    dbname => "${database_name}",
     dbusername => "${database_username}",
     dbpassword => "${database_username}",
     backup_path => "/vagrant/backups/",
