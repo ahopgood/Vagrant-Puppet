@@ -288,6 +288,8 @@ define mysql::differential_restore(
     fail("You must define a backup path location in order to do a differential backup restore")
   }
   
+#  Class["patch"] -> Define["mysql::differential_restore"] 
+  include patch
   #DB restoration
   file{"db-${dbname}-restore.sh":
     ensure => present,
@@ -296,7 +298,7 @@ define mysql::differential_restore(
     mode => 0777,
     owner => "vagrant",
     group => "vagrant",
-    
+#    require => Package["patch"],
   }
 
   exec{
