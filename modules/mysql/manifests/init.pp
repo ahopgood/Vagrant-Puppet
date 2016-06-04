@@ -237,6 +237,8 @@ define mysql::differential_backup (
   $dbusername = undef,
   $dbpassword = undef,
   $backup_path = undef,
+  $hour = "*",
+  $minute = "*",
 ) {
   if ($dbname == undef) {
     fail("You must define a database name in order to do a differential backup")
@@ -263,8 +265,8 @@ define mysql::differential_backup (
   cron{"${dbname}-backup-cron":
     command => "/usr/local/bin/db-${dbname}-backup.sh",
     user => vagrant,
-    hour => "*",
-    minute => "*",
+    hour => "${hour}",
+    minute => "${minute}",
     require => File["db-${dbname}-backup.sh"]
   }
 }
