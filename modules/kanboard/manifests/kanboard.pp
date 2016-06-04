@@ -14,11 +14,8 @@ Package{
 
 
 class {"iptables": port => "80" }
-
 class {'httpd':}
-
 class {'mysql':}
-
 class {"php":}
 
 class {'kanboard':

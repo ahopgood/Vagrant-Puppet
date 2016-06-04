@@ -13,16 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   	config.vm.box = "puppetlabs/centos-6.6-64-puppet"
   	config.vm.box_check_update = true
   	config.vm.box_version = "1.0.1"
-    config.vm.network "public_network", :mac => "080027D3418E", :bridge => "Realtek PCIe GBE Family Controller"
-    # Mask:255.255.255.0
-     
-#   config.vm.network "public_network", ip: "192.168.33.10", auto_config: true #auto_config prevents us setting the correct interface as a bridged adapter
-#   config.vm.network "forwarded_port", guest: 80, host: 8080
-#    config.vm.network "private_network", ip: "192.168.33.10", auto_config: true
-    config.vm.hostname = "kanboard.vm"
-    
-  # config.vm.synced_folder "../data", "/vagrant_data"
-#	config.vm.synced_folder ".", 	"/var/www"
+    config.vm.hostname = "kanboard.vm"    
 	config.vm.synced_folder "../", 	"/etc/puppet/modules"
 	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
 	config.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup", "/vagrant/backups" 
@@ -39,8 +30,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
   end
   
-  
   config.vm.define "server" do |server|
+    server.vm.network "public_network", :mac => "080027D3418E", :bridge => "Realtek PCIe GBE Family Controller"
 	server.vm.synced_folder "D:/Dropbox/Projects/kanboard/backup", "/vagrant/backups" 
   end
+
+  config.vm.define "local" do |local|
+    local.vm.network "private_network", ip: "192.168.33.35"
+	local.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup/test/", "/vagrant/backups" 
+  end
+  
 end

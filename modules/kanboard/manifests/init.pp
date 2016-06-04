@@ -33,22 +33,6 @@ class kanboard (
 #  Class["php"]
 #  ->  
 #  Class["kanboard"]
-  
-
-#  Package["httpd"] -> Package["php"] ->
-#  Package["php-mbstring"] -> Package["php-pdo"] ->
-#  Package["php-gd"] -> Package["php-mysql"] ->
-#  Package["php-gd"] -> 
-#  Package["unzip"] -> Package["wget"] ->
-#  Package["patch"] ->
-#  Exec["install"] -> Augeas["php.ini"]
-
-#  file {
-#    "${local_install_dir}":
-#    path       =>  "${local_install_dir}",
-#    ensure     =>  directory,
-#  }
-#  -> Package["unzip"]
  
   $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
   file{
@@ -61,7 +45,6 @@ class kanboard (
     provider => 'rpm',
     source => "${local_install_dir}${unzip_file}",
     require => File["${local_install_dir}${unzip_file}"],
-    #6.00
   }
   
   $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
@@ -78,28 +61,12 @@ class kanboard (
     #1.12
   }
 
-  $patch_file = "patch-2.6-6.el6.x86_64.rpm"
-  file{
-    "${local_install_dir}${patch_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${patch_file}",
-  }
-  package {"patch":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${patch_file}",
-    require => File["${local_install_dir}${patch_file}"],
-    #1.12
-  }
-
-  #Installers
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
   $kanboard_file = "kanboard-${major_version}-${minor_version}-${patch_version}.zip"
 
   file{
     "${kanboard_file}":
-#    require => Package["httpd"],
     ensure => present,
     path => "/var/www/html/${kanboard_file}",
     source => ["puppet:///${puppet_file_dir}${kanboard_file}"],
@@ -123,59 +90,42 @@ class kanboard (
   php::php_ini_file{"php.ini":
     changes => ["set short_open_tag On"],
   }
-        
-  exec{"Create_db_table":
-    require => Exec["chown"],
-    command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
-    unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
-    path => "/usr/bin/", 
+  
+  Class["mysql"]
+  ->
+  mysql::create_database{
+    "create_lanboard_database":
+    dbname => "${dbname}",
+    dbusername => "${dbusername}",
+    dbpassword => "${dbpassword}",
   }
-
-  #DB restoration
-  file{"db-${dbname}-restore.sh":
-    ensure => present,
-    path => "/usr/local/bin/db-${dbname}-restore.sh",
-    content => template("${module_name}/db-diff-restore.sh.erb"),
-    mode => 0777,
-    owner => "vagrant",
-    group => "vagrant",
-    
+  ->
+  mysql::differential_restore{
+    "kanboard_database_restore":
+    dbname => "${dbname}",
+    dbusername => "${dbusername}",
+    dbpassword => "${dbpassword}",
+    backup_path => "/vagrant/backups/",
   }
-
-  exec{
-    "db-restore":
-    require => [Exec["Create_db_table"],File["db-${dbname}-restore.sh"]],
-    command => "/usr/local/bin/db-${dbname}-restore.sh",
-    cwd => "/home/vagrant",
-  }
-
- #DB backup
-  file{"db-${dbname}-backup.sh":
-    ensure => present,
-    path => "/usr/local/bin/db-${dbname}-backup.sh",
-    content => template("${module_name}/db-diff-backup.sh.erb"),
-    mode => 0777,
-    owner => "vagrant",
-    group => "vagrant",
-    require => Exec["db-restore"]
-  }
- 
-  cron{"${dbname}-backup-cron":
-    command => "/usr/local/bin/db-${dbname}-backup.sh",
-    user => vagrant,
+  ->
+  mysql::differential_backup{
+    "kanboard_database_backup":
+    dbname => "${dbname}",
+    dbusername => "${dbusername}",
+    dbpassword => "${dbpassword}",
+    backup_path => "/vagrant/backups/",
     hour => "*",
     minute => "0",
-    require => File["db-${dbname}-backup.sh"]
   }
-  
+  ->
   file{"config.php":
-    require => Exec["db-restore"],
     path => "/var/www/html/kanboard/config.php",
     content => template("${module_name}/config.default.php.erb"),
     ensure => present,
     mode => 0755,
     owner => "apache",
     group => "apache",
+    require => Exec["chown"]
   }
   
   exec {
