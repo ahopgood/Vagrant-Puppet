@@ -1,5 +1,17 @@
-
-class { 'iptables':
-  port => '8080',
-  isTCP => true
+Package{
+  allow_virtual => false
 }
+
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+
+  file {
+    "${local_install_dir}":
+    path       =>  "${local_install_dir}",
+    ensure     =>  directory,
+  } 
+
+  class { 'iptables':
+    port => '8080',
+    isTCP => true
+  }
