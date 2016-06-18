@@ -30,7 +30,7 @@ class iptables (
     
     exec {"save iptables":
       path => "/usr/sbin/",
-      command => "iptables-save > /vagrant/files/backup/iptables-save.bak"
+      command => "iptables-save > /usr/local/iptables-save.bak"
     }
     
     exec {"Stop firewalld":
@@ -59,7 +59,7 @@ class iptables (
     
     exec {"restore iptables config":
       path => "/usr/sbin/",
-      command => "iptables-restore < /vagrant/files/backup/iptables-save.bak",
+      command => "iptables-restore < /usr/local/iptables-save.bak",
       require => Exec["iptables"]
     }
           
