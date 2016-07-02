@@ -166,16 +166,21 @@ class mysql {
 #    require => Package["mysql-community-server"]
 #  }
 
+  notify{"Starting mysqld":
+    require => Package["mysql-community-server"]
+  }
   exec {"Start mysqld":
     path => "/usr/sbin/",
-    command => "/etc/init.d/mysqld start",
+    command => "/etc/init.d/mysqld start &",
 #    command => "service mysqld start",
-    require => Package["mysql-community-server"]
+#    require => Package["mysql-community-server"]
+    require => Notify["Starting mysqld"]
   }
   
     exec {"Stop mysqld":
     path => "/usr/sbin/",
-    command => "service mysqld stop",
+    command => "/etc/init.d/mysqld stop",
+#    command => "service mysqld stop",
 #    command => "service mysqld start",
 #    require => Package["mysql-community-server"]
     require => Exec["Start mysqld"] #otherwise making mysqld_safe the first run will result in being unable to start the server again via service mysqld start
