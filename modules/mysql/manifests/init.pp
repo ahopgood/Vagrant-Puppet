@@ -149,22 +149,7 @@ class mysql {
     require     =>  [File["${MySQL_server}"], 
     Package["mysql-community-client"], 
     Package["mysql-community-common"]], 
-#    Package["libaio"]],
   }
-  
-  #causes puppet to hang on Centos 6.6
-#  service {"mysqld":
-#    enable => true,
-#    ensure => running,
-#    require => Package["mysql-community-server"]
-#  }
-
-#  exec {"Stop mysqld":
-#    path => "/usr/sbin/",
-#    command => "service mysqld stop",
-##    command => "service mysqld start",
-#    require => Package["mysql-community-server"]
-#  }
 
   notify{"Starting mysqld":
     require => Package["mysql-community-server"]
@@ -172,158 +157,30 @@ class mysql {
   exec {"Start mysqld":
     path => "/usr/sbin/",
     command => "/etc/init.d/mysqld start &",
-#    command => "service mysqld start",
-#    require => Package["mysql-community-server"]
     require => Notify["Starting mysqld"]
   }
   
     exec {"Stop mysqld":
     path => "/usr/sbin/",
     command => "/etc/init.d/mysqld stop",
-#    command => "service mysqld stop",
-#    command => "service mysqld start",
-#    require => Package["mysql-community-server"]
     require => Exec["Start mysqld"] #otherwise making mysqld_safe the first run will result in being unable to start the server again via service mysqld start
   }
 
+  #Need to set the password into the root.txt file
   file {
     "defaults-file":
     path    => "${local_install_dir}/root.txt",
     ensure  =>  present,
     mode => 0644,
     source  => ["puppet:///${puppet_file_dir}root.txt"],
-#    require => Exec["Start mysqld"] #otherwise making mysqld_safe the first run will result in being unable to start the server again via service mysqld start
     require => Exec["Stop mysqld"]
-#        require => Package["mysql-community-server"]
   }
 
   exec {"Set password via mysqld_safe":
     path => "/usr/bin/",
     command => "sudo /usr/bin/mysqld_safe --init-file=${local_install_dir}/root.txt &",
-# /usr/bin/mysqld_safe --init-file=/etc/puppet/installers/root.txt
-#    command => "/usr/bin/mysqld_safe",
-#    command => "service mysqld start",
-#    require => Package["mysql-community-server"],
     require => File["defaults-file"],
-  }
-  
-  #stop the service again to drop out of safe mode
-#  exec {
-#    "Stop mysqld_safe":
-##    path        =>  "/usr/sbin/mysql",
-#    path        =>  "/usr/bin/",
-#    command     =>  "/usr/bin/mysqld_safe stop",
-##    refreshonly =>  true,
-##    subscribe   =>  Exec['Set MySQL root password'],
-##    require     =>  Exec['Set MySQL root password'],
-##    subscribe => Exec['Skip grant tables'],
-##    require     =>  Exec['Skip grant tables'],
-#     require =>  Exec["Set password via mysqld_safe"],
-#  }
-#  
-#    exec {
-#    "Start mysql":
-#    path        =>  "/usr/bin/mysql",
-#    command     =>  "/etc/init.d/mysqld start",
-#    refreshonly =>  true,
-#    subscribe   =>  Exec['Stop mysqld_safe'],
-#    require     =>  Exec["Stop mysqld_safe"],
-#  }
-
-#  exec {"Start mysqld":
-#    path => "/sbin/",
-#    command => "service mysqld start &",
-##    command => "service mysqld start",
-#    require => Package["mysql-community-server"]
-#  }
-#  
-#  file {
-#    "defaults-file":
-#    path    => "${local_install_dir}/my.conf",
-#    ensure  =>  present,
-#    mode => 0644,
-#    source  => ["puppet:///${puppet_file_dir}my.conf"],
-#    require => Exec["Start mysqld"]
-#  }
-#  
-#  exec {"Setup defaults-file":
-#    path => "/usr/bin/",
-#    command => "sudo echo \"password='$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}')'\" >> ${local_install_dir}/my.conf",
-#    require => File["defaults-file"],
-#  }
-#  
-#  exec {"Reset temporary password":
-#    path => "/usr/bin/",
-#    #command => "sleep 15 mysqladmin -uroot -p$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password 'rootR00?' > /dev/null 2>&1",
-#    #command => "sudo mysql -uroot -p$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print $11}') --connect-expired-password -e\" set password=PASSWORD('rootR00?');\"",
-#    #command => "sudo mysql -uroot -p$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') --connect-expired-password -e\"ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootR00?';\"",
-#    command => "mysql --defaults-file=${local_install_dir}/my.conf -e\"ALTER USER 'root'@'localhost' IDENTIFIED BY 'rootR00?';\"",
-#    require => Exec["Setup defaults-file"],
-##    require => Service["mysqld"],
-##    returns => 1, #as we get warnings about using a password on the command line
-#  }
-#mysqladmin -uroot -p$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print $11}') password rootR00? > /dev/null 2>&1
-#  sudo mysql -uroot -p $(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print $11}') --connect-expired-password -e" set password=PASSWORD('rootR00?')";
-#  sudo mysql -uroot -p --connect-expired-password -e" set password=PASSWORD('rootR00?')";
-  
-#  sudo grep 'temporary password' /var/log/mysqld.log
-#  sudo grep 'temporary password' /var/log/mysqld.log | awk '{print $11}'
-  
-  
-  #Need to check the service is running first
-#  exec {
-#    "Stop mysql":
-#    #refreshonly =>  true,
-#    #subscribe   =>  [Package['MySQL-client'], Package['MySQL-server'], Package['MySQL-shared']],
-#    unless      =>  "/usr/bin/mysqladmin -uroot -p${password} status",
-#    path        =>  "/usr/bin/mysqld",
-#    command     =>  "/etc/init.d/mysqld stop",
-#  #  before      =>  Exec['Skip grant tables'],  
-#  }
-  
-  #Start the service in safe mode
-#  exec {
-#    "Skip grant tables":
-#    path        =>  "/usr/bin/",
-#    unless      =>  "/usr/bin/mysqladmin status",
-#    command     =>  "sudo mysqld_safe --skip-grant-tables -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '${password}';\"", 
-#    #before      =>  Exec['Set MySQL root password'],
-#    refreshonly =>  true,
-#    subscribe   =>  Exec['Stop mysql'],
-#    require     =>  Exec['Stop mysql'],
-#  }
-  
-  #Set the root password
-#  exec {
-#    "Set MySQL root password":
-#    path        =>  "/usr/bin/",
-##    command     =>  "sudo sleep 5 && mysql mysql -e \"update user set password=PASSWORD('$password') where user='root'; flush privileges;\"",
-#    command => "sudo sleep 15 && mysql mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '$password';\"",
-#    refreshonly =>  true,
-#    subscribe   =>  Exec['Skip grant tables'],
-#    require     =>  Exec['Skip grant tables'],  
-#  }
-
-  
-#  #Start service again normally without skipping the grant tables.
-#  exec {
-#    "Start mysql":
-#    path        =>  "/usr/bin/mysql",
-#    command     =>  "/etc/init.d/mysqld start",
-#    refreshonly =>  true,
-#    subscribe   =>  Exec['Stop mysqld_safe'],
-#    require     =>  Exec["Stop mysqld_safe"],
-#  } 
-  
-  #Now confirm the password, as the one issued in the --skip-grant-tables will be marked as expired
-#  exec {
-#    "Confirm password":
-#    path        =>  "/usr/bin/",
-#    command     =>  "mysql -uroot -p${password} --connect-expired-password -e\"SET PASSWORD = PASSWORD(\'${password}\');\"",
-#    refreshonly =>  true,
-#    subscribe   =>  Exec['Start mysql'],
-#    require     =>  Exec["Start mysql"],
-#  }
+  }  
 }
 
 define mysql::create_user(
