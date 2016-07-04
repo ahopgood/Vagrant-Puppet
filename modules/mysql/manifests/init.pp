@@ -38,7 +38,7 @@ class mysql {
   $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
 
-  $password             = "rootR00?"
+  $password             = "rootR00?s"
 
   #Load the installers from the puppet fileserver into the local filesystem
   #Try giving the file a name and separate target location so we don't need to fully qualify the path
@@ -172,7 +172,8 @@ class mysql {
     path    => "${local_install_dir}/root.txt",
     ensure  =>  present,
     mode => 0644,
-    source  => ["puppet:///${puppet_file_dir}root.txt"],
+#    source  => ["puppet:///${puppet_file_dir}root.txt"],
+    content => template("${module_name}/root.txt.erb"),
     require => Exec["Stop mysqld"]
   }
 
