@@ -11,7 +11,10 @@
 # Sample Usage:
 #
 #include fileserver
-class mysql {  
+class mysql (
+  $password = "rootR00?s",
+  $root_home = "/home/vagrant",
+){  
   #Modify this into a class that we can pass args into, e.g. mysql version number, os speciic installer classes etc.
   #NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_dir    = "${local_install_path}installers"
@@ -37,8 +40,6 @@ class mysql {
   $MySQL_server = "mysql-community-server-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
-
-  $password             = "rootR00?s"
 
   #Load the installers from the puppet fileserver into the local filesystem
   #Try giving the file a name and separate target location so we don't need to fully qualify the path
@@ -156,34 +157,44 @@ class mysql {
   }
   exec {"Start mysqld":
     path => "/usr/sbin/",
-    command => "/etc/init.d/mysqld start &",
+#    unless =>  "/usr/bin/mysqladmin -uroot -p${password} status",
+    command => "/etc/init.d/mysqld start",
     require => Notify["Starting mysqld"]
   }
+
+  #1. Find the previous password in the my.cnf
+  #2. If .my.cnf doesn't exist then find the temporary password
+  #3. Set the new root password
+  #4. Set root password in the my.cnf template file and place it in the /home/root directory
+  #5. Create regular mysql users using the root user, not sure if vagrant can do this?
   
-    exec {"Stop mysqld":
-    path => "/usr/sbin/",
-    command => "/etc/init.d/mysqld stop",
-    require => Exec["Start mysqld"] #otherwise making mysqld_safe the first run will result in being unable to start the server again via service mysqld start
-  }
-
-  #Need to set the password into the root.txt file
-  file {
-    "defaults-file":
-    path    => "${local_install_dir}/root.txt",
-    ensure  =>  present,
-    mode => 0644,
-#    source  => ["puppet:///${puppet_file_dir}root.txt"],
-    content => template("${module_name}/root.txt.erb"),
-    require => Exec["Stop mysqld"]
-  }
-
-  exec {"Set password via mysqld_safe":
+   exec {"reset temp password":
     path => "/usr/bin/",
-    command => "sudo /usr/bin/mysqld_safe --init-file=${local_install_dir}/root.txt &",
-    require => File["defaults-file"],
-  }  
-}
+    onlyif => "test ! -f ${root_home}/.my.cnf",
+    command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
+    require => Exec["Start mysqld"],
+    before => File["my.cnf"],
+  }
 
+   exec {"reset password":
+    path => "/usr/bin/",
+    onlyif => "test -f ${root_home}/.my.cnf",
+    command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
+    require => Exec["Start mysqld"],
+    before => File["my.cnf"],
+  }
+  
+  #if we can login with the expected password then do nothing, if not then we need to add it to the .my.cnf file.
+  file {
+    "my.cnf":
+    path    => "${root_home}/.my.cnf",
+    ensure  =>  present,
+    mode => 0655,
+    content => template("${module_name}/my.cnf.erb"),
+    require => Exec["Start mysqld"]
+  }
+}
+#sudo /usr/bin/mysqld_safe --init-file=/etc/puppet/installers/root.txt
 define mysql::create_user(
   $dbname = undef,
   $rootusername = undef,
