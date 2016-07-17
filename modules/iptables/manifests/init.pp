@@ -53,7 +53,7 @@ class iptables (
     }
     exec {"iptables":
       path => "/bin/",
-      command => "rpm -Uvh ${local_install_dir}${iptables}",
+      command => "rpm -Uvh --replacepkgs ${local_install_dir}${iptables}",
       require => [File["${iptables}"],Exec["save iptables"]],
     }
     
