@@ -28,8 +28,8 @@ class mysql (
   $major_version        = "5"
   $minor_version        = "7"
   $patch_version        = "13"
-  $os_platform          = "-1.el6.x86_64"
-#  $os_platform          = "-1.el7.x86_64"
+#  $os_platform          = "-1.el6.x86_64"
+  $os_platform          = "-1.el7.x86_64"
 
 #  $MySQL_shared_compat  = "MySQL-shared-compat-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
 #  $MySQL_server         = "MySQL-server-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
@@ -40,6 +40,7 @@ class mysql (
   $MySQL_server = "mysql-community-server-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
+  $MySQL_shared_compat = "mysql-community-libs-compat-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
 
   #Load the installers from the puppet fileserver into the local filesystem
   #Try giving the file a name and separate target location so we don't need to fully qualify the path
@@ -66,13 +67,12 @@ class mysql (
       require     =>  File["${libaio}"],
       before      =>  [Package['mysql-community-common'], Package['mysql-community-server'], Package['mysql-community-client']],
     }
-#  remove mariadb-libs.x86_64 1:5.5.41-2.el7_0
     package {
       "postfix":
       ensure    => absent,
       provider  => 'rpm',
     } 
-    
+#  remove mariadb-libs.x86_64 1:5.5.41-2.el7_0    
     package {
       'mariadb-libs':
       ensure      =>  absent,
@@ -88,8 +88,8 @@ class mysql (
       before => Package["mysql-community-common"],
       uninstall_options => ["--nodeps"]
     }
-  }
-
+  } 
+  
   file {
       "${MySQL_common}":
       path    =>  "${local_install_dir}/${MySQL_common}",
@@ -120,6 +120,23 @@ class mysql (
     require     =>  [File["${MySQL_libs}"], Package["mysql-community-common"]],
   }
   
+  file {
+      "${MySQL_shared_compat}":
+      path    =>  "${local_install_dir}/${MySQL_shared_compat}",
+      ensure  =>  present,
+      source  =>  ["puppet:///${puppet_file_dir}${MySQL_shared_compat}"],
+  }
+  
+  package {
+      'mysql-community-libs-compat':
+      ensure      =>  installed,
+      provider    =>  'rpm',
+      source      =>  "${local_install_dir}/${MySQL_shared_compat}",
+      require     =>  [File["${MySQL_shared_compat}"],
+        Package["mysql-community-libs"]
+      ],
+  }  
+  
   file{
     "${MySQL_client}":
     path      => "${local_install_dir}/${MySQL_client}",
@@ -132,7 +149,8 @@ class mysql (
     ensure      =>  installed,
     provider    =>  'rpm',
     source      =>  "${local_install_dir}/${MySQL_client}",
-    require     =>  [File["${MySQL_client}"], Package["mysql-community-libs"]],
+    require     =>  [File["${MySQL_client}"]], 
+#      Package["mysql-community-libs-compat"]],
   }
   
   file {
@@ -156,9 +174,11 @@ class mysql (
     require => Package["mysql-community-server"]
   }
   exec {"Start mysqld":
-    path => "/usr/sbin/",
+#    path => "/usr/sbin/",
 #    unless =>  "/usr/bin/mysqladmin -uroot -p${password} status",
-    command => "/etc/init.d/mysqld start",
+#    command => "/etc/init.d/mysqld start", #centos 6
+    path => "/usr/bin/",
+    command => "systemctl start mysqld", #centos 7
     require => Notify["Starting mysqld"]
   }
 
