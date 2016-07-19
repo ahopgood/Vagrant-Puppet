@@ -5,6 +5,12 @@ Package{
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
 
+  file {
+    "${local_install_dir}":
+    path       =>  "${local_install_dir}",
+    ensure     =>  directory,
+  } 
+
   #root dbusername
   #root dbpassword
   #dbname
@@ -14,14 +20,23 @@ Package{
   class {"iptables": port => "80"}
   class {"httpd":}
   class {"mysql":}
-  class {"php":}
+  class {"php":
+    major_version => '5',
+    minor_version => '4',
+    patch_version => '16',
+  }
   
+  #Used in the database differential backup and restore
   $database_name = "wordpress"
   $database_username = "wordpress"
-  $database_password = "wordpress"
+  $database_password = "wordpresS1!"
   
-class { 'wordpress':
-  major_version => '4',
-  minor_version => '3',
-  patch_version => '1',
-}
+  $root_database_username = "root"
+  $root_database_password = "rootR00?s"
+  $root_home = "/home/vagrant"
+  
+  class { 'wordpress':
+    major_version => '4',
+    minor_version => '3',
+    patch_version => '1',
+  }

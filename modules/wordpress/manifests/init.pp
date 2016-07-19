@@ -50,20 +50,25 @@ class wordpress (
     command => "rm /var/www/html/${wordpress_file_tar}",
   }
   
+  exec{"chown":
+    command => "chown httpd:httpd -R /var/www/html/wordpress",
+    require => Exec["untar"]
+  }
+  
   #Change ownership to the apache user on the /var/www/html/wordpress 
     
   mysql::create_database{
     "create_wordpress_database":
     dbname => "${database_name}",
-    dbusername => "root",
-    dbpassword => "root",
+    dbusername => "${root_database_username}",
+    dbpassword => "${root_database_password}",
   }
   
   mysql::create_user {
     "create_restricted_wordpress_db_user":
     dbname => "${database_name}",
-    rootusername => "root",
-    rootpassword => "root",
+    rootusername => "${root_database_username}",
+    rootpassword => "${root_database_password}",
     dbusername => "${database_username}",
     dbpassword => "${database_password}",
   }
@@ -72,7 +77,7 @@ class wordpress (
     "wordpress_database_restore":
     dbname => "${database_name}",
     dbusername => "${database_username}",
-    dbpassword => "${database_username}",
+    dbpassword => "${database_password}",
     backup_path => "/vagrant/backups/",
   }
   
@@ -80,7 +85,7 @@ class wordpress (
     "wordpress_database_backup":
     dbname => "${database_name}",
     dbusername => "${database_username}",
-    dbpassword => "${database_username}",
+    dbpassword => "${database_password}",
     backup_path => "/vagrant/backups/",
     minute => "*/2"
   } 
@@ -109,4 +114,5 @@ class wordpress (
     mode => 777,
     content => template("${module_name}/wp-config.php.erb"),
   }
+
 }

@@ -87,3 +87,7 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+
+/** Allows for direct file upload of plugins and wordpress updates, not recommended for hosted solutions.
+  * Hosted solutions should use an FTP server */
+define('FS_METHOD','direct');
