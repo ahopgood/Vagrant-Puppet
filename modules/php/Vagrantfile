@@ -6,7 +6,8 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|  
-  config.vm.box = "puppetlabs/centos-6.6-64-puppet"
+#  config.vm.box = "puppetlabs/centos-6.6-64-puppet"
+  config.vm.box = "puppetlabs/centos-7.0-64-puppet"
   config.vm.box_check_update = false
   config.vm.box_version = "1.0.1"
   config.vm.hostname = "php.vm"
@@ -17,7 +18,8 @@ Vagrant.configure(2) do |config|
     
   config.vm.provision "puppet" do |puppet|
   	puppet.manifests_path = "manifests"
-  	puppet.manifest_file  = "php.pp"
+#  	puppet.manifest_file  = "php.pp"
+  	puppet.manifest_file  = "init.pp"
   	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
   end
 
