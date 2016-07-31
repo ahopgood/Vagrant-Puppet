@@ -19,22 +19,17 @@ class mysql (
   #NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/mysql/"
-  
-#  $major_version        = "5"
-#  $minor_version        = "6"
-#  $patch_version        = "19"
-#  $os_platform          = "-1.el6.x86_64"
-  
+
   $major_version        = "5"
   $minor_version        = "7"
   $patch_version        = "13"
-#  $os_platform          = "-1.el6.x86_64"
-  $os_platform          = "-1.el7.x86_64"
-
-#  $MySQL_shared_compat  = "MySQL-shared-compat-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
-#  $MySQL_server         = "MySQL-server-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
-#  $MySQL_client         = "MySQL-client-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
-#  $MySQL_shared         = "MySQL-shared-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
+  $os = "$operatingsystem$operatingsystemmajrelease"
+  
+  if "${os}" == "CentOS7"{
+    $os_platform          = "-1.el7.x86_64"
+  } elsif "${os}" == "CentOS6" {
+    $os_platform          = "-1.el6.x86_64"
+  }
 
   $MySQL_common = "mysql-community-common-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
   $MySQL_server = "mysql-community-server-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
@@ -47,8 +42,7 @@ class mysql (
   
   #Ensure that the local install directory exists
   #Ensure the destination directory for the installers is present
-  $os = "$operatingsystem$operatingsystemmajrelease"
-    
+
   if "${os}" == "CentOS7"{
     #  install libaio as it is needed by mysql-server package
     $libaio = "libaio-0.3.109-13.el7.x86_64.RPM"
@@ -58,7 +52,6 @@ class mysql (
         ensure  =>  present,
         source  =>  ["puppet:///${puppet_file_dir}${libaio}"],
     }
-  
     package {
       'libaio':
       ensure      =>  installed,
@@ -71,8 +64,7 @@ class mysql (
       "postfix":
       ensure    => absent,
       provider  => 'rpm',
-    } 
-#  remove mariadb-libs.x86_64 1:5.5.41-2.el7_0    
+    }     
     package {
       'mariadb-libs':
       ensure      =>  absent,
@@ -81,7 +73,6 @@ class mysql (
       require     =>  Package["postfix"]
     }
   } elsif "${os}" == "CentOS6" {
-    
     package {"mysql-libs":
       provider => "rpm",
       ensure => absent,
@@ -150,7 +141,6 @@ class mysql (
     provider    =>  'rpm',
     source      =>  "${local_install_dir}/${MySQL_client}",
     require     =>  [File["${MySQL_client}"]], 
-#      Package["mysql-community-libs-compat"]],
   }
   
   file {
@@ -173,13 +163,19 @@ class mysql (
   notify{"Starting mysqld":
     require => Package["mysql-community-server"]
   }
-  exec {"Start mysqld":
-#    path => "/usr/sbin/",
-#    unless =>  "/usr/bin/mysqladmin -uroot -p${password} status",
-#    command => "/etc/init.d/mysqld start", #centos 6
-    path => "/usr/bin/",
-    command => "systemctl start mysqld", #centos 7
-    require => Notify["Starting mysqld"]
+
+  if "${os}" == "CentOS7"{
+    exec {"Start mysqld":
+      path => "/usr/bin/",
+      command => "systemctl start mysqld", #centos 7
+      require => Notify["Starting mysqld"]
+    }
+  } elsif "${os}" == "CentOS6" {
+    exec {"Start mysqld":
+      command => "/etc/init.d/mysqld start", #centos 6
+      path => "/usr/bin/",
+      require => Notify["Starting mysqld"]
+    }
   }
 
   #1. Find the previous password in the my.cnf
