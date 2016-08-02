@@ -50,12 +50,13 @@ class wordpress (
     command => "rm /var/www/html/${wordpress_file_tar}",
   }
   
+  #A look up for the apache::user value should be used
   exec{"chown":
-    command => "chown httpd:httpd -R /var/www/html/wordpress",
+    command => "chown apache:apache -R /var/www/html/wordpress",
     require => Exec["untar"]
   }
   
-  #Change ownership to the apache user on the /var/www/html/wordpress 
+  #Wordpress is trying to load pages from 192.168.33.21 instead of 192.168.33.22 
     
   mysql::create_database{
     "create_wordpress_database":
