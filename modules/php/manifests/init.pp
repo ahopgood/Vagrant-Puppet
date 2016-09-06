@@ -31,42 +31,45 @@ class php (
 
   #Centos versioning <packagename>-<major_ver>.<minor_ver>.<patch_ver>-<buildnumber>.el<majorLinuxVer>_<minorLinuxVer>.<arch>.rpm
 #  $os_specific = "-46.el6_6.x86_64"
-  $os_specific = "-36.el7_1.x86_64"
+  $os_specific = ".el7_1.x86_64"
+  $build_number = "36"
 
 #  if "${minor_version}" > "3" {
 ##  && "${major_version}" > 4 {
 	  notify{"In libzip":}
-	  $lib_zip = "libzip-0.10.1-8.el7.x86_64.rpm"
+#	  $lib_zip = "libzip-0.10.1-8.el7.x86_64.rpm"
+	  $lib_zip = "libzip-0.10.1-8.el7.x86_64"
+	  $lib_zip_file = "${lib_zip}.rpm"
 	  file{
-	    "${local_install_dir}${lib_zip}":
+	    "${local_install_dir}${lib_zip_file}":
 	    ensure => present,
-	    source => ["puppet:///${puppet_file_dir}${lib_zip}",]
+	    source => ["puppet:///${puppet_file_dir}${$lib_zip_file}",]
 	  }
 	  package {"libzip":
 	    ensure => present,
 	    provider => 'rpm',
-	    source => "${local_install_dir}${lib_zip}",
-	    require => [File["${local_install_dir}${lib_zip}"]],
+	    source => "${local_install_dir}${$lib_zip_file}",
+	    require => [File["${local_install_dir}${lib_zip_file}"]],
 	  }
 #  }
  
-  $php_name = "php-${major_version}.${minor_version}.${patch_version}"
+  $php_name = "php-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_file = "${php_name}.rpm"  
   $php_file_os = "${php_name}${os_specific}.rpm"
   
-  $php_cli = "php-cli-${major_version}.${minor_version}.${patch_version}"
+  $php_cli = "php-cli-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_cli_file = "${php_cli}.rpm"
   $php_cli_os = "${php_cli}${os_specific}.rpm"
   
-  $php_common = "php-common-${major_version}.${minor_version}.${patch_version}"
+  $php_common = "php-common-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_common_file = "${php_common}"
   $php_common_os = "${php_common}${os_specific}.rpm"
   
-  $php_mbstring = "php-mbstring-${major_version}.${minor_version}.${patch_version}"
+  $php_mbstring = "php-mbstring-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_mbstring_file = "${php_mbstring}.rpm"
   $php_mbstring_os = "${php_mbstring}${os_specific}.rpm"
 
-  $php_pdo = "php-pdo-${major_version}.${minor_version}.${patch_version}"
+  $php_pdo = "php-pdo-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_pdo_file = "${php_pdo}.rpm"
   $php_pdo_os = "${php_pdo}${os_specific}.rpm"
    
@@ -137,7 +140,7 @@ class php (
     require => [File["${local_install_dir}${php_pdo_file}"],Package["php-common"]],
   }
 
-  $php_gd = "php-gd-${major_version}.${minor_version}.${patch_version}"
+  $php_gd = "php-gd-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_gd_file = "${php_gd}.rpm"
   $php_gd_os = "${php_gd}${os_specific}.rpm"  
   file{
@@ -269,7 +272,6 @@ class php (
   }
 
   $libjpeg_file = "libjpeg-turbo-1.2.90-5.el7.x86_64.rpm"
-  #libjpeg-turbo-1.2.90-5.el7.i686.rpm is required
   file{
     "${local_install_dir}${libjpeg_file}":
     ensure => present,
@@ -283,7 +285,7 @@ class php (
   }
 
     
-  $php_mysql = "php-mysql-${major_version}.${minor_version}.${patch_version}"
+  $php_mysql = "php-mysql-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_mysql_file = "${php_mysql}.rpm"
   $php_mysql_os = "${php_mysql}${os_specific}.rpm"
   file{
