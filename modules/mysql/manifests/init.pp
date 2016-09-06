@@ -45,7 +45,7 @@ class mysql (
 
   if "${os}" == "CentOS7"{
     #  install libaio as it is needed by mysql-server package
-    $libaio = "libaio-0.3.109-13.el7.x86_64.RPM"
+    $libaio = "libaio-0.3.109-13.el7.x86_64.rpm"
     file {
         "${libaio}":
         path    =>  "${local_install_dir}/${libaio}",
