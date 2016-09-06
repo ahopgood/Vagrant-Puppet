@@ -19,7 +19,7 @@ class kanboard (
   
   $dbtype = "mysql"
   $dbusername = "root"
-  $dbpassword = "root"
+  $dbpassword = "rootR00?s"
   $dbname = "kanboard" 
 
   $local_install_path = "/etc/puppet/"
@@ -131,8 +131,9 @@ class kanboard (
   exec {
     "restart_apache_for_kanban":
     require => File["config.php"],
-    command => "/etc/init.d/httpd restart",
+#    command => "/etc/init.d/httpd restart",#centos 6
     cwd => "/usr/bin/",
+    command => "systemctl restart httpd"
   } 
   
   notify {
