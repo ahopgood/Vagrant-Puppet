@@ -116,4 +116,28 @@ class wordpress (
     content => template("${module_name}/wp-config.php.erb"),
   }
 
+  #Backup plugins
+  #Backup themes
+  #Perfom a zip of the plugin
+  #Try to backup to specified location
+  #If a file already exists with the filename compare the hashes, if different then backup
+  
+  #How to get the list of plugin directories?
+  #ls -1
+  
+  #Compress the directory:
+  #tar -czf <plugin-dir-name>
+  
+  
 }
+
+
+
+
+
+
+
+
+
+
+
