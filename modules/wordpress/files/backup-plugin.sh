@@ -1,24 +1,70 @@
 #!/bin/bash
 
-PLUGIN_DIR="/var/www/html/wordpress/wp-content/plugins/"
-BACKUP_PATH="/vagrant/backups/"
+# Need to allow this to run over a directory of plugins (ls -1 | backup-plugin.sh)?
+# Need to allow this to run using a plugin directory as a parameter
+# Need to allow this to run using a base plugin directory as a parameter
+# Need to allow this to run using a back up directory as a parameter
+# Need to have the script return a correct exit status code. 
 
-DIR_NAME="breadcrumb-navxt"
+#First arg should be the backup path which is a directory
+if [ ! -z $1 ];then
+  BACKUP_PATH=$1
+  echo "We are attempting to backup to the following destination directory [$BACKUP_PATH]"
+  if [ ! -d $BACKUP_PATH ];then
+    echo "Backup path [$BACKUP_PATH] doesn't exist, aborting"
+    exit 1
+  fi 
+else 
+  echo "The backup path is null, aborting"
+  exit 1
+fi
+
+#Second arg should be the parent directory of the directory we wish to backup
+if [ ! -z $2 ];then
+  echo "We are attempting to use the parent directory with name [$2]"
+  PLUGIN_DIR=$2
+  
+  if [ ! -d $PLUGIN_DIR ]; then
+    echo "The parent directory for back up [$PLUGIN_DIR] doesn't exist, aborting"
+    exit 1
+  fi
+else 
+  echo "The parent directory is null, aborting"
+  exit 1
+fi
+
+ 
+#Third arg should be the folder name to backup
+if [ ! -z $3 ];then
+  echo "We are attempting to backup the directory with name [$3]"
+  DIR_NAME=$3
+  
+  if [ ! -d "$PLUGIN_DIR$DIR_NAME" ]; then
+    echo "The directory to back up [$PLUGIN_DIR][$DIR_NAME] doesn't exist, aborting"
+    exit 1
+  fi
+else 
+  echo "The directory to back up is null, aborting"
+  exit 1
+fi
+
+#Check we are being run within the directory?
+
 ARCHIVE_NAME=$DIR_NAME".tar"
 COMPRESSED_ARCHIVE_NAME=$ARCHIVE_NAME".gz"
 
 CHECKSUM_FILE="checksum.txt"
 
-echo "Running plugin compression on $DIR_NAME"
+echo "Running compression on $DIR_NAME"
 
-
-#tar -czf $COMPRESSED_ARCHIVE_NAME $DIR_NAME
 tar -cf $ARCHIVE_NAME $DIR_NAME
-# Create compressed archive without modified data (-n) to allow for md5sum comparison disregarding modified timestamps.
-gzip -n $ARCHIVE_NAME 
-#Need to allow gzip to continue if a gzipped tar already exists in the folder
 
-# Does a file with the name already exist in $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME?
+# Create compressed archive without modified data (-n) to allow for md5sum comparison disregarding modified timestamps.
+# Need to allow gzip to continue if a gzipped tar already exists in the folder hence use of --force
+gzip -n --force $ARCHIVE_NAME 
+
+
+ Does a file with the name already exist in $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME?
 if [ -f $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME ]; then
   echo "Backup found! Checking for changes..."
   echo "Moving into $BACKUP_PATH"
@@ -39,7 +85,7 @@ if [ -f $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME ]; then
 	  else
 	    echo "Checksum different, proceeding with backup"
 	    
-	    #If md5sum does not match then rm backed up archive then mv new archive to backup directory
+	    # If md5sum does not match then rm backed up archive and mv new archive to backup directory
 	    echo "Removing old backup $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME backed up at "$(ls -l --time-style=full-iso $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME | awk '{ print $6 " " $7 }') 
   	    rm $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME
     	
@@ -50,11 +96,12 @@ if [ -f $BACKUP_PATH$COMPRESSED_ARCHIVE_NAME ]; then
       echo "Removing checksum file"
       rm $BACKUP_PATH$CHECKSUM_FILE
     else
-      echo "Cannot find plugin directory "$PLUGIN_DIR" failed to proceed with checksum verification, abandoning backup process."
-    fi #end plugin dir check
+      echo "Cannot find directory [$PLUGIN_DIR] failed to proceed with checksum verification, abandoning backup process."
+      exit 1
+    fi #end dir check
   else
-    echo "Unable to find backup directory "$BACKUP_PATH" abandoning backup process."
-    #return 1
+    echo "Unable to find backup destination directory [$BACKUP_PATH] abandoning backup process."
+    exit 1
   fi #end backup path check
 else 
   #No existing backup, this is our first so copy across the gzipped tar file.
