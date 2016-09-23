@@ -40,3 +40,8 @@ Package{
     minor_version => '3',
     patch_version => '1',
   }
+  
+  wordpress::plugin_backup{"plugin-backup":
+    plugin_dir => "/var/www/html/wordpress/wp-content/plugins/",
+    backup_path => "/vagrant/backups/"
+  }

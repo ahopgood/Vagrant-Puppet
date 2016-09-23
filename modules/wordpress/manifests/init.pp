@@ -114,23 +114,54 @@ class wordpress (
     group => "apache",
     mode => 777,
     content => template("${module_name}/wp-config.php.erb"),
-  }
-
-  #Backup plugins
-  #Backup themes
-  #Perfom a zip of the plugin
-  #Try to backup to specified location
-  #If a file already exists with the filename compare the hashes, if different then backup
-  
-  #How to get the list of plugin directories?
-  #ls -1
-  
-  #Compress the directory:
-  #tar -czf <plugin-dir-name>
-  
-  
+  }  
 }
 
+define wordpress::backup_core{
+    #This file should be present for plugin and theme backup, how to share this?
+  file {"backup-directory.sh":
+    path => "/usr/local/bin/backup-directory.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+#    content => template("${module_name}/backup-directory.sh.erb"),
+    source => ["puppet:///modules/${module_name}/backup-directory.sh"],
+  }
+}
+
+define wordpress::plugin_backup(
+  $plugin_dir = undef,
+  $backup_path = undef,
+  $hour = "*",
+  $minute = "*"
+){
+
+  if ($plugin_dir == undef) {
+    fail("You must define a plugin directory path location in order to peform backup of the wordpress plugins")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location in order to do a backup of the wordpress plugins")
+  }
+  wordpress::backup_core{"backup-core":}
+
+  file{"backup-plugins.sh":
+    path => "/usr/local/bin/backup-plugins.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    content => template("${module_name}/backup-plugins.sh.erb"),
+  }
+  
+  cron { "backup-plugins-cron":
+    command => "/usr/local/bin/backup-plugins.sh",
+    user => vagrant,
+    hour => "${hour}",
+    minute => "${minute}",
+    require => File["backup-plugins.sh"]
+  }
+}
 
 
 
