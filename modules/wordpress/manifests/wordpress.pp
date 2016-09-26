@@ -41,7 +41,14 @@ Package{
     patch_version => '1',
   }
   
-  wordpress::plugin_backup{"plugin-backup":
+  wordpress::backup_core{"backup-core":}
+  
+  wordpress::plugin_backup{"plugin-backup-resource-instance":
     plugin_dir => "/var/www/html/wordpress/wp-content/plugins/",
-    backup_path => "/vagrant/backups/"
+    backup_path => "/vagrant/backups/plugins/"
+  }
+  
+  wordpress::theme_backup{"theme-backup":
+    theme_dir => "/var/www/html/wordpress/wp-content/themes/",
+    backup_path => "/vagrant/backups/themes/"
   }

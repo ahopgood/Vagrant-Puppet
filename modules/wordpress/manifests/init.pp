@@ -138,12 +138,22 @@ define wordpress::plugin_backup(
 ){
 
   if ($plugin_dir == undef) {
-    fail("You must define a plugin directory path location in order to peform backup of the wordpress plugins")
+    fail("You must define a plugin directory path location in order to perform backup of the wordpress plugins")
   }
   if ($backup_path == undef) {
     fail("You must define a backup path location in order to do a backup of the wordpress plugins")
   }
-  wordpress::backup_core{"backup-core":}
+  
+#  Define["wordpress::backup_core"] -> Define["wordpress::plugin_backup{}"]
+  
+#  Wordpress::backup_core["backup"] -> Wordpress::plugin_backup["this"]
+  
+#  wordpress::backup_core{"backup":}
+
+  file {"${backup_path}":
+    path => "${backup_path}",
+    ensure => directory,
+  }
 
   file{"backup-plugins.sh":
     path => "/usr/local/bin/backup-plugins.sh",
@@ -152,6 +162,7 @@ define wordpress::plugin_backup(
     group => "apache",
     mode => 777,
     content => template("${module_name}/backup-plugins.sh.erb"),
+    require => Wordpress::Backup_core["backup-core"]
   }
   
   cron { "backup-plugins-cron":
@@ -163,7 +174,44 @@ define wordpress::plugin_backup(
   }
 }
 
+define wordpress::theme_backup(
+  $theme_dir = undef,
+  $backup_path = undef,
+  $hour = "*",
+  $minute = "*"
+){
 
+  if ($theme_dir == undef
+  ) {
+    fail("You must define a theme directory path location in order to perform backup of the wordpress themes")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location in order to do a backup of the wordpress themes")
+  }
+  
+  file {"${backup_path}":
+    path => "${backup_path}",
+    ensure => directory,
+  }
+  
+  file{"backup-themes.sh":
+    path => "/usr/local/bin/backup-themes.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    content => template("${module_name}/backup-themes.sh.erb"),
+    require => Wordpress::Backup_core["backup-core"]
+  }
+  
+  cron { "backup-themes-cron":
+    command => "/usr/local/bin/backup-themes.sh",
+    user => vagrant,
+    hour => "${hour}",
+    minute => "${minute}",
+    require => File["backup-themes.sh"]
+  }
+}
 
 
 
