@@ -41,7 +41,7 @@ function backup(){
 	  if [ ! -d "$PARENT_DIR$DIR_NAME" ]; then
 	    echo "The directory to back up [$PARENT_DIR][$DIR_NAME] doesn't exist, attempting to treat it as a file..."
 	    if [ ! -f "$PARENT_DIR$DIR_NAME" ];then
-	      echo "The file to backup [$PARENT_DIR][$DIR_NAME], aborting"
+	      echo "The file to backup [$PARENT_DIR][$DIR_NAME], doesn't exist aborting"
 	      exit 1
 	    fi
 	  fi

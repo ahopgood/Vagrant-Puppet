@@ -42,13 +42,19 @@ Package{
   }
   
   wordpress::backup_core{"backup-core":}
+  $minute = "0"
   
   wordpress::plugin_backup{"plugin-backup-resource-instance":
     plugin_dir => "/var/www/html/wordpress/wp-content/plugins/",
-    backup_path => "/vagrant/backups/plugins/"
+    backup_path => "/vagrant/backups/plugins/",
+    minute => $minute,
   }
   
   wordpress::theme_backup{"theme-backup":
     theme_dir => "/var/www/html/wordpress/wp-content/themes/",
-    backup_path => "/vagrant/backups/themes/"
+    backup_path => "/vagrant/backups/themes/",
+    minute => $minute,
   }
+  
+  wordpress::restore_core{"restore-core":}
+  

@@ -183,10 +183,10 @@ define wordpress::theme_backup(
 
   if ($theme_dir == undef
   ) {
-    fail("You must define a theme directory path location in order to perform backup of the wordpress themes")
+    fail("You must define a theme directory path location in order to perform backup of the wordpress themes.")
   }
   if ($backup_path == undef) {
-    fail("You must define a backup path location in order to do a backup of the wordpress themes")
+    fail("You must define a backup path location in order to do a backup of the wordpress themes.")
   }
   
   file {"${backup_path}":
@@ -213,8 +213,85 @@ define wordpress::theme_backup(
   }
 }
 
+define wordpress::restore_core{
+  file {"restore-directory.sh":
+    path => "/usr/local/bin/restore-directory.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    source => ["puppet:///modules/${module_name}/restore-directory.sh"],
+  }
+}
 
+define wordpress::plugin_restore(
+  $plugin_dir = undef,
+  $backup_path = undef,
+){
 
+  if ($plugin_dir == undef) {
+    fail("You must define a plugin directory path location to restore the wordpress plugins to.")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location from which to do a restore of the wordpress plugins.")
+  }
+
+  file {"${backup_path}":
+    path => "${backup_path}",
+    ensure => directory,
+  }
+
+  file {"restore-plugins.sh":
+    path => "/usr/local/bin/restore-plugins.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    content => template("${module_name}/restore-plugins.sh.erb"),
+    require => Wordpress::Backup_core["restore-core"]
+  }
+  
+  exec {"restore-plugins-cron":
+    command => "/usr/local/bin/restore-plugins.sh",
+    user => vagrant,
+    require => File["restore-plugins.sh"]
+  }
+}
+
+define wordpress::theme_restore(
+  $theme_dir = undef,
+  $backup_path = undef,
+){
+
+  if ($theme_dir == undef
+  ) {
+    fail("You must define a theme directory path location to restore the wordpress themes to.")
+  }
+  if ($backup_path == undef) {
+    fail("You must define a backup path location in order to do a restore of the wordpress themes.")
+  }
+  
+  file {"${backup_path}":
+    path => "${backup_path}",
+    ensure => directory,
+  }
+  
+  file{"restore-themes.sh":
+    path => "/usr/local/bin/restore-themes.sh",
+    ensure => present,
+    owner => "apache",
+    group => "apache",
+    mode => 777,
+    content => template("${module_name}/restore-themes.sh.erb"),
+    require => Wordpress::Restore_core["restore-core"]
+  }
+  
+  exec { "restore-themes-cron":
+    command => "/usr/local/bin/restore-themes.sh",
+    user => vagrant,
+    require => File["restore-themes.sh"]
+  }
+}
 
 
 
