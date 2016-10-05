@@ -66,19 +66,20 @@ function restore(){
 	if [ ! -e "$PARENT_DIR$EXPANDED_PLUGIN" ]; then
 		echo "Moving $EXPANDED_PLUGIN to $PARENT_DIR" 
 		mv $EXPANDED_PLUGIN $PARENT_DIR
-		EXIT_STATUS=0  
+	#	EXIT_STATUS=0  
 	else
 		echo "$PARENT_DIR$EXPANDED_PLUGIN already exists, aborting restore"
 		echo "Removing temporary expanded plugin [$(pwd)$EXPANDED_PLUGIN]"
 		rm -rf $EXPANDED_PLUGIN
 		EXIT_STATUS=1
+		exit 1
 	fi
 	
 	echo "Removing temporary directory [tmp]"
 	cd ../
 	rm -rf tmp 
 	
-	exit $EXIT_STATUS
+
 } #close function backup()
 
 
