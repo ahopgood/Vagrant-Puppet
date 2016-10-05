@@ -69,9 +69,8 @@ function restore(){
 	#	EXIT_STATUS=0  
 	else
 		echo "$PARENT_DIR$EXPANDED_PLUGIN already exists, aborting restore"
-		echo "Removing temporary expanded plugin [$(pwd)$EXPANDED_PLUGIN]"
+		echo "Removing temporary expanded plugin [$(pwd)/$EXPANDED_PLUGIN]"
 		rm -rf $EXPANDED_PLUGIN
-		EXIT_STATUS=1
 		exit 1
 	fi
 	
@@ -87,6 +86,7 @@ function restore(){
 if [ -z $3 ]; then 
 	while read line
 	do
+		echo $line
 		restore $1 $2 $line
 	done < /dev/stdin
 else 

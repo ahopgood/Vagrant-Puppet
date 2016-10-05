@@ -44,17 +44,36 @@ Package{
   wordpress::backup_core{"backup-core":}
   $minute = "0"
   
-  wordpress::plugin_backup{"plugin-backup-resource-instance":
+  $plugin_backup_path = "/vagrant/backups/plugins/"
+  
+  $theme_backup_path = "/vagrant/backups/themes/"
+      
+  file {["/vagrant/backups/","${plugin_backup_path}","${theme_backup_path}"]:
+    ensure => directory,
+  }
+  
+  wordpress::plugin_backup{"plugin-backup":
     plugin_dir => "/var/www/html/wordpress/wp-content/plugins/",
-    backup_path => "/vagrant/backups/plugins/",
+    backup_path => "${plugin_backup_path}",
     minute => $minute,
   }
   
   wordpress::theme_backup{"theme-backup":
     theme_dir => "/var/www/html/wordpress/wp-content/themes/",
-    backup_path => "/vagrant/backups/themes/",
+    backup_path => "${theme_backup_path}",
     minute => $minute,
   }
   
   wordpress::restore_core{"restore-core":}
   
+  Class["wordpress"]
+  ->  
+  wordpress::plugin_restore{"plugin-restore":
+    plugin_dir => "/var/www/html/wordpress/wp-content/plugins/",
+    backup_path => "${plugin_backup_path}",
+  }
+  
+#  wordpress::theme_restore{"theme-restore":
+#    theme_dir => "/var/www/html/wordpress/wp-content/themes/",
+#    backup_path => "${theme_backup_path}",
+#  }
