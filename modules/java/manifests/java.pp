@@ -3,7 +3,7 @@ Package{
 }
 
 class { 'java':
-  version => '8',
-  updateVersion => '31'
+  version => '7',
+  updateVersion => '76'
 #  is64bit => 'false'
 }

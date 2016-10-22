@@ -21,14 +21,35 @@ Supports:
 	* Major Java version 7,
 	* Major Java version 8.  
 
+Installs Java Virtual Machine to `/usr/lib/jvm`
+
 Tested:
 * Install on fresh system
-
+* Multi tenancy JVMs, i.e. 7 running alongside 8
+	* Currently installs major versions alongside each other
+	* Update versions are automatically upgraded
+	* Currently the first installed jdk is the default in **alternatives**.
+	* Multi tenanted JVMs cannot be specified in a single puppet manifest, it takes multiple runs to install the JVMs next to each other.
+* in place upgrades between update versions with the same major version
+	* 8u32 to 8u112 - done
+	* 7u76 to 7u80 - done
+	* 6u34 to 6u45 - done
+* downgrades between update versions with the same major version
+	* 8u112 to 8u32 - done
+	* 7u80 to 7u76 - done
+	* 6u45 to 6u34 - done
+		
 Currently **not** tested:
-* in place upgrades
+* in place upgrades between major versions
+	* 6 to 7
+	* 7 to 8
+	* 6 to 8
+* downgrades between major versions
+	* 8 to 7 - failed
+	* 7 to 6 -
+	* 8 to 6 -
 * reinstalling
-* downgrades
-* multi tenancy JVMs, i.e. 7 running alongside 8
+	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 
 
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
