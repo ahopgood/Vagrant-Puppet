@@ -41,25 +41,13 @@ class java (
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
   }
- 
- 
-    #Derive rpm file from verion number, update number and platform type
-  if ("${is64bit}" == 'true'){
-    if ("${version}" > 6){
-      $platform = x64
-    } else {
-      $platform = amd64
-  }
-  } else {
-    $platform = i586
-  }
   
   #Perform actions appropriate to the OS
   if $::operatingsystem == 'CentOS' {
     class {"java::centos":
       version => $version,
       updateVersion => $updateVersion,
-      platform => $platform
+      is64bit => $is64bit
     }
   } elsif $::operatingsystem == "Ubuntu"{
     #create name of java deb file
