@@ -50,6 +50,8 @@ Currently **not** tested:
 	* 8 to 6 -
 * reinstalling
 	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 
+* Defaults
+	* Currently the default JVM is the last installed version.
 
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
@@ -65,3 +67,12 @@ Both the folder structure under **files** and the deb naming should reflect this
 The *.deb* installers will need to be created via **java-package** on your target version of Ubuntu in order to install correctly (this includes the correct bit version 32 vs 64-bit).  
 Then try installing via `dpkg -i oracle-javax-jdk_xuxx_amd64/x86-Ubuntu_xx.xx.deb` on a blank OS install to see what dependencies and versions are required for that version of Ubuntu.  
 The above mentioned dependencies can be encapsulated in an *if* clause based on the `$::operatingsystemmajrelease` value enabling the correct dependencies to be installed for your generated .deb file.  
+
+## ToDo
+### CentOS
+* Move CentOS code into separate manifest
+### Ubuntu
+* Split out Ubuntu code into separate manifest
+* Create the ability to set a default major version via a parameter
+* Create the ability to have multi tenanted JVMs via a parameter, without the tenancy set to true we will remove any other major versions of the oracle JVM (just list we do to enable downgrades of updates). 
+* Use of definitions per major version using the **define** keyword, this will prevent puppet complaining about duplicate resources.
