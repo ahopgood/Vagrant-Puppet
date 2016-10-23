@@ -7,8 +7,14 @@ class java::centos(
   $updateVersion = "45"
   ){
     $local_install_path = "/etc/puppet/"
-    $local_install_dir  = "${local_install_path}installers/"
+    $local_install_dir  = "${local_install_path}${name}/"
     $puppet_file_dir    = "modules/java/"
+    
+    file {
+      "${local_install_dir}":
+      path       =>  "${local_install_dir}",
+      ensure     =>  directory,
+    }
   
     #Derive rpm file from verion number, update number and platform type
     if ("${is64bit}" == 'true'){

@@ -15,6 +15,21 @@ Installation of a Java JDK from an RPM file.
 RPM files with the appropriate minor-major numbers need to be located in the **files** folder for the passed parameters to allow for installation of the correct java version.
 
 ## Ubuntu
+
+Can be declared via the *java* definition:
+	
+	java{"java-7":
+		version => '7',
+		updateVersion => '76'
+	}
+	
+or directly via the *java::ubuntu* definition:
+
+	java::ubuntu{"java-6":
+	  version => "6",
+	  updateVersion => "45"
+	} 
+
 Supports:
 * Ubuntu 15.10 (Wily)
 	* Major Java version 6,
@@ -29,7 +44,7 @@ Tested:
 	* Currently installs major versions alongside each other
 	* Update versions are automatically upgraded
 	* Currently the first installed jdk is the default in **alternatives**.
-	* Multi tenanted JVMs cannot be specified in a single puppet manifest, it takes multiple runs to install the JVMs next to each other.
+	* Multi tenanted JVMs can now be specified in a single puppet manifest using multiple defines sections instead of multiple runs to install the JVMs next to each other.
 * in place upgrades between update versions with the same major version
 	* 8u32 to 8u112 - done
 	* 7u76 to 7u80 - done
