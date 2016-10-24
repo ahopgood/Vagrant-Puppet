@@ -56,4 +56,16 @@ define java (
   #  require     =>  Package['java-sdk'],
 }
 
+define java::install::alternative(
+  $executableName = undef,
+  $executableLocation = undef,
+){
+  exec {
+    "${executableName}-install-alternative":
+    command     =>  "alternatives --install /usr/bin/${executableName} ${executableName} ${executableLocation}${executableName} 20000",
+    path        =>  '/usr/sbin/',
+    cwd         =>  '/usr/sbin/',
+#    before      =>  Exec['java-set-alternative']
+  }
+}
 

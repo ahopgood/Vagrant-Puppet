@@ -36,7 +36,7 @@ or directly via the *java::ubuntu* definition:
 	  updateVersion => "45"
 	} 
 	
-#### <a href="Debian File naming conventions">Debian File naming conventions]</a>
+#### <a href="Debian File naming conventions">Debian File naming conventions</a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
 The naming of these *.deb* files should follow the following convention in order for the correct version to be selected:  

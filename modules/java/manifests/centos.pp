@@ -91,12 +91,19 @@ class java::centos(
       require     =>  File["${jdk}"],
     }
     #It might be worth setting up an alternatives type instead of relying on the exec command.
-    exec {
-      'java-install-alternative':
-      command     =>  "alternatives --install /usr/bin/java java /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/java 20000",
-      path        =>  '/usr/sbin/',
-      cwd         =>  '/usr/sbin/',
-      require     =>  Package["${package_name}"],
+#    exec {
+#      'java-install-alternative':
+#      command     =>  "alternatives --install /usr/bin/java java /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/java 20000",
+#      path        =>  '/usr/sbin/',
+#      cwd         =>  '/usr/sbin/',
+#      require     =>  Package["${package_name}"],
+#      before      =>  Exec['java-set-alternative']
+#    }
+
+    java::install::alternative{
+      "java-install-alternative":
+      executableName => "java",
+      executableLocation => "/usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/",
       before      =>  Exec['java-set-alternative']
     }
     
