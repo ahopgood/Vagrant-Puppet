@@ -40,7 +40,7 @@ define java (
       updateVersion => $updateVersion,
       is64bit => $is64bit
     }
-  } elsif $::operatingsystem == "Ubuntu"{
+  } elsif $::operatingsystem == 'Ubuntu'{
        include java::ubuntu::wily
      java::ubuntu{"test-java-${version}":
       version => $version,
@@ -56,16 +56,24 @@ define java (
   #  require     =>  Package['java-sdk'],
 }
 
-define java::install::alternative(
+define alternatives::install(
   $executableName = undef,
   $executableLocation = undef,
 ){
+  #Decide which alternatives program we have based on OS
+  if $::operatingsystem == 'CentOS' {
+    $alternativesName = "alternatives"
+  } elsif $::operatingsystem == 'Ubuntu' {
+    $alternativesName = "update-alternatives"
+  } else {
+    notify {"${::operatingsystem} is not supported":}
+  }
   exec {
-    "${executableName}-install-alternative":
-    command     =>  "alternatives --install /usr/bin/${executableName} ${executableName} ${executableLocation}${executableName} 20000",
+    "install-alternative-${executableName}":
+    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${executableName} 20000",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
-#    before      =>  Exec['java-set-alternative']
   }
 }
+
 
