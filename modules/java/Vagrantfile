@@ -12,7 +12,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box_check_update = false
     config.ssh.insert_key = false
 	config.vm.synced_folder "../", "/etc/puppet/modules/"
-
+	#Getting the error:Cannot allocate memory - fork(2)
+	#Ruby needs more headroom to fork processes as it copies the entire parent context before collapsing it down.
+  	config.vm.provider "virtualbox" do |vb|
+    	vb.memory = "1024"
+	end
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.define "centos" do |centos|
     centos.vm.hostname = "java-dev-centos"
