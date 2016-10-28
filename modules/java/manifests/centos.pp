@@ -99,39 +99,65 @@ class java::centos(
 #      require     =>  Package["${package_name}"],
 #      before      =>  Exec['java-set-alternative']
 #    }
-
-    java::install::alternative{
+    $executableLocation = "/usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/"
+    
+    alternatives::install{
       "java-install-alternative":
-      executableName => "java",
-      executableLocation => "/usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/",
-      before      =>  Exec['java-set-alternative']
+      executableName      => "java",
+      executableLocation  => "${executableLocation}",
+      require             => Package["${package_name}"],
+      before              => Exec['java-set-alternative'],      
+    }
+
+#    exec {
+#      'jar-install-alternative':
+#      command     =>  "alternatives --install /usr/bin/jar jar /usr/java/jdk1.${version}.0_${updateVersion}/bin/jar 20000",
+#      path        =>  '/usr/sbin/',
+#      cwd         =>  '/usr/sbin/',
+#      require     =>  Package["${package_name}"],
+#      before      =>  Exec['jar-set-alternative']  
+#    }
+
+    alternatives::install{
+      "jar-install-alternative":
+      executableName      => "jar",
+      executableLocation  => "${executableLocation}",
+      require             => Package["${package_name}"],
+      before              => Exec['jar-set-alternative'],
     }
     
-    exec {
-      'jar-install-alternative':
-      command     =>  "alternatives --install /usr/bin/jar jar /usr/java/jdk1.${version}.0_${updateVersion}/bin/jar 20000",
-      path        =>  '/usr/sbin/',
-      cwd         =>  '/usr/sbin/',
-      require     =>  Package["${package_name}"],
-      before      =>  Exec['jar-set-alternative']  
-    }
-    
-    exec {
-      'javac-install-alternative':
-      command     =>  "alternatives --install /usr/bin/javac javac /usr/java/jdk1.${version}.0_${updateVersion}/bin/javac 20000",
-      path        =>  '/usr/sbin/',
-      cwd         =>  '/usr/sbin/',
-      require     =>  Package["${package_name}"],
-      before      =>  Exec['javac-set-alternative']
+#    exec {
+#      'javac-install-alternative':
+#      command     =>  "alternatives --install /usr/bin/javac javac /usr/java/jdk1.${version}.0_${updateVersion}/bin/javac 20000",
+#      path        =>  '/usr/sbin/',
+#      cwd         =>  '/usr/sbin/',
+#      require     =>  Package["${package_name}"],
+#      before      =>  Exec['javac-set-alternative']
+#    }
+
+    alternatives::install{
+      "javac-install-alternative":
+      executableName      => "javac",
+      executableLocation  => "${executableLocation}",
+      require             => Package["${package_name}"],
+      before              => Exec['javac-set-alternative'],
     }
       
-    exec {
-      'javaws-install-alternative':
-      command     =>  "alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/javaws 20000",
-      path        =>  '/usr/sbin/',
-      cwd         =>  '/usr/sbin/',
-      require     =>  Package["${package_name}"],
-      before      =>  Exec['javaws-set-alternative']
+#    exec {
+#      'javaws-install-alternative':
+#      command     =>  "alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/javaws 20000",
+#      path        =>  '/usr/sbin/',
+#      cwd         =>  '/usr/sbin/',
+#      require     =>  Package["${package_name}"],
+#      before      =>  Exec['javaws-set-alternative']
+#    }
+
+    alternatives::install{
+      "javaws-install-alternative":
+      executableName      => "javaws",
+      executableLocation  => "${executableLocation}",
+      require             => Package["${package_name}"],
+      before              => Exec['javaws-set-alternative'],
     }
     
     exec {
