@@ -59,6 +59,7 @@ define java (
 define alternatives::install(
   $executableName = undef,
   $executableLocation = undef,
+  $priority = undef,
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
@@ -70,10 +71,33 @@ define alternatives::install(
   }
   exec {
     "install-alternative-${executableName}":
-    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${executableName} 20000",
+    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${executableName} ${priority}",
+    unless      => "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    path        =>  '/usr/sbin/',
+    cwd         =>  '/usr/sbin/',
+
+  }
+}
+
+define alternatives::set(
+  $executableName = undef,
+  $executableLocation = undef,
+  $priority = undef,
+){
+  #Decide which alternatives program we have based on OS
+  if $::operatingsystem == 'CentOS' {
+    $alternativesName = "alternatives"
+  } elsif $::operatingsystem == 'Ubuntu' {
+    $alternativesName = "update-alternatives"
+  } else {
+    notify {"${::operatingsystem} is not supported":}
+  }
+  exec {
+    "install-alternative-${executableName}":
+    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName} ${priority}",
+    onlyif      =>  "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
 }
-
 

@@ -22,6 +22,9 @@ class test_ubuntu{
 	  multiTenancy => true,
 	}
 	
+	java::ubuntu::default{"set-default-to-java-6":
+	  version => "6"
+	}
 	#java{"java-8":
 	#  version => "8",
 	#  updateVersion => "112",
