@@ -51,9 +51,9 @@ Supports:
 	* Major Java version 7,
 	* Major Java version 8.  
 
-Installs Java Virtual Machine to `/usr/lib/jvm`
+Installs Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
 
-Tested:
+#### Tested:
 * Install on fresh system
 * Multi tenancy JVMs, i.e. 7 running alongside 8
 	* Currently installs major versions alongside each other
@@ -68,20 +68,21 @@ Tested:
 	* 8u112 to 8u32 - done
 	* 7u80 to 7u76 - done
 	* 6u45 to 6u34 - done
+* Defaults
+	* Currently the default JVM is the last installed version.
 		
 Currently **not** tested:
-* in place upgrades between major versions
+* in place upgrades between major versions (multiTenancy => false)
 	* 6 to 7
 	* 7 to 8
 	* 6 to 8
-* downgrades between major versions
+* downgrades between major versions (multiTenancy => false)
 	* 8 to 7 - failed
 	* 7 to 6 -
 	* 8 to 6 -
 * reinstalling
 	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 
-* Defaults
-	* Currently the default JVM is the last installed version.
+
 
 ### Multi Tenancy JVMs
 Multi tenancy allows for multiple (major version **only**) JVMs to be installed at once, useful for certain testing environments and build servers to name two examples.  
@@ -105,7 +106,8 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 
 ## ToDo
 * Support for setting the Java Cryptography Extensions (JCE) via a define section.  
-* 
+* Install defaults via alternatives
+* Set defaults manually via alternatives
 
 ### CentOS
 * Move CentOS code into separate manifest
@@ -115,5 +117,4 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 ### Ubuntu
 * Split out Ubuntu code into separate manifest
 * Create the ability to set a **default** major version JVM via a parameter
-* Create the ability to have multi tenanted JVMs via a parameter, without the tenancy set to true we will remove any other major versions of the oracle JVM (just list we do to enable downgrades of updates). 
 * Use of definitions per major version using the **define** keyword, this will prevent puppet complaining about duplicate resources.
