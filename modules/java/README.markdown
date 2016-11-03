@@ -60,29 +60,27 @@ Installs Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
 	* Update versions are automatically upgraded
 	* Currently the first installed jdk is the default in **alternatives**.
 	* Multi tenanted JVMs can now be specified in a single puppet manifest using multiple defines sections instead of multiple runs to install the JVMs next to each other.
-* in place upgrades between update versions with the same major version
+	* Note: Defaults
+		* Currently the default JVM is the last installed version.
+* Upgrades - in place between major versions (multiTenancy => false)
+	* 6 to 7 - done
+	* 7 to 8 - done
+	* 6 to 8 - done
+* Upgrades - in place between update versions with the same major version
 	* 8u32 to 8u112 - done
 	* 7u76 to 7u80 - done
 	* 6u34 to 6u45 - done
-* downgrades between update versions with the same major version
+* Downgrades - between major versions (multiTenancy => false)
+	* 8 to 7 - done
+	* 7 to 6 - done
+	* 8 to 6 - done
+* Downgrades - between update versions with the same major version
 	* 8u112 to 8u32 - done
 	* 7u80 to 7u76 - done
 	* 6u45 to 6u34 - done
-* Defaults
-	* Currently the default JVM is the last installed version.
-		
-Currently **not** tested:
-* in place upgrades between major versions (multiTenancy => false)
-	* 6 to 7
-	* 7 to 8
-	* 6 to 8
-* downgrades between major versions (multiTenancy => false)
-	* 8 to 7 - failed
-	* 7 to 6 -
-	* 8 to 6 -
 * reinstalling
-	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 
-
+	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 		
+Currently **not** tested:
 
 ### Multi Tenancy JVMs
 Multi tenancy allows for multiple (major version **only**) JVMs to be installed at once, useful for certain testing environments and build servers to name two examples.  
