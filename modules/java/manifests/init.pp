@@ -74,7 +74,7 @@ define alternatives::install(
   }
   
   if (($manLocation != undef) and ($manExecutable != undef)){
-    $slave = "--slave ${manExecutable} ${manLocation}${manExecutable}"
+    $slave = "--slave /usr/bin/${executableName} ${manExecutable} ${manLocation}${manExecutable}"
   }
 
   if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink 
@@ -107,7 +107,7 @@ define alternatives::set(
   }
   exec {
     "install-alternative-${executableName}":
-    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName} ${priority}",
+    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
     onlyif      =>  "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
