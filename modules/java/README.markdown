@@ -80,6 +80,11 @@ Installs Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
 	* 6u45 to 6u34 - done
 * reinstalling
 	* a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via **dpkg** to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 		
+* Set defaults via alternatives
+	* Java 6 - done
+	* Java 7 - done
+	* Java 8 - done
+
 Currently **not** tested:
 
 ### Multi Tenancy JVMs
