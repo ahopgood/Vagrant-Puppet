@@ -106,7 +106,7 @@ define alternatives::set(
     notify {"${::operatingsystem} is not supported":}
   }
   exec {
-    "install-alternative-${executableName}":
+    "set-alternative-${executableName}":
     command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
     onlyif      =>  "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
