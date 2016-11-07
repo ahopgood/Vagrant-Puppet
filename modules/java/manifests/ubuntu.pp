@@ -167,7 +167,7 @@ define java::ubuntu::default(
   $jreBinLocation = "${jdkLocation}jre/bin/"
   $pluginLocation = "${jdkLocation}jre/lib/amd64/"
   $manLocation     = "${jdkLocation}man/man1/"
-  $priority = 1500 + "${version}"
+  $priority = 300 + "${version}"
 
   if ($version == 7 or $version == 8){
     #/bin
@@ -177,7 +177,7 @@ define java::ubuntu::default(
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
       manExecutable       => "jcmd.1.gz",
-#     manLocation         => "${manLocation}",
+      manLocation         => "${manLocation}",
     }
     #/bin
     alternatives::install{
@@ -186,7 +186,7 @@ define java::ubuntu::default(
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
       manExecutable       => "jmc.1.gz",
-#     manLocation         => "${jdkBinLocation}",
+      manLocation         => "${manLocation}",
     }
   }
   if ($version == 8){
@@ -197,7 +197,7 @@ define java::ubuntu::default(
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
       manExecutable       => "jdeps.1.gz",
-#     manLocation         => "${manLocation}",
+      manLocation         => "${manLocation}",
     }    
   }
   
@@ -258,7 +258,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "idlj.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -267,7 +267,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jar.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -276,7 +276,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jarsigner.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -285,7 +285,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "java.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -294,7 +294,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,      
     manExecutable       => "javac.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -303,7 +303,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "javadoc.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -312,7 +312,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "javah.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -321,7 +321,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "javap.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -330,7 +330,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "javaws.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -339,7 +339,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jconsole.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -348,7 +348,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jdb.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/lib
   alternatives::install{
@@ -364,7 +364,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jhat.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -373,7 +373,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jinfo.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -382,7 +382,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jmap.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -391,7 +391,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jps.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -400,7 +400,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jrunscript.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -409,7 +409,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jsadebugd.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #bin
   alternatives::install{
@@ -418,7 +418,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jstack.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #bin
   alternatives::install{
@@ -427,7 +427,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jstat.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #bin
   alternatives::install{
@@ -435,8 +435,8 @@ define java::ubuntu::default(
     executableName      => "jstatd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jstatd",
-#    manLocation         => "${manLocation}",
+    manExecutable       => "jstatd.1.gz",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -445,7 +445,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "jvisualvm.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -454,7 +454,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "keytool.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
   alternatives::install{
@@ -479,7 +479,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "native2ascii.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -488,7 +488,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "orbd.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -497,7 +497,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "pack200.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -506,7 +506,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "policytool.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #bin
   alternatives::install{
@@ -515,7 +515,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "rmic.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -524,7 +524,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "rmid.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -533,7 +533,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "rmiregistry.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -542,7 +542,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "schemagen.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -551,7 +551,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "serialver.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -560,7 +560,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "servertool.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -569,7 +569,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "tnameserv.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/bin
   alternatives::install{
@@ -578,7 +578,7 @@ define java::ubuntu::default(
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
     manExecutable       => "unpack200.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -587,7 +587,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "wsgen.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -596,7 +596,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "wsimport.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/bin
   alternatives::install{
@@ -605,7 +605,7 @@ define java::ubuntu::default(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manExecutable       => "xjc.1.gz",
-#    manLocation         => "${manLocation}",
+    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
   alternatives::install{

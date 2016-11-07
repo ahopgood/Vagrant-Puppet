@@ -74,7 +74,7 @@ define alternatives::install(
   }
   
   if (($manLocation != undef) and ($manExecutable != undef)){
-    $slave = "--slave /usr/bin/${executableName} ${manExecutable} ${manLocation}${manExecutable}"
+    $slave = "--slave /usr/bin/${manExecutable} ${manExecutable} ${manLocation}${manExecutable}"
   }
 
   if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink 
