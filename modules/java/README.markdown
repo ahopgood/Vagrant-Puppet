@@ -11,7 +11,7 @@ The module will default to jdk-6u45.
 
 **64-bit support only**
 
-Control over the JVM that is used as default is **not** provided as of yet.
+JVM defaults are based on major versions, e.g. JDK 8 trumps JDK 7 etc.
 
 Java Cryptography Extensions are **not** provided as of yet.  
 
@@ -21,7 +21,7 @@ RPM files with the appropriate minor-major numbers need to be located in the **f
 
 ## Ubuntu
 ### Usage
- 
+#### Single JVM usage 
 Can be declared via the *java* definition:
 	
 	java{"java-7":
@@ -35,7 +35,24 @@ or directly via the *java::ubuntu* definition:
 	  version => "6",
 	  updateVersion => "45"
 	} 
-	
+#### Multi Tenancy JVM Usage
+Set Java 7 to be the default manually JVM by overriding the alternatives priority ordering that would *usually* favour Java 8: 
+
+	java{"java-8":
+		version => '8',
+		updateVersion => '31',
+		multiTenancy => true,
+	}
+	java{"java-7":
+		version => '7',
+		updateVersion => '76',
+		multiTenancy => true,
+	}
+	->
+	java::ubuntu::default::set { "set-java-7-as-default":
+		version => "7",		
+	}
+	 
 #### <a href="Debian File naming conventions">Debian File naming conventions</a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
@@ -85,8 +102,6 @@ Installs Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
 	* Java 7 - done
 	* Java 8 - done
 
-Currently **not** tested:
-
 ### Multi Tenancy JVMs
 Multi tenancy allows for multiple (major version **only**) JVMs to be installed at once, useful for certain testing environments and build servers to name two examples.  
 `multiTenancy => false` is the default value, if present then other JVMs will be removed (as long as they are present in the versionsToRemove hash.  
@@ -110,14 +125,16 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 ## ToDo
 * Support for setting the Java Cryptography Extensions (JCE) via a define section.  
 * Install defaults via alternatives
-* Set defaults manually via alternatives
+	* Get this working where the alternative is installed but we want a higher priority to override.
+* Move java::ubuntu::alternatives::set into the Java class
+* Move java::ubuntu::alternatives::install into the Java class
 
 ### CentOS
 * Move CentOS code into separate manifest
 * Update CentOS documentation with more information on usage and file naming strategy
 * Multi tenancy
+* Set defaults manually via alternatives
 
 ### Ubuntu
-* Split out Ubuntu code into separate manifest
 * Create the ability to set a **default** major version JVM via a parameter
 * Use of definitions per major version using the **define** keyword, this will prevent puppet complaining about duplicate resources.

@@ -159,7 +159,7 @@ define java::ubuntu(
  * Used to set a particular JDK as a default using debian alternatives.
  * Requires a Java JDK installation.
  */
-define java::ubuntu::default(
+define java::ubuntu::default::install(
   $version = undef,
 ){
   $jdkLocation    = "/usr/lib/jvm/jdk-${version}-oracle-x64/"
@@ -1096,9 +1096,3 @@ define java::ubuntu::default::set(
     priority            => $priority,
   }
 }
-
-
-
-
-#Error: update-alternatives --install /usr/bin/jar jar /usr/lib/jvm/jdk-6-oracle-x64/bin/jar 20000 returned 2 instead of one of [0]
-#Error: /Stage[main]/Main/Java::Ubuntu::Default[set-default-to-java-6]/Alternatives::Install[jar-install-alternative]/Exec[install-alternative-jar]/returns: change from notrun to 0 failed: update-alternatives --install /usr/bin/jar jar /usr/lib/jvm/jdk-6-oracle-x64/bin/jar 20000 returned 2 instead of one of [0]
