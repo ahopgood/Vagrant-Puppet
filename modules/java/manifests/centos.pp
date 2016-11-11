@@ -100,11 +100,12 @@ class java::centos(
 #      before      =>  Exec['java-set-alternative']
 #    }
     $executableLocation = "/usr/java/jdk1.${version}.0_${updateVersion}/jre/bin/"
-    
+    $priority = 300 + "${version}"
     alternatives::install{
       "java-install-alternative":
       executableName      => "java",
       executableLocation  => "${executableLocation}",
+      priority            => "${priority}",
       require             => Package["${package_name}"],
       before              => Exec['java-set-alternative'],      
     }
@@ -122,6 +123,7 @@ class java::centos(
       "jar-install-alternative":
       executableName      => "jar",
       executableLocation  => "${executableLocation}",
+      priority            => "${priority}",
       require             => Package["${package_name}"],
       before              => Exec['jar-set-alternative'],
     }
@@ -139,6 +141,7 @@ class java::centos(
       "javac-install-alternative":
       executableName      => "javac",
       executableLocation  => "${executableLocation}",
+      priority            => "${priority}",
       require             => Package["${package_name}"],
       before              => Exec['javac-set-alternative'],
     }
@@ -156,6 +159,7 @@ class java::centos(
       "javaws-install-alternative":
       executableName      => "javaws",
       executableLocation  => "${executableLocation}",
+      priority            => "${priority}",
       require             => Package["${package_name}"],
       before              => Exec['javaws-set-alternative'],
     }
