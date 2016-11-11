@@ -97,29 +97,29 @@ define java::ubuntu(
     if $::operatingsystemmajrelease == "15.10" {
       notify{"We're on Ubuntu wiley trying to use Java package ${jdk}":}
  
-    if ($multiTenancy){
-      notify{"Java ${version}":
-        message => "Multi tenancy JVMs allowed"
-      }
-    } else {
-      notify{"Java ${version}":
-        message => "Multi tenancy JVMs not supported"
-      }
+      if ($multiTenancy){
+        notify{"Java ${version}":
+          message => "Multi tenancy JVMs allowed"
+        }
+      } else {
+        notify{"Java ${version}":
+          message => "Multi tenancy JVMs not supported"
+        }
       
-      $versionsToRemove = {
-        "6" => ["oracle-java7-jdk","oracle-java8-jdk"],
-        "7" => ["oracle-java6-jdk","oracle-java8-jdk"],
-        "8" => ["oracle-java6-jdk","oracle-java7-jdk"],
-      }   
+        $versionsToRemove = {
+          "6" => ["oracle-java7-jdk","oracle-java8-jdk"],
+          "7" => ["oracle-java6-jdk","oracle-java8-jdk"],
+          "8" => ["oracle-java6-jdk","oracle-java7-jdk"],
+        }   
       
-      package {
-        $versionsToRemove["${version}"]:
-        ensure      => "purged",
-        provider    =>  'dpkg',
-      }
-    }
+        package {
+          $versionsToRemove["${version}"]:
+          ensure      => "purged",
+          provider    =>  'dpkg',
+        }
+      }#end multi-tenancy else
  
-    include java::ubuntu::wily
+      include java::ubuntu::wily
       
       file {
         "${jdk}":
@@ -161,8 +161,22 @@ define java::ubuntu(
  */
 define java::ubuntu::default::install(
   $version = undef,
+  $updateVersion = undef,
 ){
-  $jdkLocation    = "/usr/lib/jvm/jdk-${version}-oracle-x64/"
+  #JDK location changes based on OS
+  if ($::operatingsystem == "Ubuntu"){
+    $jdkLocation    = "/usr/lib/jvm/jdk-${version}-oracle-x64/"    
+  } elsif ($::operatingsystem == "CentOS"){
+      if ($updateVersion == undef){
+        fail("CentOS Java default is missing an updateVersion")
+      }
+      $jdkLocation    = "/usr/java/jdk1.${version}.0_${updateVersion}/"
+  } else {
+    notify {"Alternatives not supported":
+      message => "operating system [${::operatingsystem}] not supported for setting defaults via alternatives"
+    }
+  }
+
   $jdkBinLocation = "${jdkLocation}bin/"
   $jreBinLocation = "${jdkLocation}jre/bin/"
   $pluginLocation = "${jdkLocation}jre/lib/amd64/"

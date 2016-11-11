@@ -5,9 +5,13 @@
   java{"java-7":
     version => '7',
     updateVersion => '76',
-    multiTenancy => true,
+#    multiTenancy => true,
   }
-  
+  ->
+  java::ubuntu::default::install{"install-jdk-7-as-default":
+    version => "7",
+    updateVersion => '76',
+  }
       
 # java{"java-8":
 #   version => "8",
