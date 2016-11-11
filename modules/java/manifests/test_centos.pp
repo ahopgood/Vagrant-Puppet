@@ -8,7 +8,7 @@
 #    multiTenancy => true,
   }
   ->
-  java::ubuntu::default::install{"install-jdk-7-as-default":
+  java::default::install{"install-jdk-7-as-default":
     version => "7",
     updateVersion => '76',
   }

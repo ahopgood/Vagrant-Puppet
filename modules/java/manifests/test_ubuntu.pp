@@ -18,7 +18,7 @@
     multiTenancy => true,
   }
 #  ->
-#  java::ubuntu::default::install{"install-default-to-java-8":
+#  java::default::install{"install-default-to-java-8":
 #    version => "8",
 #  }
 #  ->
