@@ -126,15 +126,12 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 * Support for setting the Java Cryptography Extensions (JCE) via a define section.  
 * Install defaults via alternatives
 	* Get this working where the alternative is installed but we want a higher priority to override.
-* Move java::ubuntu::alternatives::set into the Java class
-* Move java::ubuntu::alternatives::install into the Java class
+	
 
 ### CentOS
-* Move CentOS code into separate manifest
 * Update CentOS documentation with more information on usage and file naming strategy
 * Multi tenancy
 * Set defaults manually via alternatives
 
 ### Ubuntu
 * Create the ability to set a **default** major version JVM via a parameter
-* Use of definitions per major version using the **define** keyword, this will prevent puppet complaining about duplicate resources.

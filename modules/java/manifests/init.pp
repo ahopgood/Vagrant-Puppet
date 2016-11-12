@@ -35,10 +35,11 @@ define java (
   
   #Perform actions appropriate to the OS
   if $::operatingsystem == 'CentOS' {
-    class {"java::centos":
+    java::centos{"test-java-${version}":
       version => $version,
       updateVersion => $updateVersion,
-      is64bit => $is64bit
+      is64bit => $is64bit,
+      multiTenancy => $multiTenancy
     }
   } elsif $::operatingsystem == 'Ubuntu'{
        include java::ubuntu::wily
@@ -56,63 +57,7 @@ define java (
   #  require     =>  Package['java-sdk'],
 }
 
-define alternatives::install(
-  $executableName = undef,
-  $executableLocation = undef,
-  $priority = undef,
-  $manExecutable = undef,
-  $manLocation = undef,
-  $execAlias = undef,
-){
-  #Decide which alternatives program we have based on OS
-  if $::operatingsystem == 'CentOS' {
-    $alternativesName = "alternatives"
-  } elsif $::operatingsystem == 'Ubuntu' {
-    $alternativesName = "update-alternatives"
-  } else {
-    notify {"${::operatingsystem} is not supported":}
-  }
-  
-  if (($manLocation != undef) and ($manExecutable != undef)){
-    $slave = "--slave /usr/bin/${manExecutable} ${manExecutable} ${manLocation}${manExecutable}"
-  }
 
-  if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink 
-    $targetExecutable = "${execAlias}"
-  } else {
-    $targetExecutable = "${executableName}"
-  } 
-  
-  exec {
-    "install-alternative-${executableName}":
-    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
-    unless      => "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
-    path        =>  '/usr/sbin/',
-    cwd         =>  '/usr/sbin/',
-  }
-}
-
-define alternatives::set(
-  $executableName = undef,
-  $executableLocation = undef,
-  $priority = undef,
-){
-  #Decide which alternatives program we have based on OS
-  if $::operatingsystem == 'CentOS' {
-    $alternativesName = "alternatives"
-  } elsif $::operatingsystem == 'Ubuntu' {
-    $alternativesName = "update-alternatives"
-  } else {
-    notify {"${::operatingsystem} is not supported":}
-  }
-  exec {
-    "set-alternative-${executableName}":
-    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
-    onlyif      =>  "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
-    path        =>  '/usr/sbin/',
-    cwd         =>  '/usr/sbin/',
-  }
-}
 
 /**
  * Used to set a particular JDK as a default using debian alternatives.
@@ -126,14 +71,12 @@ define java::default::install(
   if ($::operatingsystem == "Ubuntu"){
     $jdkLocation    = "/usr/lib/jvm/jdk-${version}-oracle-x64/"    
   } elsif ($::operatingsystem == "CentOS"){
-      if ($updateVersion == undef){
-        fail("CentOS Java default is missing an updateVersion")
-      }
-      $jdkLocation    = "/usr/java/jdk1.${version}.0_${updateVersion}/"
-  } else {
-    notify {"Alternatives not supported":
-      message => "operating system [${::operatingsystem}] not supported for setting defaults via alternatives"
+    if ($updateVersion == undef){
+      fail("CentOS Java default is missing an updateVersion")
     }
+    $jdkLocation    = "/usr/java/jdk1.${version}.0_${updateVersion}/"
+  } else {
+    fail("operating system [${::operatingsystem}] not supported for setting defaults via alternatives")
   }
 
   $jdkBinLocation = "${jdkLocation}bin/"
@@ -145,7 +88,7 @@ define java::default::install(
   if ($version == 7 or $version == 8){
     #/bin
     alternatives::install{
-      "jcmd-install-alternative":
+      "java-${version}-jcmd-install-alternative":
       executableName      => "jcmd",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
@@ -154,7 +97,7 @@ define java::default::install(
     }
     #/bin
     alternatives::install{
-      "jmc-install-alternative":
+      "java-${version}-jmc-install-alternative":
       executableName      => "jmc",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
@@ -165,7 +108,7 @@ define java::default::install(
   if ($version == 8){
     #/bin
     alternatives::install{
-      "jdeps-install-alternative":
+      "java-${version}-jdeps-install-alternative":
       executableName      => "jdeps",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
@@ -176,7 +119,7 @@ define java::default::install(
   
   #bin
   alternatives::install{
-    "appletviewer-install-alternative":
+    "java-${version}-appletviewer-install-alternative":
     executableName      => "appletviewer",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -185,14 +128,14 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "ControlPanel-install-alternative":
+    "java-${version}-ControlPanel-install-alternative":
     executableName      => "ControlPanel",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
   }
   #/bin
   alternatives::install{
-    "extcheck-install-alternative":
+    "java-${version}-extcheck-install-alternative":
     executableName      => "extcheck",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -202,7 +145,7 @@ define java::default::install(
 
   #/jre/lib/amd64
   alternatives::install{
-    "firefox-javaplugin.so-install-alternative":
+    "java-${version}-firefox-javaplugin.so-install-alternative":
     executableName      => "firefox-javaplugin.so", 
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -210,7 +153,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "iceape-javaplugin.so-install-alternative":
+    "java-${version}-iceape-javaplugin.so-install-alternative":
     executableName      => "iceape-javaplugin.so", 
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -218,7 +161,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "iceweasel-javaplugin.so-install-alternative":
+    "java-${version}-iceweasel-javaplugin.so-install-alternative":
     executableName      => "iceweasel-javaplugin.so",
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -226,7 +169,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "idlj-install-alternative":
+    "java-${version}-idlj-install-alternative":
     executableName      => "idlj",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -235,7 +178,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jar-install-alternative":
+    "java-${version}-jar-install-alternative":
     executableName      => "jar",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -244,7 +187,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jarsigner-install-alternative":
+    "java-${version}-jarsigner-install-alternative":
     executableName      => "jarsigner",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -253,7 +196,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "java-install-alternative":
+    "java-${version}-java-install-alternative":
     executableName      => "java",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -262,7 +205,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "javac-install-alternative":
+    "java-${version}-javac-install-alternative":
     executableName      => "javac",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,      
@@ -271,7 +214,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "javadoc-install-alternative":
+    "java-${version}-javadoc-install-alternative":
     executableName      => "javadoc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -280,7 +223,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "javah-install-alternative":
+    "java-${version}-javah-install-alternative":
     executableName      => "javah",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -289,7 +232,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "javap-install-alternative":
+    "java-${version}-javap-install-alternative":
     executableName      => "javap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -298,7 +241,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "javaws-install-alternative":
+    "java-${version}-javaws-install-alternative":
     executableName      => "javaws",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -307,7 +250,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jconsole-install-alternative":
+    "java-${version}-jconsole-install-alternative":
     executableName      => "jconsole",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -316,7 +259,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jdb-install-alternative":
+    "java-${version}-jdb-install-alternative":
     executableName      => "jdb",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -325,14 +268,14 @@ define java::default::install(
   }
   #/jre/lib
   alternatives::install{
-    "jexec-install-alternative":
+    "java-${version}-jexec-install-alternative":
     executableName      => "jexec",
     executableLocation  => "${jdkLocation}jre/lib/",
     priority            => $priority,
   }
   #/bin
   alternatives::install{
-    "jhat-install-alternative":
+    "java-${version}-jhat-install-alternative":
     executableName      => "jhat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -341,7 +284,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jinfo-install-alternative":
+    "java-${version}-jinfo-install-alternative":
     executableName      => "jinfo",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -350,7 +293,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jmap-install-alternative":
+    "java-${version}-jmap-install-alternative":
     executableName      => "jmap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -359,7 +302,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jps-install-alternative":
+    "java-${version}-jps-install-alternative":
     executableName      => "jps",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -368,7 +311,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jrunscript-install-alternative":
+    "java-${version}-jrunscript-install-alternative":
     executableName      => "jrunscript",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -377,7 +320,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jsadebugd-install-alternative":
+    "java-${version}-jsadebugd-install-alternative":
     executableName      => "jsadebugd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -386,7 +329,7 @@ define java::default::install(
   }
   #bin
   alternatives::install{
-    "jstack-install-alternative":
+    "java-${version}-jstack-install-alternative":
     executableName      => "jstack",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -395,7 +338,7 @@ define java::default::install(
   }
   #bin
   alternatives::install{
-    "jstat-install-alternative":
+    "java-${version}-jstat-install-alternative":
     executableName      => "jstat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -404,7 +347,7 @@ define java::default::install(
   }
   #bin
   alternatives::install{
-    "jstatd-install-alternative":
+    "java-${version}-jstatd-install-alternative":
     executableName      => "jstatd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -413,7 +356,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "jvisualvm-install-alternative":
+    "java-${version}-jvisualvm-install-alternative":
     executableName      => "jvisualvm",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -422,7 +365,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "keytool-install-alternative":
+    "java-${version}-keytool-install-alternative":
     executableName      => "keytool",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -431,7 +374,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "midbrowser-javaplugin.so-install-alternative":
+    "java-${version}-midbrowser-javaplugin.so-install-alternative":
     executableName      => "midbrowser-javaplugin.so",
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -439,7 +382,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "mozilla-javaplugin.so-install-alternative":
+    "java-${version}-mozilla-javaplugin.so-install-alternative":
     executableName      => "mozilla-javaplugin.so",
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -447,7 +390,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "native2ascii-install-alternative":
+    "java-${version}-native2ascii-install-alternative":
     executableName      => "native2ascii",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -456,7 +399,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "orbd-install-alternative":
+    "java-${version}-orbd-install-alternative":
     executableName      => "orbd",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -465,7 +408,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "pack200-install-alternative":
+    "java-${version}-pack200-install-alternative":
     executableName      => "pack200",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -474,7 +417,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "policytool-install-alternative":
+    "java-${version}-policytool-install-alternative":
     executableName      => "policytool",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -483,7 +426,7 @@ define java::default::install(
   }
   #bin
   alternatives::install{
-    "rmic-install-alternative":
+    "java-${version}-rmic-install-alternative":
     executableName      => "rmic",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -492,7 +435,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "rmid-install-alternative":
+    "java-${version}-rmid-install-alternative":
     executableName      => "rmid",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -501,7 +444,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "rmiregistry-install-alternative":
+    "java-${version}-rmiregistry-install-alternative":
     executableName      => "rmiregistry",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -510,7 +453,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "schemagen-install-alternative":
+    "java-${version}-schemagen-install-alternative":
     executableName      => "schemagen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -519,7 +462,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "serialver-install-alternative":
+    "java-${version}-serialver-install-alternative":
     executableName      => "serialver",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -528,7 +471,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "servertool-install-alternative":
+    "java-${version}-servertool-install-alternative":
     executableName      => "servertool",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -537,7 +480,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "tnameserv-install-alternative":
+    "java-${version}-tnameserv-install-alternative":
     executableName      => "tnameserv",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -546,7 +489,7 @@ define java::default::install(
   }
   #/jre/bin
   alternatives::install{
-    "unpack200-install-alternative":
+    "java-${version}-unpack200-install-alternative":
     executableName      => "unpack200",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
@@ -555,7 +498,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "wsgen-install-alternative":
+    "java-${version}-wsgen-install-alternative":
     executableName      => "wsgen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -564,7 +507,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "wsimport-install-alternative":
+    "java-${version}-wsimport-install-alternative":
     executableName      => "wsimport",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -573,7 +516,7 @@ define java::default::install(
   }
   #/bin
   alternatives::install{
-    "xjc-install-alternative":
+    "java-${version}-xjc-install-alternative":
     executableName      => "xjc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
@@ -582,7 +525,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "xulrunner-addons-javaplugin.so-install-alternative":
+    "java-${version}-xulrunner-addons-javaplugin.so-install-alternative":
     executableName      => "xulrunner-addons-javaplugin.so",
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
@@ -590,7 +533,7 @@ define java::default::install(
   }
   #/jre/lib/amd64
   alternatives::install{
-    "xulrunner-javaplugin.so-install-alternative":
+    "java-${version}-xulrunner-javaplugin.so-install-alternative":
     executableName      =>  "xulrunner-javaplugin.so", 
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
