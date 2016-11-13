@@ -7,11 +7,6 @@
     updateVersion => '76',
     multiTenancy => true,
   }
-       ->
-    java::default::install{"install-jdk-7in-alternatives":
-      version => "7",
-      updateVersion => "76",
-    }
      
  java{"java-8":
    version => "8",

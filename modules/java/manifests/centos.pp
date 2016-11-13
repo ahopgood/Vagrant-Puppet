@@ -75,11 +75,11 @@ define java::centos(
       require     =>  File["${jdk}"],
       install_options => "${install_options}",
     }
-#    ->
-#    java::default::install{"install-jdk-${version}-in-alternatives":
-#      version => $version,
-#      updateVersion => $updateVersion,
-#    }
+    ->
+    java::default::install{"install-jdk-${version}-in-alternatives":
+      version => $version,
+      updateVersion => $updateVersion,
+    }
     
     
     #How to uninstall via rpm: rpm -e package name
