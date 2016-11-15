@@ -8,10 +8,10 @@
     updateVersion => '76',
     multiTenancy => true,
   }
-#  ->
-#  java::ubuntu::default::set{"set-default-to-java-7":
-#    version => "7",
-#  }
+  ->
+  java::default::set{"set-default-to-java-7":
+    version => "7",
+  }
   java{"java-8":
     version => "8",
     updateVersion => "31",
@@ -26,10 +26,10 @@
 #    path => "/bin/",
 #    command => "ls -l /etc/alternatives | grep jvm | /usr/bin/awk '{ print $9 }' > /vagrant/test.txt"
 #  }
-  ->
-  java::ubuntu::default::set{"set-default-to-java-8":
-    version => "8",
-  }
+#  ->
+#  java::default::set{"set-default-to-java-8":
+#    version => "8",
+#  }
 
   java::ubuntu{"java-6":
     version => "6",
@@ -37,7 +37,7 @@
     multiTenancy => true,
   }
 #  ->
-#  java::ubuntu::default::set{"set-default-to-java-6":
+#  java::default::set{"set-default-to-java-6":
 #    version => "6",
 #  }
   #java{"java-8":
