@@ -62,7 +62,7 @@ define alternatives::set(
   exec {
     "set-alternative-${executableName}":
     command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
-    onlyif      =>  "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    onlyif      =>  "${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
