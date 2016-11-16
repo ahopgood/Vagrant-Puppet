@@ -40,7 +40,7 @@ define alternatives::install(
   exec {
     "${name}-install-alternative":
     command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
-    unless      => "update-alternatives --list ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    unless      => "update-alternatives --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
