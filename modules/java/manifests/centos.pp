@@ -58,7 +58,7 @@ define java::centos(
       require    =>  File["${local_install_dir}"],
       path       =>  "${local_install_dir}${jdk}",
       ensure     =>  present,
-      source     =>  ["puppet:///${puppet_file_dir}${jdk}"],
+      source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${jdk}"],
     }  
     
     #Will have to switch this to rpm -Uvh as rpm -i won't allow for idempotentcy

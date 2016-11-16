@@ -24,10 +24,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	centos.vm.box_version = "1.0.1"
     centos.vm.network "private_network", ip: "192.168.33.10"
     
-	centos.vm.provision "puppet" do |puppet|
- 		puppet.manifests_path = "manifests"
-		puppet.manifest_file  = "java.pp"
-	end
+#	centos.vm.provision "puppet" do |puppet|
+# 		puppet.manifests_path = "manifests"
+#		puppet.manifest_file  = "test_centos.pp"
+#	end
   end
 
 
@@ -39,7 +39,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		
 	ubuntu.vm.provision "puppet" do |puppet|
  		puppet.manifests_path = "manifests"
-		puppet.manifest_file  = "java.pp"
+		puppet.manifest_file  = "test_ubuntu.pp"
 	end
   end
   
