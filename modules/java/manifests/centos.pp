@@ -2,9 +2,9 @@ Package{
   allow_virtual => false,
 }
 define java::centos(
-  $is64bit = true,
   $version = "6",
   $updateVersion = "45",
+  $is64bit = true,
   $multiTenancy = undef,
   ){
     $local_install_path = "/etc/puppet/"

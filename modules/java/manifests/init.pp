@@ -21,7 +21,8 @@ define java (
 	#$isJdk = true,
 	$version = "6",
 	$updateVersion = "45",
-  $multiTenancy = false) {
+  $multiTenancy = false,
+  $isDefault = false) {
 	     
   $is64bit = true
   #package names are a pain
@@ -50,11 +51,14 @@ define java (
       multiTenancy => $multiTenancy
     }
   } else {
-    notify {  "Operating system not supported:$::operatingsystem$::operatingsystemmajrelease":  }  
+    fail("Operating system not supported:$::operatingsystem$::operatingsystemmajrelease")
   }
-  
-  #  subscribe   =>  Package['java-sdk'],
-  #  require     =>  Package['java-sdk'],
+  if ($isDefault == true){
+    java::default::set{"set-default-to-java-${version}":
+      version => "${version}",
+      updateVersion => "${updateVersion}",
+    }
+  }
 }
 
 

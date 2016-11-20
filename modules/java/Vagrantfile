@@ -37,10 +37,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.box = "ubuntu/wily64"
 	ubuntu.vm.synced_folder "files", "/vagrant/debs"
 		
-	ubuntu.vm.provision "puppet" do |puppet|
- 		puppet.manifests_path = "manifests"
-		puppet.manifest_file  = "test_ubuntu.pp"
-	end
+#	ubuntu.vm.provision "puppet" do |puppet|
+# 		puppet.manifests_path = "manifests"
+#		puppet.manifest_file  = "test_ubuntu.pp"
+#	end
   end
   
 end

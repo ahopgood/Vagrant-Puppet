@@ -1,6 +1,6 @@
 define java::ubuntu(
-  $version = "",
-  $updateVersion = "",
+  $version = "6",
+  $updateVersion = "45",
   $is64bit = true,
   $multiTenancy = undef
 ){
