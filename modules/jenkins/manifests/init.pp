@@ -64,7 +64,7 @@ class jenkins (
   }
   
   #Requires java to be installed
-  class { 'java': 
+  java{"install-java":
     version => '7',
     updateVersion => '76',
   }
@@ -102,8 +102,6 @@ class jenkins (
   }
   
   #Install Jenkins
-  #sudo rpm -ivh /vagrant/files/jenkins-1.614-1.1.noarch.rpm
-  
   #iptables port exemption needed
   
 }
