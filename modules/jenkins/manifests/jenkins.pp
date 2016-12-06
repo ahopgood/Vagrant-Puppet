@@ -10,6 +10,16 @@
 #
 # Sample Usage:
 #
-class { 'jenkins':
-  
+
+Package{
+  allow_virtual => false,
 }
+file {
+  "/etc/puppet/installers/":
+    ensure     =>  directory,
+}
+->
+class { 'jenkins': }
+
+
+
