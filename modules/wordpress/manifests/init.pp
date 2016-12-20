@@ -239,7 +239,7 @@ define wordpress::plugin_restore(
   
   exec {"restore-plugins":
     command => "/usr/local/bin/restore-plugins.sh",
-    user => vagrant,
+    user => "apache",
     require => File["restore-plugins.sh"]
   }
 }
