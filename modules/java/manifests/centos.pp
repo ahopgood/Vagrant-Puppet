@@ -5,7 +5,7 @@ define java::centos(
   $version = "6",
   $updateVersion = "45",
   $is64bit = true,
-  $multiTenancy = undef,
+  $multiTenancy = false,
   ){
     $local_install_path = "/etc/puppet/"
     $local_install_dir  = "${local_install_path}${name}/"
@@ -42,15 +42,9 @@ define java::centos(
     #you'll end up with both versions installed so we need to ensure the previous version is absent
     if ("${version}" == 5 or "${version}" == 6 or "${version}" == 7){
 #      $package_name  = "jdk"
-      $package_name = "1.${version}.0_${updateVersion}-fcs"
+      $package_name = "1.${version}.0_${updateVersion}-fcs.x86_64"
     } elsif ("${version}" == 8){
       $package_name  = "jdk1.${version}.0_${updateVersion}"
-#      $uninstall_package = "jdk"
-#      package {
-#        "${uninstall_package}":
-#        ensure  => absent,
-#        provider => 'rpm'
-#      }
     } 
     
     file {
@@ -62,24 +56,42 @@ define java::centos(
     }  
     
     #Will have to switch this to rpm -Uvh as rpm -i won't allow for idempotentcy
-    if ($multiTenancy == true){
+    if ("${multiTenancy}" == "true"){
       $install_options = ['--force']
+      #Old versions of java are still installed, is this an issue?
     } else {
       notify{"Multi-tenancy not allowed":}
+      #Hack: duplicate notify declaration prevents multiple major versions being installed.
+      #sudo rpm -qa jdk1.8.*| grep -v 'jdk1.8.0_31'
     }
+    
     package {
       "${package_name}":
-      ensure    => "1.${version}.0_${updateVersion}-fcs",
+#      ensure    => "1.${version}.0_${updateVersion}-fcs",
+      ensure      => "${package_name}",
       provider    =>  'rpm',
       source      =>  "${local_install_dir}${jdk}",
       require     =>  File["${jdk}"],
-      install_options => "${install_options}",
+      install_options => $install_options,
     }
     ->
     java::default::install{"install-jdk-${version}-in-alternatives":
       version => $version,
       updateVersion => $updateVersion,
     }
+    ->  
+    exec {"remove-old-versions-of-java-${version}":
+      path => "/bin/",
+      command => "rpm -e $(rpm -qa | grep jdk-1.${version}.* | grep -v 'jdk1.${version}.0_${updateVersion}')",
+      before => Package["${package_name}"],
+      onlyif => "rpm -qa | grep jdk-1.*"
+    }       
+
+#    if ("${multiTenancy}" == "true"){
+#      #Because we used --force on rpm we need to remove the previous minor versions of the major version we're trying to install.
+#    }
+    #Upgrading Java in a multi-tenancy environment will leave the old versions still installed.
+    #i.e. starting with java 6 & 8 then upgrading 6 to 7 will result in 6,7 and 8 being installed
     
     
     #How to uninstall via rpm: rpm -e package name
