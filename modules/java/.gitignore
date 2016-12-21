@@ -3,3 +3,4 @@
 /files/*.rpm
 /files/*.bin
 /.project
+/.settings

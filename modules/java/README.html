@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+	<body>
+		<h1 id="java">java</h1>
+		<p>This is the java module. It provides...
+			the Oracle Java Development Kit (JDK)</p>
+		<p>The module can be passed the following parameters as Strings:
+			<br/>
+		</p>
+		<ul>
+			<li>Major version number, e.g. "6"</li>
+			<li>Minor / update version number, e.g. "45"</li>
+			<li>multiTenancy boolean, defaults to false to prevent unintentionally installing multiple JVMs
+				The module will default to jdk-6u45.</li>
+		</ul>
+		<p>
+			<strong>64-bit support only</strong>
+		</p>
+		<p>Control over the JVM that is used as default is 
+			<strong>not</strong> provided as of yet.
+		</p>
+		<p>Java Cryptography Extensions are 
+			<strong>not</strong> provided as of yet.
+			<br/>
+		</p>
+		<h2 id="centos">CentOS</h2>
+		<p>Installation of a Java JDK from an RPM file.
+			RPM files with the appropriate minor-major numbers need to be located in the 
+			<strong>files</strong> folder for the passed parameters to allow for installation of the correct java version.
+		</p>
+		<h2 id="ubuntu">Ubuntu</h2>
+		<h3 id="usage">Usage</h3>
+		<p>Can be declared via the 
+			<em>java</em> definition:
+		</p>
+		<pre><code>java{"java-7":
+    version =&gt; '7',
+    updateVersion =&gt; '76'
+}
+</code></pre>
+		<p>or directly via the 
+			<em>java::ubuntu</em> definition:
+		</p>
+		<pre><code>java::ubuntu{"java-6":
+  version =&gt; "6",
+  updateVersion =&gt; "45"
+} 
+</code></pre>
+		<h4 id="a-href-debian-file-naming-conventions-debian-file-naming-conventions-a"><a href="Debian File naming conventions">Debian File naming conventions</a></h4>
+		<p>The 
+			<em>.deb</em> files with the appropriate minor-major numbers need to be located in the 
+			<strong>files/Ubuntu/15.10</strong> folder for the passed parameters to allow for installation of the correct java version.
+			<br/>
+			These deb files should be created using the 
+			<strong>java-package</strong> utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.
+			<br/>
+			The naming of these 
+			<em>.deb</em> files should follow the following convention in order for the correct version to be selected:
+			<br/>
+
+			<strong>oracle-java&amp;ltmajor_version$gt-jdk_&amp;ltmajor_version$gtu&amp;ltupdate_version$gt_amd64-Ubuntu_&amp;ltubuntu_version$gt.deb</strong>
+			<br/>
+			an example would be:
+			<br/>
+
+			<code>oracle-java8-jdk_8u31_amd64-Ubuntu_15.10.deb</code>
+		</p>
+		<h3 id="current-status-support">Current Status / Support</h3>
+		<p>Supports:</p>
+		<ul>
+			<li>Ubuntu 15.10 (Wily)
+					* Major Java version 6,
+					* Major Java version 7,
+					* Major Java version 8.
+				<br/>
+			</li>
+		</ul>
+		<p>Installs Java Virtual Machine to 
+			<code>/usr/lib/jvm</code>
+		</p>
+		<p>Tested:</p>
+		<ul>
+			<li>Install on fresh system</li>
+			<li>Multi tenancy JVMs, i.e. 7 running alongside 8
+					* Currently installs major versions alongside each other
+					* Update versions are automatically upgraded
+					
+				<em>Currently the first installed jdk is the default in</em>
+				<em>alternatives</em>*.
+					* Multi tenanted JVMs can now be specified in a single puppet manifest using multiple defines sections instead of multiple runs to install the JVMs next to each other.
+			</li>
+			<li>in place upgrades between update versions with the same major version
+					* 8u32 to 8u112 - done
+					* 7u76 to 7u80 - done
+					* 6u34 to 6u45 - done</li>
+			<li>downgrades between update versions with the same major version
+					* 8u112 to 8u32 - done
+					* 7u80 to 7u76 - done
+					* 6u45 to 6u34 - done</li>
+		</ul>
+		<p>Currently 
+			<strong>not</strong> tested:
+		</p>
+		<ul>
+			<li>in place upgrades between major versions
+					* 6 to 7
+					* 7 to 8
+					* 6 to 8</li>
+			<li>downgrades between major versions
+					* 8 to 7 - failed
+					* 7 to 6 -
+					* 8 to 6 -</li>
+			<li>reinstalling
+					
+				<em>a rerun of puppet will reinstall your JDK, this is because the JDK is uninstalled via</em>
+				<em>dpkg</em>* to ensure that the previous update version is removed as the puppet dpkg  provider cannot remove with a specific version, it works only with a generic package name e.g. oracle-java6-jdk 
+			</li>
+			<li>Defaults
+					* Currently the default JVM is the last installed version.</li>
+		</ul>
+		<h3 id="multi-tenancy-jvms">Multi Tenancy JVMs</h3>
+		<p>Multi tenancy allows for multiple (major version 
+			<strong>only</strong>) JVMs to be installed at once, useful for certain testing environments and build servers to name two examples.
+			<br/>
+
+			<code>multiTenancy =&gt; false</code> is the default value, if present then other JVMs will be removed (as long as they are present in the versionsToRemove hash.
+			<br/>
+			You can only use the 
+			<code>java</code> or 
+			<code>java::ubuntu</code> defined resources 
+			<strong>once</strong> with multiTenancy disabled or else your manifest run will fail with a duplicate resource declaration for the 
+			<strong>package</strong> resource that removes the other JVM versions. In this way you get a hard failure on running multiTenancy disabled with multiple declarations.
+			<br/>
+			If the 
+			<code>multiTenancy =&gt; true</code> value is set then the 
+			<code>java</code> or 
+			<code>java::ubuntu</code> defined resources can be declared multiple times, once per major version number you wish to be deployed.
+			<br/>
+			This will result in your java installations all living side by side in the 
+			<code>/usr/lib/jvm</code> directory.
+			<br/>
+		</p>
+		<h3 id="adding-compatibility-for-other-ubuntu-versions">Adding compatibility for other Ubuntu versions</h3>
+		<p>This module will attempt to locate the jdk deb files based on the 
+			<code>$::operatingsystem</code> and 
+			<code>$::operatingsystemmajrelease</code> puppet facts.
+			<br/>
+			In the case of Ubuntu 15.10 (Wily) these result in the values 
+			<code>Ubuntu</code> and 
+			<code>15.10</code> respectively.
+			<br/>
+			Both the folder structure under 
+			<strong>files</strong> and the deb naming should reflect this for the current version of Ubuntu and for support of future versions.
+			<br/>
+			The 
+			<em>.deb</em> installers will need to be created via 
+			<strong>java-package</strong> on your target version of Ubuntu in order to install correctly (this includes the correct bit version 32 vs 64-bit).
+			<br/>
+			Then try installing via 
+			<code>dpkg -i oracle-javax-jdk_xuxx_amd64/x86-Ubuntu_xx.xx.deb</code> on a blank OS install to see what dependencies and versions are required for that version of Ubuntu.
+			<br/>
+			The above mentioned dependencies can be encapsulated in an 
+			<em>if</em> clause based on the 
+			<code>$::operatingsystemmajrelease</code> value enabling the correct dependencies to be installed for your generated .deb file.
+			<br/>
+		</p>
+		<h3 id="adding-new-major-versions-of-java">Adding new major versions of Java</h3>
+		<p>Observe the packaging and 
+			<a href="#Debian File naming conventions">naming conventions</a> mentioned previously.
+			<br/>
+			In the 
+			<code>ubuntu.pp</code> manifest you'll need to add a new mapping to the 
+			<strong>versionsToRemove</strong> hash for your new major version, specifying the removal of oracle-java6-jdk, oracle-java7-jdk and oracle-java8-jdk. 
+			Also add your new version to the hashes for every other version, e.g. oracle-java9-jdk.
+			<br/>
+		</p>
+		<h2 id="todo">ToDo</h2>
+		<ul>
+			<li>Support for setting the Java Cryptography Extensions (JCE) via a define section.
+				<br/>
+				* 
+			</li>
+		</ul>
+		<h3 id="centos2">CentOS</h3>
+		<ul>
+			<li>Move CentOS code into separate manifest</li>
+			<li>Update CentOS documentation with more information on usage and file naming strategy</li>
+			<li>Multi tenancy</li>
+		</ul>
+		<h3 id="ubuntu2">Ubuntu</h3>
+		<ul>
+			<li>Split out Ubuntu code into separate manifest</li>
+			<li>Create the ability to set a 
+				<strong>default</strong> major version JVM via a parameter
+			</li>
+			<li>Create the ability to have multi tenanted JVMs via a parameter, without the tenancy set to true we will remove any other major versions of the oracle JVM (just list we do to enable downgrades of updates). </li>
+			<li>Use of definitions per major version using the 
+				<strong>define</strong> keyword, this will prevent puppet complaining about duplicate resources.
+			</li>
+		</ul>
+	</body>
+</html>

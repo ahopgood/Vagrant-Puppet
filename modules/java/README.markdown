@@ -173,7 +173,10 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 * Support for setting the Java Cryptography Extensions (JCE) via a define section.  
 * Install defaults via alternatives - done
 	* Get this working where the alternative is installed but we want a higher priority to override.
-	
+* Some sort of test suit to prevent unintentional regression
+	* Could define test manifests for conditions
+	* Could use a snapshot of the VMs to ensure quick run time
+	* Needs to be platform agnostic as ssh will not work on windows, or will it?
 
 ### CentOS
 * Update CentOS documentation with more information on usage and file naming strategy
