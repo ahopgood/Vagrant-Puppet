@@ -18,8 +18,8 @@ class httpd {
   $puppet_file_dir = "modules/httpd/"
   $local_install_dir = "${local_install_path}installers/"
 
-  $httpd_user = "httpd"
-  $httpd_group = "httpd"
+  $httpd_user = "apache"
+  $httpd_group = "apache"
 
   Class["httpd"] -> Class["iptables"]
 
