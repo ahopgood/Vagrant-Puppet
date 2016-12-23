@@ -3,11 +3,11 @@
   }
 
     
-  java{"java-8":
-    version => "8",
-    updateVersion => "31",
-#    multiTenancy => true,
-  }
+#  java{"java-8":
+#    version => "8",
+#    updateVersion => "31",
+##    multiTenancy => true,
+#  }
 
 #  java{"java-8":
 #    version => "8",
@@ -35,15 +35,23 @@
 ##    multiTenancy => true,
 #  }
 
-#  java{"java-6":
-#    version => "6",
-#    updateVersion => "34",
-##    multiTenancy => true,
-#  }
+  java{"java-6":
+    version => "6",
+    updateVersion => "34",
+#    multiTenancy => true,
+  }
 
 #  java{"java-5":
 #    version => "5",
 #    updateVersion => "22",
+##    isDefault => true,
+##    multiTenancy => true,
+#  }
+  
+#  java{"java-5":
+#    version => "5",
+#    updateVersion => "20",
+##    isDefault => true,
 ##    multiTenancy => true,
 #  }
 

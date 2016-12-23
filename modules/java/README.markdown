@@ -10,9 +10,7 @@ The module can be passed the following parameters as Strings:
 * isDefault boolean, uses alternatives to manually override the priority based ordering of multi-tenancy JVMs
 The module will default to jdk-6u45.
 
-**64-bit support only**
-
-JVM defaults are based on major versions, e.g. JDK 8 trumps JDK 7 etc unless manually overriden using the isDefault flag.
+JVM defaults are based on major versions, e.g. JDK 8 trumps JDK 7 etc unless manually overridden using the isDefault flag.
 
 Java Cryptography Extensions are **not** provided as of yet.  
 ## Current Status / Support
@@ -26,6 +24,10 @@ Supports:
 	* Major Java version 6,
 	* Major Java version 7,
 	* Major Java version 8.
+### Known Issues
+**64-bit support only**  
+[CentOS Known Issues](#CentOS_known_issues)  
+[Ubuntu Known Issues](#Ubuntu_known_issues)  
 
 ## Usage
 ### Single JVM usage 
@@ -121,8 +123,11 @@ Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<updateVersion>
 
 Installation of a Java JDK from an RPM file.
 RPM files with the appropriate minor-major numbers need to be located in the **files** folder for the passed parameters to allow for installation of the correct java version.
+### <a href="CentOS_known_issues">Known issues</a>
+* Major version downgrades - alternatives are not removed so the previous version will still be pointed to. 
+* Multi-tenancy JVMs - removing a JVM from the manifest will leave it still installed on the file system.
 
-### <a href="CentOS File naming conventions">CentOS File naming conventions</a>
+### <a href="CentOS_File_naming_conventions">CentOS File naming conventions</a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct java version.  
 The *current* file naming structure by Oracle has no OS dependent parts and simply takes the following forms based on major versions:  
 * **Java 5** - jdk-1_<version>_0_<updateVersion>-linux-amd64.rpm
@@ -139,13 +144,17 @@ This module will attempt to locate the jdk rpm files based on the `$::operatings
 In the case of CentOS 6 these result in the values `CentOS` and `6` respectively, the folder structure under **files** should reflect this by looking in */files/CentOS/6/* for installers, this pattern should be followed for support of future versions of CentOS.   
 
 ### Adding new major versions of Java
-Observe the packaging and [naming conventions](#CentOS File naming conventions) mentioned previously.  
+Observe the packaging and [naming conventions](#CentOS_File_naming_conventions) mentioned previously.  
+Be wary of renamed packages or new formats by checking `rpm -qa jdk*` after doing a manual rpm install.  
 
 ## Ubuntu
 Installs the Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
 Installation of a Java JDK from a .deb file.
 
-### <a href="Debian File naming conventions">Debian File naming conventions</a>
+###<a href="Ubuntu_known_issues">Ubuntu known issues</a>
+* Multi-tenancy JVMs - currently removing of a java declaration won't remove it from the system, this is a scope issue, each instance doesn't know what other major versions are installed, they can clean up their minor versions without issue.  
+
+### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
 The naming of these *.deb* files should follow the following convention in order for the correct version to be selected:  
@@ -163,7 +172,7 @@ Then try installing via `dpkg -i oracle-javax-jdk_xuxx_amd64/x86-Ubuntu_xx.xx.de
 The above mentioned dependencies can be encapsulated in an *if* clause based on the `$::operatingsystemmajrelease` value enabling the correct dependencies to be installed for your generated .deb file.  
 
 ### Adding new major versions of Java
-Observe the packaging and [naming conventions](#Debian File naming conventions) mentioned previously.  
+Observe the packaging and [naming conventions](#Debian_file_naming_conventions) mentioned previously.  
 In the `ubuntu.pp` manifest you'll need to add a new mapping to the **versionsToRemove** hash for your new major version, specifying the removal of oracle-java6-jdk, oracle-java7-jdk and oracle-java8-jdk. 
 Also add your new version to the hashes for every other version, e.g. oracle-java9-jdk.  
 
@@ -173,13 +182,13 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 * Support for setting the Java Cryptography Extensions (JCE) via a define section.  
 * Install defaults via alternatives - done
 	* Get this working where the alternative is installed but we want a higher priority to override.
-* Some sort of test suit to prevent unintentional regression
+* Some sort of test suite to prevent unintentional regression
 	* Could define test manifests for conditions
 	* Could use a snapshot of the VMs to ensure quick run time
 	* Needs to be platform agnostic as ssh will not work on windows, or will it?
 
 ### CentOS
-* Update CentOS documentation with more information on usage and file naming strategy
+* Update CentOS documentation with more information on usage and file naming strategy - done
 * Multi tenancy - done
 * Set defaults manually via alternatives - done
 
