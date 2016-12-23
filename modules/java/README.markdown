@@ -24,7 +24,9 @@ Supports:
 	* Major Java version 6,
 	* Major Java version 7,
 	* Major Java version 8.
-### Known Issues
+
+### Known Issues  
+
 **64-bit support only**  
 [CentOS Known Issues](#CentOS_known_issues)  
 [Ubuntu Known Issues](#Ubuntu_known_issues)  
