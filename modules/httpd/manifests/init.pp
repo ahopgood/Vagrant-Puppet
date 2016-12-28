@@ -22,7 +22,7 @@ class httpd {
   $httpd_group = "apache"
 
   Class["httpd"] -> Class["iptables"]
-  
+  $os = "$operatingsystem$operatingsystemmajrelease"  
   group { "${httpd_group}":
     ensure    =>  present,
   }
@@ -36,21 +36,25 @@ class httpd {
     require     =>  Group["${httpd_group}"]
   }
 
-  $os = "$operatingsystem$operatingsystemmajrelease"
-  if "${operatingsystem}" == "CentOS"{
+  if ("${operatingsystem}" == "CentOS") {
     class{"httpd::centos":
       httpd_user => $httpd_user,
       httpd_group => $httpd_group,
     }
-  } elsif "${operatingsystem}" == "Ubuntu" {
+  } elsif ("${operatingsystem}" == "Ubuntu") {
     notify{"${operatingsystem} currently not supported":}
+    class{"httpd::ubuntu":
+      major_version => "2",
+      minor_version => "4",
+      patch_version => "12"
+    }
   } else {
     notify{"${operatingsystem} version ${operatingsystemmajrelease}":}
   }
   
   service {
     "httpd":
-    require => Package["httpd"],
+#    require => Package["httpd"],
     ensure => running,
     enable => true
   }
