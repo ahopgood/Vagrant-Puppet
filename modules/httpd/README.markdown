@@ -9,8 +9,8 @@ The module can be passed the following parameters as Strings:
   
 ## Current Status / Support
 Tested to work on the following operating systems:
-* CentOS 6
-* CentOS 7
+* CentOS 6 - Apache 2.2.15, **it is advisable to move on from CentOS 6 - these repositories are no longer being updated**
+* CentOS 7 - Apache 2.4.6
 
 ### Known Issues  
 **64-bit support only**  
@@ -69,7 +69,7 @@ Command line service calls are as follows:
 * `sudo systemctl status httpd` to get the current status of the service
 
 ### <a href="CentOS_known_issues">Known issues</a>
-*
+* CentOS 6 is on a very out of date version of apache (2.2.15), the repositories for this version of CentOS are no longer being updated.
 
 ### <a href="CentOS_file_naming_conventions">CentOS file naming conventions</a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct apache httpd version.  
@@ -115,7 +115,7 @@ As well as name resolution you'll also need to add a conditional section based o
 	}
 
 
-All dependencies and the actual Apache installer itself are best obtained by running `yumdownloader <installername>` on the target CentOS version, sometimes this will require `sudo apt-get install yum-tools` to be installed first.  
+All dependencies and the actual Apache installer itself are best obtained by running `yumdownloader <installername>` on the target CentOS version, sometimes this will require `sudo apt-get install yum-utils` to be installed first.  
 
 ### Adding new major versions of Apache
 Ensure that the .rpm installer is present in the */file/CentOS/* directory under the correct version of CentOS.  
@@ -138,6 +138,10 @@ an example would be:
 ### Adding new major versions of Apache
 
 ## ToDo
+* Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
+	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
+	* CentOS7 - 2.4.6  
+	* Ubuntu - 2.4.12
 * Ubuntu support
 * Raspberian support
 * Terry Pratchett x-clacks header
@@ -146,4 +150,5 @@ an example would be:
 * Custom error pages; 404, 401, 403, 500 etc
 * Removal of Operating System information from error pages 
 * Removal of apache version information from error pages
-
+* Have all files saved to `/etc/puppet/installers/httpd/`
+* In the case of an upgrade from one version of apache to another, remove old package files from `/etc/puppet/installers/httpd` folder
