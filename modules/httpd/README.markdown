@@ -124,6 +124,7 @@ If the dependencies change between versions then a new conditional section will 
 
 ## Ubuntu
 ### <a href="Ubuntu_known_issues">Ubuntu known issues</a>
+* iptables isn't supported by default on Ubuntu 15.10 - modular dependency between httpd and iptables will cause module to fail.
 * Ubuntu support is still under development
 
 ### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
