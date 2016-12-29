@@ -118,4 +118,12 @@ class httpd::centos($httpd_user = undef, $httpd_group = undef){
     Package["apr-util-ldap"], 
     Package["mailcap"], Package["httpd-tools"], Package["apr-util"]],
   }
+  
+  service {
+    "httpd":
+    require => Package["httpd"],
+    ensure => running,
+    enable => true
+  }
+  
 }

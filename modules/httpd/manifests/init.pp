@@ -21,7 +21,7 @@ class httpd {
   $httpd_user = "apache"
   $httpd_group = "apache"
 
-  Class["httpd"] -> Class["iptables"]
+#  Class["httpd"] -> Class["iptables"]
   $os = "$operatingsystem$operatingsystemmajrelease"  
   group { "${httpd_group}":
     ensure    =>  present,
@@ -42,7 +42,7 @@ class httpd {
       httpd_group => $httpd_group,
     }
   } elsif ("${operatingsystem}" == "Ubuntu") {
-    notify{"${operatingsystem} currently not supported":}
+    notify{"Using ${operatingsystem}":}
     class{"httpd::ubuntu":
       major_version => "2",
       minor_version => "4",
@@ -50,12 +50,5 @@ class httpd {
     }
   } else {
     notify{"${operatingsystem} version ${operatingsystemmajrelease}":}
-  }
-  
-  service {
-    "httpd":
-#    require => Package["httpd"],
-    ensure => running,
-    enable => true
   }
 }
