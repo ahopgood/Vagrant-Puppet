@@ -1,5 +1,7 @@
 class httpd::centos($httpd_user = undef, $httpd_group = undef){
 
+  Class["httpd::centos"] -> Class["iptables"]
+
   $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"  
 
   $os = "$operatingsystem$operatingsystemmajrelease"

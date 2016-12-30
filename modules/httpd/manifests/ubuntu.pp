@@ -7,6 +7,11 @@ class httpd::ubuntu (
   $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"
   $local_install_dir = "${local_install_path}installers/"
   
+  ufw{"open port 80": 
+    port => "80",
+    isTCP => true 
+  }
+  
   $platform = "amd64"
   $ubuntu_version = "-2ubuntu2.1_"
   
