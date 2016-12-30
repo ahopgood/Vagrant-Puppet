@@ -27,7 +27,7 @@ define ufw (
   exec {"add firewall rule ${port}/${protocol}":
     path => "/usr/sbin/",
     command => "ufw allow ${port}/${protocol}",
-    unless => "ufw status | /bin/grep ${port}/${protocol} * ALLOW"
+    unless => "ufw status | /bin/grep ${port}/${protocol} .* ALLOW"
   }
   ->
   exec {"Enable Firewall":

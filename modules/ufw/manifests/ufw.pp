@@ -13,5 +13,5 @@ Package{
 
   ufw {"test":
     port => '8080',
-    isTCP => true
+    isTCP => false
   }
