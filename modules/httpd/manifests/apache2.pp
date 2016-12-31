@@ -12,4 +12,5 @@ Package{
   } 
   
   class { "httpd": }
-  
+  ->
+  httpd::xclacks{"test-clacks":}
