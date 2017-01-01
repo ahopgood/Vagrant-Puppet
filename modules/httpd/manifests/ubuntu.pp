@@ -157,8 +157,11 @@ class httpd::ubuntu (
     "apache2":
     require => Package["apache2"],
     ensure => running,
-    enable => true
+    enable => true,
+    subscribe => 
   }
+  
+  
    
 }
 #Unpacking apache2 (2.4.12-2ubuntu2.1) ...
