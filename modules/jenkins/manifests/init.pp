@@ -27,8 +27,8 @@ class jenkins (
     "${module_name} installation completed":
   }  
 
-  $java_major_version = "8"
-  $java_update_version = "112"
+  $java_major_version = "7"
+  $java_update_version = "76"
 
 #Ubuntu
 #15.10 = wiley
@@ -36,14 +36,9 @@ class jenkins (
   if $::operatingsystem == 'CentOS' {
     notify {    "Using operating system:$::operatingsystem": }
   } elsif $::operatingsystem == "Ubuntu"{
-    #create name of java deb file
-    $java_name = "oracle-java${java_major_version}-jdk_${java_major_version}u${java_update_version}_amd64-${operatingsystem}_${::operatingsystemmajrelease}.deb"
-    #Java deb format example oracle_java8-jdk_8u112_amd64-Ubuntu_15.10.deb
     if $::operatingsystemmajrelease == "15.10" {
-      notify{"We're on Ubuntu wiley trying to use Java package ${java_name}":}
+
     }
-    #install correct versions of dependencies for the ubuntu distro
-    
   } else {
     notify {  "Operating system not supported:$::operatingsystem$::operatingsystemmajrelease":  }  
   }
@@ -63,10 +58,11 @@ class jenkins (
     require     =>  Group["${jenkins_group}"]
   }
   
-  #Requires java to be installed
+  #Requires java to be installed,
+  #running the module again causes issues as the java module removes old versions before installing Java again which is a dependency of Jenkins and causes a failure
   java{"install-java":
-    version => '7',
-    updateVersion => '76',
+    version => "${java_major_version}",
+    updateVersion => "${java_update_version}",
   }
   
   $daemon = "daemon_0.6.4-1_amd64.deb"
@@ -100,8 +96,48 @@ class jenkins (
     source => "${local_install_dir}${jenkins}",
     require => [File["${jenkins}"], Package["${daemon}"]]
   }
-  
+
+  #If there is an init.d script installed then you can use the service resource type.
+  service {"jenkins":
+    ensure => running,
+    enable => true,
+    require => Package["${jenkins}"]
+  }
+
   #Install Jenkins
-  #iptables port exemption needed
-  
+  #iptables port exemption needed?
+  #/var/lib/jenkins/ contains all the configurations
+
+  #Need to set a new password hash & last
+  #jbcrypt:$2a$10$ hashed password
+
+  #Adding the following to /var/lib/jenkins/config.xml will prevent you needing to add the initial password to the UI
+  #Can use augeas to do this
+#<jenkins.security.LastGrantedAuthoritiesProperty>
+#<roles>
+#<string>authenticated</string>
+#</roles>
+#<timestamp>1481300676660</timestamp>
+#</jenkins.security.LastGrantedAuthoritiesProperty>
+
+#  file {"/var/lib/jenkins/users/admin/config.xml":
+#    mode => "a+w",
+#    recurse => true,
+#    require => Package["${jenkins}"]
+#  }
+#
+#  $jenkins_changes=[
+#    'set jenkins.security.LastGrantedAuthoritiesProperty/roles/string/#text authenticate',
+#    'set jenkins.security.LastGrantedAuthoritiesProperty/timestamp/#text 1481300676660',
+#  ]
+#
+#  augeas{ "configure-jekins-login":
+#    incl => "/var/lib/jenkins/users/admin/config.xml",
+#    lens => "Xml.lns",
+#    context => "/files/var/lib/jenkins/users/admin/config.xml/user/properties/",
+#    changes => $jenkins_changes,
+#    require  => [File['/var/lib/jenkins/users/admin/config.xml']],
+#    notify => Service["jenkins"]
+#  }
+
 }
