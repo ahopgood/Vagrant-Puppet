@@ -29,15 +29,11 @@ define httpd::xclacks {
 # set /files/etc/apache2/apache2.conf/Directory[3]/arg "/var/www/html"
 
   if ("${operatingsystem}" == "Ubuntu"){
-
     exec {"enable headers plugin": 
       path => "/usr/sbin/:/usr/bin/",
       command => "/usr/sbin/a2enmod headers",
-#      returns => 13,
-#      user => vagrant,
       unless => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
       require => Package["apache2"],
-#      notify => Service["apache2"],
     }
     ->
     exec {"restart-apache2-to-install-headers":
@@ -64,7 +60,41 @@ define httpd::xclacks {
       path => "/usr/sbin/:/bin/",
       command => "service apache2 reload",
     }
-    
+  } elsif ("${operatingsystem}" == "CentOS"){
+    if ("${$operatingsystemmajrelease}" == "6") {
+      notify{"Beginning support for CentOS6":}
+    }
+#    exec {"enable headers plugin": 
+#      path => "/usr/sbin/:/usr/bin/",
+#      command => "/usr/sbin/a2enmod headers",
+#      unless => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
+#      require => Package["apache2"],
+#    }
+#    ->
+#    exec {"restart-apache2-to-install-headers":
+#      path => "/usr/sbin/:/bin/",
+#      command => "service apache2 restart",
+#    }
+#    
+#    $header_contents = [
+#    "set Directory[4]/arg '\"/var/www/html/\"'",
+#    "set Directory[4]/directive[1] header",
+#    "set Directory[4]/directive[1]/arg[1] set",
+#    "set Directory[4]/directive[1]/arg[2] X-Clacks-Overhead",
+#    "set Directory[4]/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+#    ]  
+#    augeas {"add header to directory":
+#      incl => "/etc/apache2/apache2.conf",
+#      lens => "Httpd.lns",
+#      context => "/files/etc/apache2/apache2.conf/",
+#      changes => $header_contents,
+#      require => Exec["restart-apache2-to-install-headers"]
+#    }
+#    ->
+#    exec {"restart-apache2-to-add-x-clacks":
+#      path => "/usr/sbin/:/bin/",
+#      command => "service apache2 reload",
+#    }
   } else {
     fail("${operatingsystem} is not currently supported")
   }
