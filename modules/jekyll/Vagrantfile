@@ -8,6 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box_version = "1.0.1"  
   config.vm.box_check_update = false
+  config.ssh.insert_key = false
 
   config.vm.synced_folder "../", 	"/etc/puppet/modules"
 #	config.vm.synced_folder "templates",
@@ -27,24 +28,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
   end
 
-  config.vm.define "local" do | local |
-    local.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	local.vm.network "private_network", ip: "192.168.33.22"
-	local.vm.provision "puppet" do |puppet|
-		puppet.manifests_path = "manifests"
-		puppet.manifest_file  = "jekyll.pp"
-#   	puppet.options = ["--templatesdir","/tmp/vagrant-puppet-3/template"]
-	end
+  config.vm.define "ubuntu" do | ubuntu |
+	ubuntu.vm.box = "ubuntu/wily64"
+	ubuntu.vm.box_version = "20160329.0.0"
+	ubuntu.vm.network "private_network", ip: "192.168.33.25"
+	ubuntu.vm.network "forwarded_port", guest: "4000", host: "8888"
+	ubuntu.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
+	ubuntu.vm.synced_folder "published_blog", "/published_blog"
   end
-
-  config.vm.define "standalone" do | standalone |
-	standalone.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	standalone.vm.network "private_network", ip: "192.168.33.23"
-  end
-  
-#<<SCRIPT
-#sudo apt-get install 
-#SCRIPT  
   
   config.vm.define "jekyll" do | jekyll |
 	jekyll.vm.box = "hashicorp/precise64"
