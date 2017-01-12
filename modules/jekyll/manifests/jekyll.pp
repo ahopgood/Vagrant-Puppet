@@ -1,1 +1,1 @@
-class {'jekyll':}
+class {'jekyll::gem':}
