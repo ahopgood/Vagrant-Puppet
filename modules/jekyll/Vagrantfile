@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   config.vm.define "server" do | server |
 	server.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	server.vm.network "public_network", :mac => "080027D3418F", :bridge => "Realtek PCIe GBE Family Controller"
+#	server.vm.network "public_network", :mac => "080027D3418F", :bridge => "Realtek PCIe GBE Family Controller"
 	server.vm.provision "puppet" do |puppet|
 		puppet.manifests_path = "manifests"
 		puppet.manifest_file  = "jekyll.pp"

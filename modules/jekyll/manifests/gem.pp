@@ -21,6 +21,16 @@ class jekyll::gem{
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/jekyll/"
   
+  if ("${operatingsystem}" == "Ubuntu"){
+    if ("${operatingsystemmajrelease}" == "15.10"){
+      notify{"Installing Jekyll for ${operatingsystem} ${operatingsystemmajrelease}":}
+    } else {
+      fail("The version ${operatingsystemmajrelease} of ${operatingsystem} is not supported")
+    }
+  } else {
+    fail("${operatingsystem} is not supported")
+  }
+  
   file {"${local_install_dir}":
     ensure => directory,
   }
