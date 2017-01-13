@@ -23,9 +23,7 @@ class jenkins (
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/jenkins/"
   
-  notify {
-    "${module_name} installation completed":
-  }  
+  notify {"${module_name} installation completed":}
 
   $java_major_version = "7"
   $java_update_version = "76"
@@ -33,7 +31,7 @@ class jenkins (
 #Ubuntu
 #15.10 = wiley
 #16.04 = Xenial
-  if $::operatingsystem == 'CentOS' {
+  if ($::operatingsystem) == 'CentOS' {
     notify {    "Using operating system:$::operatingsystem": }
   } elsif $::operatingsystem == "Ubuntu"{
     if $::operatingsystemmajrelease == "15.10" {
@@ -60,12 +58,12 @@ class jenkins (
   
   #Requires java to be installed,
   #running the module again causes issues as the java module removes old versions before installing Java again which is a dependency of Jenkins and causes a failure
+  $daemon = "daemon_0.6.4-1_amd64.deb"
   java{"install-java":
     version => "${java_major_version}",
     updateVersion => "${java_update_version}",
   }
-  
-  $daemon = "daemon_0.6.4-1_amd64.deb"
+  ->
   file {
     "${daemon}":
     require    =>  File["${local_install_dir}"],
@@ -93,51 +91,93 @@ class jenkins (
   package {
     "${jenkins}":
     provider => "dpkg",
+    ensure => installed,
     source => "${local_install_dir}${jenkins}",
     require => [File["${jenkins}"], Package["${daemon}"]]
   }
 
   #If there is an init.d script installed then you can use the service resource type.
   service {"jenkins":
-    ensure => running,
+    ensure => stopped,
     enable => true,
     require => Package["${jenkins}"]
   }
 
   #Install Jenkins
   #iptables port exemption needed?
+  #192.168.33.16:8080 to access the Jenkins admin page
   #/var/lib/jenkins/ contains all the configurations
 
-  #Need to set a new password hash & last
-  #jbcrypt:$2a$10$ hashed password
+  #Backup
+  #rsync /var/lib/jenkins /vagrant/backup/2/ --exclude /var/lib/jenkins/plugins/
+  #Get a list of the plugins from the jenkins API
+  #http://192.168.33.16:8080/pluginManager/api/json?tree=plugins[shortName,version]&pretty=true
 
-  #Adding the following to /var/lib/jenkins/config.xml will prevent you needing to add the initial password to the UI
-  #Can use augeas to do this
-#<jenkins.security.LastGrantedAuthoritiesProperty>
-#<roles>
-#<string>authenticated</string>
-#</roles>
-#<timestamp>1481300676660</timestamp>
-#</jenkins.security.LastGrantedAuthoritiesProperty>
+  #Restore & set ownership
+  #$(date +%y-%m-%d-%h%M-jenkins-backup)
+  #rsync/vagrant/backup/2/ /var/lib/jenkins
+  #chown -R /var/lib/jenkins jenkins
+  #chngrp -R /var/lib/jenkins jenkins
+  #
+}
 
-#  file {"/var/lib/jenkins/users/admin/config.xml":
-#    mode => "a+w",
-#    recurse => true,
-#    require => Package["${jenkins}"]
-#  }
+
+/**
+ *
+ * Param $hour
+ */
+
+# Define: jenkins::backup
 #
-#  $jenkins_changes=[
-#    'set jenkins.security.LastGrantedAuthoritiesProperty/roles/string/#text authenticate',
-#    'set jenkins.security.LastGrantedAuthoritiesProperty/timestamp/#text 1481300676660',
-#  ]
+# A resource for a cron job to back up the /var/lib/jenkins/ directory using rsync.
+# The plugins directory is excluded due to its size.
 #
-#  augeas{ "configure-jekins-login":
-#    incl => "/var/lib/jenkins/users/admin/config.xml",
-#    lens => "Xml.lns",
-#    context => "/files/var/lib/jenkins/users/admin/config.xml/user/properties/",
-#    changes => $jenkins_changes,
-#    require  => [File['/var/lib/jenkins/users/admin/config.xml']],
-#    notify => Service["jenkins"]
-#  }
+# A dated directory is created in the backup_location
+#
+# Parameters:
+# * $backup_location - A directory path to the main backup location
+# * $hour - the hour value for the cron task, defaults to * (i.e. every hour)
+# * $minute - the minute value for the cron task, defaults to 0 (so at the beginning of every hour)
+# Actions:
+#
+# Requires: see Modulefile
+#
+# Sample Usage:
+#
+define jenkins::backup (
+  $backup_location = undef,
+  $hour = "*",
+  $minute = "0",
+) {
 
+  #Add hour, minute as parameters
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir  = "${local_install_path}installers/"
+  $puppet_file_dir    = "modules/jenkins/"
+
+  $backup_script = "jenkins-backup.sh"
+  file{"backup-script-file":
+    ensure => present,
+    path => "${local_install_dir}${backup_script}",
+    source => "puppet:///${puppet_file_dir}${$backup_script}",
+  }
+  cron { "cron-jenkins-backup":
+    command => "${local_install_dir}${backup_script} ${backup_location}",
+    user => 'root',
+    hour => $hour,
+    minute => $minute,
+    require => File["backup-script-file"]
+  }
+#  exec{ "Perform-Jenkins-Folder-Backup":
+#    path => "/usr/bin/",
+#    command => "/usr/bin/rsync -a /var/lib/jenkins/* ${backup_location}$(/bin/date +%y-%m-%d-%H%M-jenkins-backup) --exclude /var/lib/jenkins/plugins/",
+##    command => "rsync -a /var/lib/jenkins/* /vagrant/backup/$(ls -1 /vagrant/backup/ | tail -n1) --exclude /var/lib/jenkins/plugins/",
+#    onlyif => "/bin/ls -1 /var/lib/jenkins"
+##    require => Exec["create-jenkins-backup-dir"]
+#  }
+}
+
+define jenkins::restore {
+  #Get the latest backup dir
+  #ls -1 /vagrant/backup/ | tail -n1
 }

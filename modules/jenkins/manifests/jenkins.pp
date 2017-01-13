@@ -20,6 +20,8 @@ file {
 }
 ->
 class { 'jenkins': }
-
+-> jenkins::backup{"test-backup":
+  backup_location => "/vagrant/backup/",
+}
 
 

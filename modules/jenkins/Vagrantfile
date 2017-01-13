@@ -19,6 +19,7 @@ Vagrant.configure(2) do |config|
     dev.vm.network "private_network", ip: "192.168.33.16"
     dev.vm.box = "ubuntu/wily64"
   	dev.vm.synced_folder "../", "/etc/puppet/modules"
+    dev.vm.synced_folder "~/Dropbox/Projects/Jenkins", "/vagrant/backups/"
 	  dev.vm.provision "puppet" do |puppet|
  		  puppet.manifests_path = "manifests"
 		  puppet.manifest_file  = "jenkins.pp"
