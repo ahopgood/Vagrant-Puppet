@@ -1,1 +1,3 @@
-class {'jekyll::gem':}
+class {'jekyll::gem':
+  showDrafts => "true"
+}

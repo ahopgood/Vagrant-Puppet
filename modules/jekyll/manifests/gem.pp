@@ -1,4 +1,9 @@
-class jekyll::gem{
+class jekyll::gem (
+  $blog_source_directory = "/blog/",
+  $blog_output_directory = "/published_blog/",
+  $blog_host_address = "192.168.33.25",
+  $showDrafts = "false",
+) {
   #gem install -i tmp jekyll -v 3.3.1
   #tmp/cache/*.gem
   #gem install -f --local /vagrant/files/*.gem
@@ -94,7 +99,27 @@ class jekyll::gem{
     source => "${local_install_dir}${jekyll_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
-    install_options => ["--force"]
+    install_options => ["--force"],
+    require => [
+      Package["addressable"],
+      Package["colorator"],
+      Package["ffi"],
+      Package["forwardable-extended"],
+      Package["jekyll-sass-converter"],
+      Package["jekyll-watch"],
+      Package["kramdown"],
+      Package["liquid"],
+      Package["listen"],
+      Package["mercenary"],
+      Package["pathutil"],
+      Package["public_suffix"],
+      Package["rb-fsevent"],
+      Package["rb-inotify"],
+      Package["rouge"],
+      Package["safe_yaml"],
+      Package["sass"],
+      Package["sass-listen"],
+    ]
   }
 
   $jekyll_sass_converter_gem_file = "jekyll-sass-converter-1.5.0.gem"
@@ -264,5 +289,51 @@ class jekyll::gem{
     ensure   => 'installed',
     provider => 'gem',
   }
+
+  if ("${showDrafts}" == "true"){
+    $drafts = "--drafts"
+  } else {
+    $drafts = ""
+  }
+  
+  file{"stop-jekyll-script":
+    ensure => present,
+    path => "${local_install_dir}stop-jekyll.sh",
+    source => "puppet:///${puppet_file_dir}stop-jekyll.sh",
+  }
+#SIGTERM causes issues, try this as a script instead
+  exec {"stop-jekyll":
+    path => "/usr/bin/",
+    command => "${local_install_dir}stop-jekyll.sh",
+    require => File["stop-jekyll-script"],
+    onlyif => "/bin/ps -aux | /bin/grep jekyll | /bin/grep -v grep",
+    returns => [143,1],
+  
+  }
+#  exec {"stop-jekyll":
+#    path => "/usr/bin/",
+#    command => "pkill -f jekyll",
+#    onlyif => "/bin/ps -aux | /bin/grep jekyll | /bin/grep -v grep",
+#    before => Exec["start-jekyll-server"],
+#    require => File["stop-jekyll-script"]
+#  }
+
+  exec {"start-jekyll-server":
+    path => "/usr/local/bin/",   
+    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} --force_polling &",
+    require => Package["jekyll"],
+  }
+#exec
+#jekyll serve --host 192.168.33.25 -s /blog/ -d /published_blog/ --watch --drafts --force_polling
+
+#get pid of jekyll
+#ps -aux | grep jekyll | grep -v grep | awk '{ print $2 }'
+#Kill jekyll
+#pkill -f jekyll
+
+#Serve can take any args that build can
+#jekyll build --watch --drafts --force_polling
+
+#Note serve's --detach option breaks incremental builds
 
 }

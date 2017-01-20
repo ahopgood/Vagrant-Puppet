@@ -31,10 +31,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "ubuntu" do | ubuntu |
 	ubuntu.vm.box = "ubuntu/wily64"
 	ubuntu.vm.box_version = "20160329.0.0"
+	ubuntu.vm.hostname = "dev.jekyll"
+	
 	ubuntu.vm.network "private_network", ip: "192.168.33.25"
 	ubuntu.vm.network "forwarded_port", guest: "4000", host: "8888"
+	
 	ubuntu.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
 	ubuntu.vm.synced_folder "published_blog", "/published_blog"
+	
+	ubuntu.vm.synced_folder "../", "/etc/puppet/modules"
+	ubuntu.vm.provision "puppet" do |puppet|
+		puppet.manifests_path = "manifests"
+		puppet.manifest_file  = "jekyll.pp"
+	end
   end
   
   config.vm.define "jekyll" do | jekyll |
@@ -42,7 +51,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	jekyll.vm.box_version  = "1.1.0"
 	jekyll.vm.network "private_network", ip: "192.168.33.24"
 #	jekyll.vm.network "forwarded_port", guest: "4000", host: "8888"
-	
+	jekyll.vm.hostname = "jekyll.prod"
 	jekyll.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
 	jekyll.vm.synced_folder "published_blog", "/published_blog"
 
