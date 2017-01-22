@@ -158,7 +158,6 @@ class httpd::ubuntu (
     require => Package["apache2"],
     ensure => running,
     enable => true,
-    subscribe => 
   }
   
   

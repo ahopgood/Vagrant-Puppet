@@ -42,18 +42,21 @@ define httpd::xclacks {
     }
     
     $header_contents = [
-    "set Directory[4]/arg '\"/var/www/html/\"'",
-    "set Directory[4]/directive[1] header",
-    "set Directory[4]/directive[1]/arg[1] set",
-    "set Directory[4]/directive[1]/arg[2] X-Clacks-Overhead",
-    "set Directory[4]/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+    "ins Directory after /files/etc/apache2/apache2.conf/Directory[last()]",
+    "set Directory[last()]/arg '\"/var/www/html/\"'",
+    "set Directory[last()]/IfModule/arg headers_module",
+    "set Directory[last()]/IfModule/directive[1] header",
+    "set Directory[last()]/IfModule/directive[1]/arg[1] set",
+    "set Directory[last()]/IfModule/directive[1]/arg[2] X-Clacks-Overhead",
+    "set Directory[last()]/IfModule/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
     ]  
     augeas {"add header to directory":
       incl => "/etc/apache2/apache2.conf",
       lens => "Httpd.lns",
       context => "/files/etc/apache2/apache2.conf/",
       changes => $header_contents,
-      require => Exec["restart-apache2-to-install-headers"]
+      require => Exec["restart-apache2-to-install-headers"],
+      onlyif   => "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'X-Clacks-Overhead'] size == 0", 
     }
     ->
     exec {"restart-apache2-to-add-x-clacks":

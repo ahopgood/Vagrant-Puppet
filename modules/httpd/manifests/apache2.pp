@@ -13,4 +13,4 @@ Package{
   
   class { "httpd": }
   ->
-  httpd::xclacks{"test-clacks":}
+  httpd::xclacks{"x-clacks":}

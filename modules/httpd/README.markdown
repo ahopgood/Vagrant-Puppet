@@ -151,6 +151,38 @@ an example would be:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
 
+## Terry Pratchett x-clacks header
+Support has been added for the following HTTP header:
+`X-Clacks-Overhead "GNU Terry Pratchett"`
+An explanation can be found [here](http://www.gnuterrypratchett.com/).
+### Usage
+```
+  class { "httpd": }
+  ->
+  httpd::xclacks{"x-clacks":}
+```
+This will add a directive on the `/var/www/html` directory (support for other document roots could be added at a later point).
+The directive looks like this on Ubuntu:
+```
+<Directory "/var/www/html/">
+<IfModule headers_module>
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</IfModule>
+</Directory>
+```
+And this on CentOS:
+```
+<IfModule mod_headers.c>
+<Directory "/var/www/html/">
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</Directory>
+</IfModule>
+</IfModule>
+```
+#### Depdendencies
+This will only work if the headers module is installed.
+
+
 ## ToDo
 * Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
 	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
@@ -158,7 +190,6 @@ an example would be:
 	* Ubuntu - 2.4.12
 * Ubuntu support
 * Raspberian support
-* Terry Pratchett x-clacks header
 * Virtual Host configuration
 * SSL Configuration
 * Custom error pages; 404, 401, 403, 500 etc
