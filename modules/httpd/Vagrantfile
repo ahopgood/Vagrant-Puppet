@@ -36,10 +36,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	centos6.vm.network "private_network", ip: "192.168.33.26"
 	centos6.vm.box_version = "1.0.1"
 	centos6.vm.hostname = "httpd.centos6.vm"
-	centos6.vm.provision "puppet" do |puppet|
-  		puppet.manifests_path = "manifests"
- 		puppet.manifest_file  = "httpd.pp"
-  	end
+#	centos6.vm.provision "puppet" do |puppet|
+#  		puppet.manifests_path = "manifests"
+# 		puppet.manifest_file  = "httpd.pp"
+#  	end
   end
 
   config.vm.define "centos7" do |centos7|

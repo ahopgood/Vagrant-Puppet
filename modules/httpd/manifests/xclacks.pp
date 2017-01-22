@@ -92,9 +92,40 @@ define httpd::xclacks {
         path => "/sbin/:/bin/",
         command => "service httpd reload",
         unless => "/usr/sbin/apachectl -t -D DUMP_MODULES | /bin/grep headers",
+        before => Augeas["add header to directory"],
       }
       
+      #module check
+      #<IfModule mod_headers.c>
       
+      $header_contents = [
+        "ins IfModule after /files/etc/httpd/conf/httpd.conf/IfModule[last()]",
+        "set IfModule[last()]/arg mod_headers.c",
+        "set IfModule[last()]/Directory/arg '\"/var/www/html/\"'",
+        "set IfModule[last()]/Directory/directive[1] header",
+        "set IfModule[last()]/Directory/directive[1]/arg[1] set",
+        "set IfModule[last()]/Directory/directive[1]/arg[2] X-Clacks-Overhead",
+        "set IfModule[last()]/Directory/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+        
+        #"ins Directory after /files/etc/httpd/conf/httpd.conf/Directory[last()]",
+        #"set Directory[last()]/arg '\"/var/www/html/\"'",
+        #"set Directory[last()]/directive[1] header",
+        #"set Directory[last()]/directive[1]/arg[1] set",
+        #"set Directory[last()]/directive[1]/arg[2] X-Clacks-Overhead",
+        #"set Directory[last()]/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+      ]  
+      augeas {"add header to directory":
+        incl => "/etc/httpd/conf/httpd.conf",
+        lens => "Httpd.lns",
+        context => "/files/etc/httpd/conf/httpd.conf/",
+        changes => $header_contents,
+        onlyif   => "match /files/etc/httpd/conf/httpd.conf/Directory[.]/directive[. = 'header']/arg[. = 'X-Clacks-Overhead'] size == 0", 
+      }
+      ->
+      exec {"restart-httpd-to-add-x-clacks":
+        path => "/sbin/:/bin/",
+        command => "service httpd reload",
+      }
     
     }#close centos 6 check
     
