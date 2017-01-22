@@ -61,8 +61,8 @@ define httpd::xclacks {
       command => "service apache2 reload",
     }
   } elsif ("${operatingsystem}" == "CentOS"){
-    if ("${$operatingsystemmajrelease}" == "6") {
-      notify{"Beginning support for CentOS6":}
+    if ("${operatingsystemmajrelease}" == "6" or "${operatingsystemmajrelease}" == "7") {
+      notify{"Beginning support for CentOS${operatingsystemmajrelease}":}
       #Find if the module is installed
       #apachectl -t -D DUMP_MODULES | grep headers
       
@@ -126,10 +126,8 @@ define httpd::xclacks {
         path => "/sbin/:/bin/",
         command => "service httpd reload",
       }
-    
-    }#close centos 6 check
-    
-    
+    #close centos 6 & 7 check
+    }
     #Tells us if the module is installed, ideally want to know when it isn't install 
     #get /files/etc/httpd/conf/httpd.conf/directive[. = 'LoadModule']/arg[. != 'headers_module']
     
@@ -142,43 +140,7 @@ define httpd::xclacks {
     #match directive[. = '/LoadModule'] size == 0
 
 
-/**
- * /files/etc/httpd/conf/httpd.conf/directive[161] = "LoadModule"
-/files/etc/httpd/conf/httpd.conf/directive[161]/arg[1] = "headers_module"
-/files/etc/httpd/conf/httpd.conf/directive[161]/arg[2] = "modules/mod_headers.so"
- 
- */
-#    exec {"enable headers plugin": 
-#      path => "/usr/sbin/:/usr/bin/",
-#      command => "/usr/sbin/a2enmod headers",
-#      unless => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
-#      require => Package["apache2"],
-#    }
-#    ->
-#    exec {"restart-apache2-to-install-headers":
-#      path => "/usr/sbin/:/bin/",
-#      command => "service apache2 restart",
-#    }
-#    
-#    $header_contents = [
-#    "set Directory[4]/arg '\"/var/www/html/\"'",
-#    "set Directory[4]/directive[1] header",
-#    "set Directory[4]/directive[1]/arg[1] set",
-#    "set Directory[4]/directive[1]/arg[2] X-Clacks-Overhead",
-#    "set Directory[4]/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
-#    ]  
-#    augeas {"add header to directory":
-#      incl => "/etc/apache2/apache2.conf",
-#      lens => "Httpd.lns",
-#      context => "/files/etc/apache2/apache2.conf/",
-#      changes => $header_contents,
-#      require => Exec["restart-apache2-to-install-headers"]
-#    }
-#    ->
-#    exec {"restart-apache2-to-add-x-clacks":
-#      path => "/usr/sbin/:/bin/",
-#      command => "service apache2 reload",
-#    }
+
   } else {
     fail("${operatingsystem} is not currently supported")
   }
