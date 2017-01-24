@@ -37,9 +37,9 @@ ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
 #Take snapshot so we can work on a fresh OS per puppet manifest we apply
 vagrant snapshot save $vm_name virgin
 
-MANIFESTS=("tomcat6.pp" "tomcat7.pp" "tomcat8.pp")
-#MANIFESTS=$(ls -1 tests/)
-#MANIFESTS=$(ls -1 tests | tr "," " " | tr "\n", " ")
+#MANIFESTS=("tomcat6.pp" "tomcat7.pp" "tomcat8.pp")
+# Get list of manifests from the tests/ directory
+MANIFESTS=($(ls -m tests | tr "," " "))
 for ((i=0; i < "${#MANIFESTS[*]}"; i++));
 do
     run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name i
