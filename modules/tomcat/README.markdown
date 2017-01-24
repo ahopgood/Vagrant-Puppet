@@ -41,7 +41,14 @@ Features to be implemented:
 ** Not set if not a module parameter
 * Have the tomcat service file start and stop tomcat as the tomcat user
 
-##Errors##
-###Tomcat script cannot be found, bash code 127###
+## Errors
+### Tomcat script cannot be found, bash code 127
 This is due to the tomcat.erb file not being formatted in the unix filesystem.
 Run a utility such as dos2unix to fix this.
+
+## Ubuntu
+Ubuntu support is current under way
+
+## CentOS
+### CentOS 6
+### CentOS 7
