@@ -52,4 +52,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   		centos6.vm.hostname = "tomcat-dev-centos6"
 	end
 	
+
+    config.vm.define "Ubuntu_15_test" do |ubuntu_15_test|
+      ubuntu_15_test.ssh.insert_key = false
+      ubuntu_15_test.vm.box = "ubuntu/wily64"
+    end
 end

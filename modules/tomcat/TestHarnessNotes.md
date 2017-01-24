@@ -15,6 +15,7 @@ The box used must support puppet e.g. `CentOS_6_test.vm.box = "puppetlabs/centos
 * Tomcat module only
 * tomcat6 test manifest with Java version 6u45
 * tomcat7 test manifest with Java version 7u11
+* Works sequentially on a single core, even if there are multiple VMs it will only go through one at a time, might change this in future
 
 ## Snapshots, why use them?
 Running two faulty (in different ways) test manifests using snapshots resulted in the following running time:
