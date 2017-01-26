@@ -14,7 +14,7 @@ function run_manifest {
 
 
     echo "Working on VM ["$vm_name"] with snapshot ["$snapshot_name"] and testing with manifest "$manifest_name
-    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop' 2> $manifest_name"_"$vm_name"-errors.txt"
+    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
     #Save result to global array
     RESULTS_ARRAY[$iteration]=$manifest_name" "$vm_name" result ["$?"]"
     echo "Result in array "${RESULTS_ARRAY[$iteration]}
@@ -52,29 +52,55 @@ function run_vm {
 
     for ((i=0; i < "${#MANIFESTS[*]}"; i++));
     do
+#        vagrant up $vm_name
+#        port=$(vagrant ssh-config $vm_name | grep Port | awk '{ print $2 }')
+#        ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
+
         run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
-        echo "Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
 
         #Reset the snapshot
+        echo "Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
         vagrant snapshot restore $vm_name virgin
+        #vagrant destroy $vm_name -f
     done
 
     #Force vagrant to destroy the machine
     vagrant destroy $vm_name -f
 }
 
+# Enters the specified module folder and runs the vm for the Vagrant file contained there
+function run_module {
+    cd $1
+    echo "In run_module for $1... "$(pwd)
+    VMs=($(vagrant status | grep -E "*test" | awk '{ print $1 }'))
+    #Handle vagrant not being installed
+    echo "Using Vagrant Profiles:"${VMs[@]}
+    for ((j=0; j < "${#VMs[*]}"; j++));
+    do
+        echo "Starting run for "${VMs[j]}
+        run_vm ${VMs[j]} j
+    done
+    cd ../
+    echo "Leaving module $1..."
+}
+
 declare -a RESULTS_ARRAY
 echo "Working in vagrant directory "$(pwd)
 
-#Get list of VMs from vagrant file that end in _test
-VMs=($(vagrant status | grep -E "*test" | awk '{ print $1 }'))
-echo ${VMs[@]}
-#vm_name="CentOS_6_test"
-for ((j=0; j < "${#VMs[*]}"; j++));
+#cd $1
+#echo "Using module directory $1"
+
+MODULES=($(ls -m | tr "," " "))
+echo "Module list:"
+for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
-    echo "Starting run for "${VMs[j]}
-    run_vm ${VMs[j]} j
+    if [ -d ${MODULES[k]} ];then
+        echo "${MODULES[k]}"
+        run_module ${MODULES[k]}
+    fi
+#    run_module "tomcat"
 done
+#Get list of VMs from vagrant file that end in _test
 echo "Test results:"
 echo ${RESULTS_ARRAY[@]}
 
