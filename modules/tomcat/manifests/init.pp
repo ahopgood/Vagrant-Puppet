@@ -54,7 +54,6 @@ class tomcat (
     notify {    "Using operating system:$::operatingsystem": }
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
-    
   }
 
   group { "${tomcat_group}":
@@ -156,11 +155,18 @@ class tomcat (
   }
 
   if ("${port}" != null){ 
-  	#Create an iptables (firewall) exception, persist and restart iptables 
-    class { 'iptables':
-      port => "${port}",
-      require => File["Set CATALINA_HOME"]
+    if ("{$operatingsystem}" == "CentOS") {
+      #Create an iptables (firewall) exception, persist and restart iptables 
+      class { 'iptables':
+        port => "${port}",
+        require => File["Set CATALINA_HOME"]
+      }
+    } elsif ("${operatingsystem}" == "Ubuntu"){
+#      class {"":}
+    } else {
+      notify {  "Operating system not supported:$::operatingsystem":  }  
     }
+
   }
 
   file {  "${tomcat_users}":
