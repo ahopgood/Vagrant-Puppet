@@ -7,7 +7,10 @@ MySQL shared libraries, MySQL server and a MySQL client.
 It will also uninstall the old shared libraries from centos systems.
 
 ## CentOS
-Currently supports MySQL 5.7.13 only.
+Currently supports MySQL versions:
+
+* 5.7.13
+
 Makes use of the *.my.cnf* file to set the root password and allows us to reset it later, protected by being present in the home directory of the user running the command.
 ### CentOS 6
 This module also:
@@ -27,7 +30,7 @@ Makes use of **systemctl** to start the mysql daemon (mysqld).
 Ubunut is currently not supported
 
 ## To Do
-* Fix CentOS 6 with a call to /etc/init.d/mysqld start & sleep 10 followed by another call to /etc/init.d/mysqld start
+* **done** - Fix CentOS 6 with a call to /etc/init.d/mysqld start & sleep 10 followed by another call to /etc/init.d/mysqld start
 * **done** - Create test profiles for CentOS 6, CentOS 7 and Ubuntu
 * Separate files folder into /OS/Ver folder structure
 * Update installers to use this new structure
