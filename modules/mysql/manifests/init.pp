@@ -24,13 +24,12 @@ class mysql (
   $minor_version        = "7"
   $patch_version        = "13"
   $os = "$operatingsystem$operatingsystemmajrelease"
-  
+
+  $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
   if "${os}" == "CentOS7"{
     $os_platform          = "-1.el7.x86_64"
-    $file_location = ""
   } elsif "${os}" == "CentOS6" {
     $os_platform          = "-1.el6.x86_64"
-    $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
   }
 
   $MySQL_common = "mysql-community-common-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
