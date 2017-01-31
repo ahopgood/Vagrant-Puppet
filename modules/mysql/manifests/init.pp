@@ -27,8 +27,10 @@ class mysql (
   
   if "${os}" == "CentOS7"{
     $os_platform          = "-1.el7.x86_64"
+    $file_location = ""
   } elsif "${os}" == "CentOS6" {
     $os_platform          = "-1.el6.x86_64"
+    $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
   }
 
   $MySQL_common = "mysql-community-common-${major_version}.${minor_version}.${patch_version}${os_platform}.rpm"
@@ -50,7 +52,7 @@ class mysql (
         "${libaio}":
         path    =>  "${local_install_dir}/${libaio}",
         ensure  =>  present,
-        source  =>  ["puppet:///${puppet_file_dir}${libaio}"],
+        source  =>  ["puppet:///${puppet_file_dir}${file_location}${libaio}"],
     }
     package {
       'libaio':
@@ -85,7 +87,7 @@ class mysql (
       "${MySQL_common}":
       path    =>  "${local_install_dir}/${MySQL_common}",
       ensure  =>  present,
-      source  =>  ["puppet:///${puppet_file_dir}${MySQL_common}"],
+      source  =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_common}"],
   }
   
   package {
@@ -100,7 +102,7 @@ class mysql (
     "${MySQL_libs}":
     path        => "${$local_install_dir}/${MySQL_libs}",
     ensure      =>  present,
-    source      =>  ["puppet:///${puppet_file_dir}${MySQL_libs}"],
+    source      =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_libs}"],
   }
   
   package {
@@ -115,7 +117,7 @@ class mysql (
       "${MySQL_shared_compat}":
       path    =>  "${local_install_dir}/${MySQL_shared_compat}",
       ensure  =>  present,
-      source  =>  ["puppet:///${puppet_file_dir}${MySQL_shared_compat}"],
+      source  =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_shared_compat}"],
   }
   
   package {
@@ -132,7 +134,7 @@ class mysql (
     "${MySQL_client}":
     path      => "${local_install_dir}/${MySQL_client}",
     ensure    => present,
-    source    => ["puppet:///${puppet_file_dir}${MySQL_client}"],
+    source    => ["puppet:///${puppet_file_dir}${file_location}${MySQL_client}"],
   }
   
   package {
@@ -147,7 +149,7 @@ class mysql (
     "${MySQL_server}":
     path    =>  "${local_install_dir}/${MySQL_server}",
     ensure  =>  present,
-    source  =>  ["puppet:///${puppet_file_dir}${MySQL_server}"],  
+    source  =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_server}"],
   }
   
   package {

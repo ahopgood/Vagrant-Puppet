@@ -2,3 +2,4 @@
 /.vagrant
 /.project
 /files/*.rpm
+/files/CentOS/*/*.rpm
