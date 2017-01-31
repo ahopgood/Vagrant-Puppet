@@ -3,3 +3,4 @@
 /.project
 /files/*.rpm
 /files/CentOS/*/*.rpm
+/files/Ubuntu/*/*.deb

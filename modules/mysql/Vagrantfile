@@ -6,8 +6,6 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "puppetlabs/centos-6.6-64-puppet"
-  config.vm.box_version = "1.0.1"
   config.vm.box_check_update = false
   config.vm.synced_folder "../",	"/etc/puppet/modules"
   config.ssh.insert_key = false
