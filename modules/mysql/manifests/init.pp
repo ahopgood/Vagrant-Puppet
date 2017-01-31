@@ -171,10 +171,16 @@ class mysql (
       require => Notify["Starting mysqld"]
     }
   } elsif "${os}" == "CentOS6" {
+    exec {"Start mysqld part une":
+      command => "/etc/init.d/mysqld start & /bin/sleep 10", #centos 6
+      path => "/usr/bin/",
+      require => Notify["Starting mysqld"]
+    }
+
     exec {"Start mysqld":
       command => "/etc/init.d/mysqld start", #centos 6
       path => "/usr/bin/",
-      require => Notify["Starting mysqld"]
+      require => [Notify["Starting mysqld"],Exec["Start mysqld part une"]]
     }
   }
 
