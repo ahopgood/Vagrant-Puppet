@@ -32,7 +32,7 @@ Ubunut is currently not supported
 ## To Do
 * **done** - Fix CentOS 6 with a call to /etc/init.d/mysqld start & sleep 10 followed by another call to /etc/init.d/mysqld start
 * **done** - Create test profiles for CentOS 6, CentOS 7 and Ubuntu
-* Separate files folder into /OS/Ver folder structure
+* **done** - Separate files folder into /OS/Ver folder structure
 * Update installers to use this new structure
 * Add support for Ubuntu
 * Update create_database definition to use the db name when calling the exec block so it can be called multiple times 
