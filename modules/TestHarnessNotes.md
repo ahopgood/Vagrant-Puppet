@@ -37,3 +37,22 @@ user    0m14.324s
 sys     0m4.080s
 
 ```
+
+## To Do
+* Perform correct argument checking for each part / function of the test_harness.sh
+* Create a permissive hierarchy of args that fall back to defaults:
+    * If a module name isn't provided then use the directory listing
+    * if a VM name isn't provided then use the vagrant status listing
+    * if a manifest isn't provided then use the directory listing
+* Add help file for providing useful feedback to standard out
+    * Abbreviated args list if args are missing
+    * Verbose help if the `--help` args are used
+* option for verbose output
+* option for version information? (-v?)
+* Rename the output files after generation to append the error code at the end.
+* Removal of *test-errors.txt files if they are empty or if they have a zero error code.
+* Addition of `--detailed-exitcodes` to puppet apply with `--noop` to hopefully return the correct error codes, or actually apply puppet and see what happens.
+* Split each function into a separate script file.
+* Possibly rewrite in ruby to increase portability of results.
+* Change the output file names to be in the order of <vm_name>-<manifest_name>_test_errors.txt.
+* Reformat the output array to provide a justified error code that is coloured based on its zero or non-zero status
