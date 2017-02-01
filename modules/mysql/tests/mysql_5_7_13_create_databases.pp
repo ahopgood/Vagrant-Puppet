@@ -17,8 +17,16 @@ Package{
     root_home => "/home/vagrant",
   }
   ->
-  mysql::create_database{"Create db 1":
-    dbname => "test",
+  mysql::create_database{"Create db a":
+    dbname => "a",
     dbpassword => "rootR00?s",
     dbusername => "root",
   }
+  ->
+  mysql::create_database{"Create db b":
+    dbname => "b",
+    dbpassword => "rootR00?s",
+    dbusername => "root",
+  }
+
+  #verify access to the databases with root credentials
