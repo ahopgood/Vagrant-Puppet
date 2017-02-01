@@ -23,9 +23,9 @@ class tomcat (
   $port = null,
   $java_opts = '',
   $catalina_opts = '' ) {
-
+    
   #Java required
-  Class['java'] -> Class['tomcat']
+  Java['java'] -> Class['tomcat']
      
   notify {
     "${module_name} installation completed":
@@ -48,10 +48,13 @@ class tomcat (
   $tomcat_server_config = "${catalina_home}/conf/server.xml"
   $tomcat_env_file		  = "setenv.sh" 
   
-  if $::operatingsystem == 'CentOS' {
+  if ("{$operatingsystem}" == "CentOS") {
+    notify {    "Using operating system:$::operatingsystem": }
+  } elsif ("${operatingsystem}" == "Ubuntu"){
     notify {    "Using operating system:$::operatingsystem": }
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
+    
   }
 
   group { "${tomcat_group}":
@@ -187,7 +190,7 @@ class tomcat (
   #Tomcat service startup script
   file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
-    content =>  template("${module_name}/tomcat.erb"),
+    content =>  template("${module_name}/${operatingsystem}/tomcat.erb"),
     ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],
