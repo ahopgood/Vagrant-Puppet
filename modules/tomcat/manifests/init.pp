@@ -155,16 +155,19 @@ class tomcat (
   }
 
   if ("${port}" != null){ 
-    if ("{$operatingsystem}" == "CentOS") {
+    if ("${operatingsystem}"=="CentOS") {
       #Create an iptables (firewall) exception, persist and restart iptables 
       class { 'iptables':
         port => "${port}",
         require => File["Set CATALINA_HOME"]
       }
-    } elsif ("${operatingsystem}" == "Ubuntu"){
-#      class {"":}
+    } elsif ("${operatingsystem}"=="Ubuntu"){
+      ufw {"test":
+        port => '8080',
+        isTCP => true
+      }
     } else {
-      notify {  "Operating system not supported:$::operatingsystem":  }  
+      fail("Operating system not supported:$::operatingsystem")  
     }
 
   }
@@ -176,7 +179,7 @@ class tomcat (
   }
   
   file { "${tomcat_server_config}":
-    content => template("${module_name}/server.xml.erb"),
+    content => template("${module_name}/server.xml.${tomcat_short_ver}.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"] 
   }
