@@ -10,10 +10,6 @@ Package{
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
   } 
-
-  class { "iptables": 
-    port => "80", 
-  }
   
   class { "httpd": }
   ->
