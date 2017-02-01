@@ -23,9 +23,6 @@ class mysql::centos (
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/mysql/"
 
-  $major_version        = "5"
-  $minor_version        = "7"
-  $patch_version        = "13"
   $os = "$operatingsystem$operatingsystemmajrelease"
 
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
@@ -184,6 +181,7 @@ class mysql::centos (
     exec {"Start mysqld":
       command => "/etc/init.d/mysqld start", #centos 6
       path => "/usr/bin/",
+      onlyif => "/sbin/service mysqld /sbin/status",
       require => [Notify["Starting mysqld"],Exec["Start mysqld part une"]]
     }
   }
@@ -194,20 +192,41 @@ class mysql::centos (
   #4. Set root password in the my.cnf template file and place it in the /home/root directory
   #5. Create regular mysql users using the root user, not sure if vagrant can do this?
 
-  exec {"reset temp password":
-    path => "/usr/bin/",
-    onlyif => "test ! -f ${root_home}/.my.cnf",
-    command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
-    require => Exec["Start mysqld"],
-    before => File["my.cnf"],
-  }
+  if (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and ("${os}" == "CentOS6")){
+    exec {"reset temp password":
+      path => "/usr/bin/",
+      onlyif => "test ! -f ${root_home}/.my.cnf",
+      command => "mysql -uroot --password=\"$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print \$11 }')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
+      require => Exec["Start mysqld"],
+      before => File["my.cnf"],
+    }
+    #mysql -uroot -p="$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print $11 }')"  --connect-expired-password -e"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('rootR00?s');"
+    exec {"reset password":
+      path => "/usr/bin/",
+      onlyif => "test -f ${root_home}/.my.cnf",
+      command => "mysql -uroot --password=\"$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
+#      command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
+      require => Exec["Start mysqld"],
+      before => File["my.cnf"],
+    }
+  } elsif (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and ("${os}" == "CentOS7")) {
+    exec {"reset temp password":
+      path => "/usr/bin/",
+      onlyif => "test ! -f ${root_home}/.my.cnf",
+      command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
+      require => Exec["Start mysqld"],
+      before => File["my.cnf"],
+    }
 
-  exec {"reset password":
-    path => "/usr/bin/",
-    onlyif => "test -f ${root_home}/.my.cnf",
-    command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-    require => Exec["Start mysqld"],
-    before => File["my.cnf"],
+    exec {"reset password":
+      path => "/usr/bin/",
+      onlyif => "test -f ${root_home}/.my.cnf",
+      command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
+      require => Exec["Start mysqld"],
+      before => File["my.cnf"],
+    }
+  } else {
+    fail("MySQL ${major_version}.${minor_version}.${patch_version} not supported yet for ${os}")
   }
 
   #if we can login with the expected password then do nothing, if not then we need to add it to the .my.cnf file.
