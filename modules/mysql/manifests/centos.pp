@@ -179,9 +179,9 @@ class mysql::centos (
     }
 
     exec {"Start mysqld":
-      command => "/etc/init.d/mysqld start", #centos 6
+      command => "/etc/init.d/mysqld restart", #centos 6
       path => "/usr/bin/",
-      onlyif => "/sbin/service mysqld /sbin/status",
+#      onlyif => "/sbin/service mysqld /sbin/status",
       require => [Notify["Starting mysqld"],Exec["Start mysqld part une"]]
     }
   }

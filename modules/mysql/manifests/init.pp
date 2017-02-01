@@ -75,18 +75,18 @@ define mysql::create_user(
     fail("You must define a password for the database in order to create a database user")
   }
 
-  exec{"Create_database_user":
+  exec{"Create_database_user ${dbusername}":
     command => "/bin/echo \"CREATE USER '${dbusername}'@'localhost' IDENTIFIED BY '${dbpassword}';\" | mysql -u${rootusername} -p${rootpassword}",
     unless => "mysql -u${dbusername} -p${dbpassword}",
-    path => "/usr/bin/", 
-#    require => Class["mysql"]
+    path => "/usr/bin/",
+    require => [Package["mysql-community-server"], Exec["reset password"]]
   }
   ->
-  exec{"Grant_privileges_for_user":
+  exec{"Grant_privileges_for_user ${dbusername}":
     command => "/bin/echo \"GRANT ALL PRIVILEGES ON ${dbname}.* TO '${dbusername}'@'localhost' WITH GRANT OPTION;\" | mysql -u${rootusername} -p${rootpassword}",
     unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin",
-  }  
+  }
 }
 
 define mysql::create_database(
@@ -104,10 +104,11 @@ define mysql::create_database(
     fail("You must define a password for the database in order to create a database")
   }
   
-  exec{"Create_database":
+  exec{"Create_database ${dbname}":
     command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
-    path => "/usr/bin/", 
+    path => "/usr/bin/",
+    require => [Package["mysql-community-server"], Exec["reset password"]]
   }
 }
 
