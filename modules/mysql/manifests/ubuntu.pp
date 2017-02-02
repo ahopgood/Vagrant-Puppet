@@ -12,7 +12,7 @@ class mysql::ubuntu(
   $puppet_file_dir      = "modules/mysql/"
 
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
-  $os_platform = "-1-ubuntu14.04_amd64.deb"
+  $os_platform = "-1ubuntu14.04_amd64.deb"
 
   $mysql_common_file = "mysql-common_5.7.13${os_platform}"
   file {"${mysql_common_file}":
@@ -78,6 +78,8 @@ class mysql::ubuntu(
     source => "puppet:///${$puppet_file_dir}${file_location}${mysql_community_server_file}",
   }
 
+  #Will need to set the password here using debconf
+  #https://stackoverflow.com/questions/7739645/install-mysql-on-ubuntu-without-password-prompt
   package {"mysql-community-server":
     ensure      =>  installed,
     provider    =>  'dpkg',
