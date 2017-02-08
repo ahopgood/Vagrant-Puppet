@@ -12,7 +12,9 @@ class mysql::ubuntu(
   $puppet_file_dir      = "modules/mysql/"
 
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
-  $os_platform = "-1ubuntu14.04_amd64.deb"
+  $os = "-1ubuntu14.04_amd64"
+  $extension = ".deb"
+  $os_platform = "${os}${extension}"
 
   $mysql_common_file = "mysql-common_5.7.13${os_platform}"
   file {"${mysql_common_file}":
@@ -71,27 +73,61 @@ class mysql::ubuntu(
     require     =>  File["${libmecab2_file}"],
   }
 
-  $mysql_community_server_file = "mysql-community-server_5.7.13${os_platform}"
+  # Turn off prompts (the frontend)
+  #export DEBIAN_FRONTEND="noninteractive"
+
+  # Set the values we wish to enter via debconf which will allow the selections / values to be used by the installer
+  #sudo debconf-set-selections <<< "mysql-community-server mysql-community-server/root_pass password "
+  #sudo debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root_pass  password "
+  # To Check selections
+  #sudo debconf-get-selections | grep mysql
+
+  exec {"set root password":
+    path => "/bin/",
+    command => "/bin/echo mysql-community-server mysql-community-server/root-pass password ${password} | /usr/bin/debconf-set-selections",
+  }
+
+  exec {"confirm root password":
+    path => "/bin/",
+    command => "/bin/echo mysql-community-server mysql-community-server/re-root-pass  password ${password} | /usr/bin/debconf-set-selections",
+  }
+
+  #How to reset when running again?
+  $mysql_community_server_file = "mysql-community-server_5.7.13${os}${extension}"
+
   file {"${mysql_community_server_file}":
     ensure => present,
     path => "${local_install_dir}${mysql_community_server_file}",
     source => "puppet:///${$puppet_file_dir}${file_location}${mysql_community_server_file}",
+    mode => 777,
   }
 
-  #Will need to set the password here using debconf
-  #https://stackoverflow.com/questions/7739645/install-mysql-on-ubuntu-without-password-prompt
-  package {"mysql-community-server":
-    ensure      =>  installed,
-    provider    =>  'dpkg',
-    source      =>  "${local_install_dir}/${mysql_community_server_file}",
-    require     =>  [File["${mysql_community_server_file}"],Package["libmecab2"], Package["mysql-client"]]
+  exec {"mysql-community-server":
+    path => ["/usr/bin/","/bin/","/usr/sbin", "/sbin", "/usr/local/sbin"],
+    environment => ["DEBIAN_FRONTEND=noninteractive"],
+    command =>  "dpkg -i ${local_install_dir}${mysql_community_server_file}",
+    logoutput => on_failure,
+    notify => Service["mysql"],
+    require =>  [File["${mysql_community_server_file}"],
+      Package["libmecab2"],
+      Package["mysql-client"],
+      Exec["set root password"],
+      Exec["confirm root password"],
+    ]
   }
+  service{"mysql":
+    ensure => running,
+    enable => true,
+    require => Exec["mysql-community-server"],
+  }
+
+  #Use systemd to run mysql
 }
 
 /*
-sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-common_5.7.13-1-ubuntu14.04_amd64.deb
-sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-community-client_5.7.13-1-ubuntu14.04_amd64.deb
-sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-client_5.7.13-1-ubuntu14.04_amd64.deb
+sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-common_5.7.13-1ubuntu14.04_amd64.deb
+sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-community-client_5.7.13-1ubuntu14.04_amd64.deb
+sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-client_5.7.13-1ubuntu14.04_amd64.deb
 sudo dpkg -i /vagrant/files/Ubuntu/15.10/libmecab2_0.996-1.1_amd64.deb
-sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-community-server_5.7.13-1-ubuntu14.04_amd64.deb
+sudo dpkg -i /vagrant/files/Ubuntu/15.10/mysql-community-server_5.7.13-1ubuntu14.04_amd64.deb
 */
