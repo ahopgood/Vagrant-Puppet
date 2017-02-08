@@ -166,23 +166,22 @@ class mysql::centos (
   }
 
   if ("${os}" == "CentOS7"){
-    exec {"Start mysqld":
-      path => "/usr/bin/",
-      command => "systemctl start mysqld", #centos 7
-      require => Notify["Starting mysqld"]
+#    exec {"Start mysqld":
+#      path => "/usr/bin/",
+#      command => "systemctl start mysqld", #centos 7
+#      require => Notify["Starting mysqld"]
+#    }
+    service {"mysqld":
+      ensure => running,
+      enable => true,
+      #      provider =>
+      require => Package["mysql-community-server"],
     }
   } elsif "${os}" == "CentOS6" {
-    exec {"Start mysqld part une":
-      command => "/etc/init.d/mysqld start & /bin/sleep 10", #centos 6
-      path => "/usr/bin/",
-      require => Notify["Starting mysqld"]
-    }
-
-    exec {"Start mysqld":
-      command => "/etc/init.d/mysqld restart", #centos 6
-      path => "/usr/bin/",
-#      onlyif => "/sbin/service mysqld /sbin/status",
-      require => [Notify["Starting mysqld"],Exec["Start mysqld part une"]]
+    service {"mysqld":
+      ensure => running,
+      enable => true,
+      require => Package["mysql-community-server"],
     }
   }
 
@@ -197,7 +196,8 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print \$11 }')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
-      require => Exec["Start mysqld"],
+#      require => [Exec["Start mysqld"]],
+      require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
     #mysql -uroot -p="$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print $11 }')"  --connect-expired-password -e"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('rootR00?s');"
@@ -206,7 +206,8 @@ class mysql::centos (
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
 #      command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-      require => Exec["Start mysqld"],
+#      require => Exec["Start mysqld"],
+      require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
   } elsif (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and ("${os}" == "CentOS7")) {
@@ -214,7 +215,8 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
-      require => Exec["Start mysqld"],
+#      require => Exec["Start mysqld"],
+      require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
 
@@ -222,7 +224,8 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-      require => Exec["Start mysqld"],
+#      require => Exec["Start mysqld"],
+      require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
   } else {
@@ -236,7 +239,9 @@ class mysql::centos (
       ensure  =>  present,
       mode => 0655,
       content => template("${module_name}/my.cnf.erb"),
-      require => Exec["Start mysqld"]
+#      require => [Exec["Start mysqld"]],
+    require => [Service["mysqld"]],
+
   }
 }
 

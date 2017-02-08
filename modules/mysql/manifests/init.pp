@@ -34,6 +34,7 @@ class mysql (
       password => $password,
       root_home => $root_home,
     }
+    contain mysql::centos
   } elsif "${os}" == "CentOS6" {
     class{"mysql::centos":
       major_version => $major_version,
@@ -42,6 +43,7 @@ class mysql (
       password => $password,
       root_home => $root_home,
     }
+    contain mysql::centos
   } elsif ("${os}" == "Ubuntu15.10"){
     class{"mysql::ubuntu":
       major_version => $major_version,
@@ -50,6 +52,7 @@ class mysql (
       password => $password,
       root_home => $root_home,
     }
+    contain mysql::ubuntu
   }
 }
 #sudo /usr/bin/mysqld_safe --init-file=/etc/puppet/installers/root.txt
