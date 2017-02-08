@@ -109,7 +109,8 @@ class mysql::centos (
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_libs}",
-      require     =>  [File["${MySQL_libs}"], Package["mysql-community-common"]],
+      require     =>  [File["${MySQL_libs}"],
+        Package["mysql-community-common"]],
   }
 
   file {
@@ -157,8 +158,10 @@ class mysql::centos (
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_server}",
       require     =>  [File["${MySQL_server}"],
+        Package["mysql-community-libs-compat"],
         Package["mysql-community-client"],
         Package["mysql-community-common"]],
+      notify      => Service["mysqld"],
   }
 
   notify{"Starting mysqld":
@@ -166,15 +169,9 @@ class mysql::centos (
   }
 
   if ("${os}" == "CentOS7"){
-#    exec {"Start mysqld":
-#      path => "/usr/bin/",
-#      command => "systemctl start mysqld", #centos 7
-#      require => Notify["Starting mysqld"]
-#    }
     service {"mysqld":
       ensure => running,
       enable => true,
-      #      provider =>
       require => Package["mysql-community-server"],
     }
   } elsif "${os}" == "CentOS6" {
@@ -240,8 +237,7 @@ class mysql::centos (
       mode => 0655,
       content => template("${module_name}/my.cnf.erb"),
 #      require => [Exec["Start mysqld"]],
-    require => [Service["mysqld"]],
-
+      require => [Service["mysqld"]],
   }
 }
 
