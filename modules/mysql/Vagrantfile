@@ -15,6 +15,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #     puppet.manifest_file  = "init.pp"
 #  end
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
   config.vm.define "CentOS_7_test" do |centos7|
   	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
   	centos7.vm.box_version = "1.0.1"

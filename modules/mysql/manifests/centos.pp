@@ -160,7 +160,8 @@ class mysql::centos (
       require     =>  [File["${MySQL_server}"],
         Package["mysql-community-libs-compat"],
         Package["mysql-community-client"],
-        Package["mysql-community-common"]],
+        Package["mysql-community-common"]
+      ],
       notify      => Service["mysqld"],
   }
 
@@ -193,17 +194,14 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print \$11 }')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
-#      require => [Exec["Start mysqld"]],
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
-    #mysql -uroot -p="$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print $11 }')"  --connect-expired-password -e"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('rootR00?s');"
+
     exec {"reset password":
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
-#      command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-#      require => Exec["Start mysqld"],
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
@@ -212,7 +210,6 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
-#      require => Exec["Start mysqld"],
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
@@ -221,7 +218,6 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-#      require => Exec["Start mysqld"],
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
@@ -236,7 +232,6 @@ class mysql::centos (
       ensure  =>  present,
       mode => 0655,
       content => template("${module_name}/my.cnf.erb"),
-#      require => [Exec["Start mysqld"]],
       require => [Service["mysqld"]],
   }
 }

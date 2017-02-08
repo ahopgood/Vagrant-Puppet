@@ -26,6 +26,10 @@ class mysql (
   $os = "$operatingsystem$operatingsystemmajrelease"
   notify{"Found ${os}":}
 
+  if (versioncmp("${memorysize_mb}", "512.00") < 0){
+    fail("We need a machine with more than 1000.00 MB of memory found only [${memorysize_mb}]")
+  }
+
   if "${os}" == "CentOS7"{
     class{"mysql::centos":
       major_version => $major_version,
