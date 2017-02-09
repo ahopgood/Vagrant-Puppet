@@ -200,3 +200,50 @@ define mysql::differential_restore(
     cwd => "/home/vagrant",
   }
 }
+
+/*
+* Definition to provide a MySQL connector in Java, also known as j/connector.
+* Defaults to version 5.1.40
+*/
+define mysql::connector::java (
+  $major_version = "5",
+  $minor_version = "1",
+  $patch_version = "40",
+  $destination_path = undef,
+){
+  $puppet_file_dir      = "modules/${module_name}/"
+  notify{"In connector::java $major_version $minor_version $patch_version":}
+  $java_connector = "mysql-connector-java-${major_version}.${minor_version}.${patch_version}"
+  $java_connector_archive = "${java_connector}.tar.gz"
+  $java_connector_jar = "${java_connector}-bin.jar"
+
+  file {"j-connector-archive":
+    ensure => present,
+    source => ["puppet:///${puppet_file_dir}${java_connector_archive}"],
+    path => "${local_install_dir}${java_connector_archive}",
+    require => File["${local_install_dir}"]
+  }
+
+  exec {"Unpack j-connector archive":
+    path      =>  "/bin/",
+    cwd       =>  "${local_install_dir}",
+    command   =>  "/bin/tar xfvz ${local_install_dir}${java_connector_archive}",
+    require   =>  File[ "j-connector-archive" ],
+  }
+
+  file { "j-connctor jar":
+    ensure => present,
+    source => "${local_install_dir}${java_connector}/${java_connector_jar}",
+    path => "${destination_path}${java_connector_jar}",
+    require => Exec["Unpack j-connector archive"],
+  }
+
+  file {"remove unpacked j-connector archive directory":
+    ensure => absent,
+    force => true,
+    path => "${local_install_dir}${java_connector}",
+    require => [Exec["Unpack j-connector archive"],
+      File["j-connctor jar"],
+    ]
+  }
+}
