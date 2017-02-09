@@ -17,3 +17,10 @@ mysql::connector::java{"connector java":
 #  patch_version => "0",
   destination_path => "/home/vagrant/",
 }
+
+mysql::connector::java{"connector java duplicate":
+  #  major_version => "1",
+  #  minor_version => "4",
+  #  patch_version => "0",
+  destination_path => "/opt/",
+}
