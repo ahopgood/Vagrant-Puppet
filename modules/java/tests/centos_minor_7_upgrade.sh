@@ -2,10 +2,10 @@
 
 sudo puppet apply --execute "java{"java-7":\
 version => '7', \
-updateVersion => '76',\
+update_version => '76',\
 }"
 
 sudo puppet apply --execute "java{"java-7":\
 version => '7', \
-updateVersion => '80',\
+update_version => '80',\
 }"

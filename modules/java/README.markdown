@@ -37,33 +37,33 @@ Can be declared via the *java* definition:
 	
 	java{"java-7":
 		version => '7',
-		updateVersion => '76'
+		update_version => '76'
 	}
 	
 or directly via the *java::ubuntu* definition:
 
 	java::ubuntu{"java-6":
 	  version => "6",
-	  updateVersion => "45"
+	  update_version => "45"
 	}
 or directly via the *java::centos* definition:
 	
 	java::centos{"java-6":
 	  version => "6",
-	  updateVersion => "45"
+	  update_version => "45"
 	}
 ### Multi Tenancy JVM Usage
 Set Java 7 to be the default manually JVM by overriding the alternatives priority ordering that would *usually* favour Java 8: 
 
 	java{"java-8":
 		version => '8',
-		updateVersion => '31',
+		update_version => '31',
 		multiTenancy => true,
 		isDefault => true,
 	}
 	java{"java-7":
 		version => '7',
-		updateVersion => '76',
+		update_version => '76',
 		multiTenancy => true,
 	}
 
@@ -71,12 +71,12 @@ Or explicitly call the *java::default::set* definition yourself
 
 	java{"java-8":
 		version => '8',
-		updateVersion => '31',
+		update_version => '31',
 		multiTenancy => true,
 	}
 	java{"java-7":
 		version => '7',
-		updateVersion => '76',
+		update_version => '76',
 		multiTenancy => true,
 	}
 	->
@@ -84,7 +84,7 @@ Or explicitly call the *java::default::set* definition yourself
 		version => "7",		
 	}
 	 
-### Notes on Multi Tenancy JVMs
+#### Notes on Multi Tenancy JVMs
 Multi tenancy allows for multiple (major version **only**) JVMs to be installed at once, useful for certain testing environments and build servers to name two examples.  
 `multiTenancy => false` is the default value, if present then other JVMs will be removed (as long as they are present in the versionsToRemove hash.  
 You can only use the `java`, `java::ubuntu`, `java::centos` defined resources **once** with multiTenancy disabled or else your manifest run will fail with a duplicate resource declaration for the **package** resource that removes the other JVM versions. In this way you get a hard failure on running multiTenancy disabled with multiple declarations.     
@@ -120,8 +120,20 @@ This will result in your java installations all living side by side in the `/usr
 	* Java 7 - done
 	* Java 8 - done
 
+## Java Cryptography Extensions (JCE)
+
+### JCE Naming Conventions
+
+In order to locate the archive files containing the JCE extensions they need to be named appropriately following this scheme:
+`jce_policy-*jdk_major_version*.zip` where jdk_major_version reflects the major version of the SDK you want to install the extensions for.
+For example:
+* Java 6 -> `jce_policy-6.zip`
+* Java 7 -> `jce_policy-7.zip`
+* Java 8 -> `jce_policy-8.zip`
+Unlike the JDK installers these are not platform dependent so are located in the root `/files` folder for the module.
+ 
 ## CentOS
-Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<updateVersion>`
+Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<update_version>`
 
 Installation of a Java JDK from an RPM file.
 RPM files with the appropriate minor-major numbers need to be located in the **files** folder for the passed parameters to allow for installation of the correct java version.
@@ -132,9 +144,9 @@ RPM files with the appropriate minor-major numbers need to be located in the **f
 ### <a href="CentOS_File_naming_conventions">CentOS File naming conventions</a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct java version.  
 The *current* file naming structure by Oracle has no OS dependent parts and simply takes the following forms based on major versions:  
-* **Java 5** - jdk-1_<version>_0_<updateVersion>-linux-amd64.rpm
-* **Java 6** - jdk-<version>u<updateVersion>-linux-amd64.rpm
-* **Java 7 & 8** - jdk-<version>u<updateVersion>-linux-x64.rpm
+* **Java 5** - jdk-1_<version>_0_<update_version>-linux-amd64.rpm
+* **Java 6** - jdk-<version>u<update_version>-linux-amd64.rpm
+* **Java 7 & 8** - jdk-<version>u<update_version>-linux-x64.rpm
 Ensuring this pattern is followed will allow the module to locate files correctly, it was decided not to rename all the JDKs into a common naming structure since this places the onus on the person running the module to rename files every time there is an update.  
 
 This decision may be revisited in future in order to simplify the module if Oracle continue to change their naming scheme.  
@@ -177,7 +189,6 @@ The above mentioned dependencies can be encapsulated in an *if* clause based on 
 Observe the packaging and [naming conventions](#Debian_file_naming_conventions) mentioned previously.  
 In the `ubuntu.pp` manifest you'll need to add a new mapping to the **versionsToRemove** hash for your new major version, specifying the removal of oracle-java6-jdk, oracle-java7-jdk and oracle-java8-jdk. 
 Also add your new version to the hashes for every other version, e.g. oracle-java9-jdk.  
-
 
 
 ## ToDo
