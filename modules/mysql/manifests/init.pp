@@ -211,7 +211,11 @@ define mysql::connector::java (
   $patch_version = "40",
   $destination_path = undef,
 ){
-  $puppet_file_dir      = "modules/${module_name}/"
+
+  if ($destination_path == undef){
+    fail("A destination_path parameter is required.")
+  }
+  $puppet_file_dir = "modules/${module_name}/"
   notify{"In connector::java $major_version $minor_version $patch_version":}
   $java_connector = "mysql-connector-java-${major_version}.${minor_version}.${patch_version}"
   $java_connector_archive = "${java_connector}.tar.gz"
@@ -231,7 +235,7 @@ define mysql::connector::java (
     require   =>  File[ "j-connector-archive" ],
   }
 
-  file { "j-connctor jar":
+  file { "${destination_path}${java_connector_jar}":
     ensure => present,
     source => "${local_install_dir}${java_connector}/${java_connector_jar}",
     path => "${destination_path}${java_connector_jar}",
@@ -243,7 +247,7 @@ define mysql::connector::java (
     force => true,
     path => "${local_install_dir}${java_connector}",
     require => [Exec["Unpack j-connector archive"],
-      File["j-connctor jar"],
+      File["${destination_path}${java_connector_jar}"],
     ]
   }
 }
