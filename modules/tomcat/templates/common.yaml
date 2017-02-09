@@ -1,6 +1,6 @@
 java::is64bit: true,
 java::version: "7",
-java::updateVersion: "54",
+java::update_version: "54",
 
 #tomcat::tomcat_manager_username: ''
 #tomcat::tomcat_manager_password: '',
