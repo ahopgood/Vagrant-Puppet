@@ -11,7 +11,7 @@
 # Sample Usage:
 #
 
-class { 'java':
+java { 'java-6':
   version => '6',
   update_version => '45'
 }
