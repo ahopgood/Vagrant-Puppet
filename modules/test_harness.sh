@@ -70,9 +70,14 @@ function run_vm {
 
 # Enters the specified module folder and runs the vm for the Vagrant file contained there
 function run_module {
+    ORIGINAL_DIR=$(pwd)
     cd $1
     echo "In run_module for $1... "$(pwd)
     VMs=($(vagrant status | grep -E "*test" | awk '{ print $1 }'))
+    if [ ! -z $2 ];then
+        VMs=($2)
+        echo "Using specific vagrant profile $2"
+    fi
     #Handle vagrant not being installed
     echo "Using Vagrant Profiles:"${VMs[@]}
     for ((j=0; j < "${#VMs[*]}"; j++));
@@ -80,25 +85,48 @@ function run_module {
         echo "Starting run for "${VMs[j]}
         run_vm ${VMs[j]} j
     done
-    cd ../
+    cd $ORIGINAL_DIR
+    #Need to move out of the current directory
     echo "Leaving module $1..."
 }
 
 declare -a RESULTS_ARRAY
 echo "Working in vagrant directory "$(pwd)
-
 #cd $1
 #echo "Using module directory $1"
 
+VAGRANT_PROFILE=""
 MODULES=($(ls -m | tr "," " "))
-echo "Module list:"
+
+while getopts m:p: FLAG; do
+    case $FLAG in
+        m)
+            echo "Setting module path to ["$OPTARG"]"
+            MODULES=($OPTARG)
+        ;;
+        p)
+            echo "Setting the vagrant profile to ["$OPTARG"]"
+            VAGRANT_PROFILE=$OPTARG
+        ;;
+        \?)
+            echo "Unsupported parameter :$OPTARG"
+        ;;
+    esac
+done
+# -m <modulename> or -p "<modulename1 modulename2>" the name of the module to run against, this is relative to the execution location of the script, optional argument, defaults to pwd (present working directory).
+# -p <vagrant profile name> the name of the vagrant profile for your virtual machine, using the define keyword in vagrant, optional argument, defaults to all VM profiles returned by the vagrant status command
+
+echo "Module list [${#MODULES[*]} modules]:"
+
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
     if [ -d ${MODULES[k]} ];then
         echo "${MODULES[k]}"
-        run_module ${MODULES[k]}
+        run_module ${MODULES[k]} $VAGRANT_PROFILE
+#        echo "exit status $?"
     fi
 #    run_module "tomcat"
+    echo "exiting ${MODULES[k]}"
 done
 #Get list of VMs from vagrant file that end in _test
 echo "Test results:"
