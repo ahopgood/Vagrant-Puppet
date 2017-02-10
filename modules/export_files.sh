@@ -14,5 +14,5 @@ if [ -z "$1" -o ! -d "$1" ]; then
 else
 	#echo "Searching directory $1"
 	echo "Transferring to target directory $1"
-	find . \( -name '*.deb' -o -name '*.rpm' -o -name '*.tar.gz' \) -exec cp --parents {\} "$1" \;
+	find . \( -name '*.deb' -o -name '*.rpm' -o -name '*.tar.gz' -o -name '*.zip' \) -exec cp --parents {\} "$1" \;
 fi
