@@ -1033,7 +1033,7 @@ define java::jce(
 ) {
 
   # Require java with a specific major major_version, how to check this?
-  Java['java-6']->Java::Jce['jce']
+  Java <<| |>> ->Java::Jce['jce']
 
   # Derive jdk location based on OS
   if ($::operatingsystem == "Ubuntu"){
@@ -1045,6 +1045,15 @@ define java::jce(
     $jdkLocation    = "/usr/java/jdk1.${major_version}.0_${update_version}/"
   } else {
     fail("operating system [${::operatingsystem}] not supported for installing unlimited strength Java Cryptographic Extensions (JCE)")
+  }
+
+  # The JCE Zip files for each major version of Java have different internal folder names because consistency makes life boring
+  if (versioncmp("${major_version}","6") == 0){
+    $unpacked_jce_folder = "jce"
+  } elsif (versioncmp("${major_version}","7")  == 0) {
+    $unpacked_jce_folder = "UnlimitedJCEPolicy"
+  } elsif (versioncmp("${major_version}","8") == 0) {
+    $unpacked_jce_folder = "UnlimitedJCEPolicyJDK8"
   }
 
   $jce_file = "jce_policy-${major_version}.zip"
@@ -1092,7 +1101,7 @@ define java::jce(
   file {"${securityLocation}${US_export_policy}":
     ensure => present,
     path => "${securityLocation}${US_export_policy}",
-    source => ["${zipLocation}/jce-${major_version}/jce/${US_export_policy}"],
+    source => ["${zipLocation}jce-${major_version}/${unpacked_jce_folder}/${US_export_policy}"],
     require => [
       Exec["move Java ${major_version} default ${US_export_policy} files"],
       Exec["move Java ${major_version} default ${local_policy} files"],
@@ -1102,14 +1111,14 @@ define java::jce(
   file {"${securityLocation}${local_policy}":
     ensure => present,
     path => "${securityLocation}${local_policy}",
-    source => ["${zipLocation}/jce-${major_version}/jce/${local_policy}"],
+    source => ["${zipLocation}jce-${major_version}/${unpacked_jce_folder}/${local_policy}"],
     require => [
       Exec["move Java ${major_version} default ${US_export_policy} files"],
       Exec["move Java ${major_version} default ${local_policy} files"],
     ]
   }
   ->
-  exec {"remove JCE folder":
+  exec {"remove JCE folder ${zipLocation}jce-${major_version}":
     path => "/bin/",
     command => "rm -rf ${zipLocation}jce-${major_version}",
     require => Exec["unzip ${jce_file}"],
