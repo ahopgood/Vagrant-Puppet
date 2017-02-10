@@ -247,6 +247,7 @@ define mysql::connector::java (
     path => "${destination_path}${java_connector}",
     require => [Exec["Unpack j-connector archive for ${destination_path}"],
       File["j-connector-archive ${destination_path}"],
+      File[ "${destination_path}${java_connector_jar}"],
     ]
   }
 
