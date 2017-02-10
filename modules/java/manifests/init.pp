@@ -1065,6 +1065,7 @@ define java::jce(
     source => ["puppet:///modules/${module_name}/${jce_file}"],
   }
 
+  #Zip doens't work on CentOS_7_test
   exec {"unzip ${jce_file}":
     cwd => "${zipLocation}",
     path => "/usr/bin/",
