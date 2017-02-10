@@ -25,7 +25,7 @@ class tomcat (
   $catalina_opts = '' ) {
     
   #Java required
-  Java['java'] -> Class['tomcat']
+  Java <| |> -> Class['tomcat']
      
   notify {
     "${module_name} installation completed":
