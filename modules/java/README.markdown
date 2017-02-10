@@ -131,6 +131,11 @@ For example:
 * Java 7 -> `jce_policy-7.zip`
 * Java 8 -> `jce_policy-8.zip`
 Unlike the JDK installers these are not platform dependent so are located in the root `/files` folder for the module.
+
+#### To Do
+
+* Minor versions of the same major version need to work on multi-tenancy environments
+* Need to be able to use multiple major versions on the same environment
  
 ## CentOS
 Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<update_version>`

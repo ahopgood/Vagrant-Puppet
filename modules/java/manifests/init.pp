@@ -1046,4 +1046,78 @@ define java::jce(
   } else {
     fail("operating system [${::operatingsystem}] not supported for installing unlimited strength Java Cryptographic Extensions (JCE)")
   }
+
+  $jce_file = "jce_policy-${major_version}.zip"
+  $zipLocation = "/opt/"
+
+  file {"${jce_file}":
+    ensure => present,
+    path => "${zipLocation}${jce_file}",
+    source => ["puppet:///modules/${module_name}/${jce_file}"],
+  }
+
+  exec {"unzip ${jce_file}":
+    cwd => "${zipLocation}",
+    path => "/usr/bin/",
+    command => "unzip -q ${jce_file} -d ${zipLocation}jce-${major_version}",
+    unless => "/bin/ls -1 ${zipLocation} | /bin/grep jce-${major_version}",
+    require => File["${jce_file}"],
+  }
+
+  $jreLocation = "${jdkLocation}jre/"
+  $securityLocation = "${jreLocation}lib/security/"
+  $securityBackupLocation = "${securityLocation}original_strength_policy_jars/"
+
+  file {"${securityBackupLocation}":
+    ensure => directory,
+    mode => 777,
+  }
+
+  $US_export_policy = "US_export_policy.jar"
+  exec {"move Java ${major_version} default ${US_export_policy} files":
+    path => "/bin/",
+    command => "mv ${securityLocation}${US_export_policy} ${securityBackupLocation}",
+    unless => "/bin/ls -1 ${securityBackupLocation} | /bin/grep ${US_export_policy}",
+    require => File["${securityBackupLocation}"],
+  }
+
+  $local_policy = "local_policy.jar"
+  exec {"move Java ${major_version} default ${local_policy} files":
+    path => "/bin/",
+    command => "mv ${securityLocation}${local_policy} ${securityBackupLocation}",
+    unless => "/bin/ls -1 ${securityBackupLocation} | /bin/grep ${local_policy}",
+    require => File["${securityBackupLocation}"],
+  }
+
+  file {"${securityLocation}${US_export_policy}":
+    ensure => present,
+    path => "${securityLocation}${US_export_policy}",
+    source => ["${zipLocation}/jce-${major_version}/jce/${US_export_policy}"],
+    require => [
+      Exec["move Java ${major_version} default ${US_export_policy} files"],
+      Exec["move Java ${major_version} default ${local_policy} files"],
+    ]
+  }
+
+  file {"${securityLocation}${local_policy}":
+    ensure => present,
+    path => "${securityLocation}${local_policy}",
+    source => ["${zipLocation}/jce-${major_version}/jce/${local_policy}"],
+    require => [
+      Exec["move Java ${major_version} default ${US_export_policy} files"],
+      Exec["move Java ${major_version} default ${local_policy} files"],
+    ]
+  }
+  ->
+  exec {"remove JCE folder":
+    path => "/bin/",
+    command => "rm -rf ${zipLocation}jce-${major_version}",
+    require => Exec["unzip ${jce_file}"],
+  }
+  ->
+  exec {"remove ${jce_file}":
+    path => "/bin/",
+    command => "rm ${zipLocation}${jce_file}",
+    require => Exec["unzip ${jce_file}"],
+  }
 }
