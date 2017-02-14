@@ -45,8 +45,11 @@ function run_vm {
     vagrant snapshot save $vm_name virgin
 
     # Get list of manifests from the tests/ directory
-    MANIFESTS=($(ls -m tests | tr "," " "))
-
+    if [ ! -z $3 ]; then
+        MANIFESTS=$3
+    else
+        MANIFESTS=($(ls -m tests | tr "," " "))
+    fi
     #Create a count based on the vm number / iterator multiplied by the total number of manifests we'll run so we can insert them in the results array correctly
     iterator=$((${#MANIFESTS[*]} * $vm_iterator))
 
@@ -55,8 +58,8 @@ function run_vm {
 #        vagrant up $vm_name
 #        port=$(vagrant ssh-config $vm_name | grep Port | awk '{ print $2 }')
 #        ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
-
-        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
+        echo "Manifest ${MANIFESTS[i]}"
+#        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
 
         #Reset the snapshot
         echo "Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
@@ -70,24 +73,55 @@ function run_vm {
 
 # Enters the specified module folder and runs the vm for the Vagrant file contained there
 function run_module {
+    local OPTIND FLAG a
+    while getopts m:p:t: FLAG; do
+        case $FLAG in
+            m)
+                echo "Using module path ["$OPTARG"]"
+                MODULE=($OPTARG)
+            ;;
+            p)
+                echo "Using the vagrant profile ["$OPTARG"]"
+                if [ -z $OPTARG ]; then
+                    VMs=""
+                else
+                    VMs=$OPTARG
+                fi
+            ;;
+            t)
+                echo "Using test manifests ["$OPTARG"]"
+                if [ -z $OPTARG ]; then
+                    TEST_MANIFESTS=""
+                else
+                    TEST_MANIFESTS=$OPTARG
+                fi
+
+
+            ;;
+            \?)
+                echo "Unsupported parameter :$OPTARG"
+            ;;
+        esac
+    done
+
     ORIGINAL_DIR=$(pwd)
-    cd $1
-    echo "In run_module for $1... "$(pwd)
+    cd $MODULE
+    echo "In run_module for $MODULE... "$(pwd)
     VMs=($(vagrant status | grep -E "*test" | awk '{ print $1 }'))
-    if [ ! -z $2 ];then
-        VMs=($2)
-        echo "Using specific vagrant profile $2"
-    fi
+#    if [ ! -z $2 ];then
+#        VMs=($2)
+#        echo "Using specific vagrant profile $2"
+#    fi
     #Handle vagrant not being installed
     echo "Using Vagrant Profiles:"${VMs[@]}
     for ((j=0; j < "${#VMs[*]}"; j++));
     do
         echo "Starting run for "${VMs[j]}
-        run_vm ${VMs[j]} j
+        run_vm ${VMs[j]} j $TEST_MANIFESTS
     done
     cd $ORIGINAL_DIR
     #Need to move out of the current directory
-    echo "Leaving module $1..."
+    echo "Leaving module $MODULE..."
 }
 
 declare -a RESULTS_ARRAY
@@ -96,9 +130,10 @@ echo "Working in vagrant directory "$(pwd)
 #echo "Using module directory $1"
 
 VAGRANT_PROFILE=""
+TEST_MANIFESTS=""
 MODULES=($(ls -m | tr "," " "))
 
-while getopts m:p: FLAG; do
+while getopts m:p:t: FLAG; do
     case $FLAG in
         m)
             echo "Setting module path to ["$OPTARG"]"
@@ -106,7 +141,19 @@ while getopts m:p: FLAG; do
         ;;
         p)
             echo "Setting the vagrant profile to ["$OPTARG"]"
-            VAGRANT_PROFILE=$OPTARG
+            if [ -z $OPTARG ]; then
+                VAGRANT_PROFILE=""
+            else
+                VAGRANT_PROFILE="-p "$OPTARG
+            fi
+        ;;
+        t)
+            echo "Setting the test manifests to ["$OPTARG"]"
+            if [ -z $OPTARG ];then
+                TEST_MANIFESTS=""
+            else
+                TEST_MANIFESTS="-t "$OPTARG
+            fi
         ;;
         \?)
             echo "Unsupported parameter :$OPTARG"
@@ -115,14 +162,14 @@ while getopts m:p: FLAG; do
 done
 # -m <modulename> or -p "<modulename1 modulename2>" the name of the module to run against, this is relative to the execution location of the script, optional argument, defaults to pwd (present working directory).
 # -p <vagrant profile name> the name of the vagrant profile for your virtual machine, using the define keyword in vagrant, optional argument, defaults to all VM profiles returned by the vagrant status command
-
+# -t <test_manifest>
 echo "Module list [${#MODULES[*]} modules]:"
 
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
     if [ -d ${MODULES[k]} ];then
-        echo "${MODULES[k]}"
-        run_module ${MODULES[k]} $VAGRANT_PROFILE
+        echo "${MODULES[k]} [$VAGRANT_PROFILE] [$TEST_MANIFESTS]"
+        run_module -m ${MODULES[k]} $VAGRANT_PROFILE $TEST_MANIFESTS
 #        echo "exit status $?"
     fi
 #    run_module "tomcat"
