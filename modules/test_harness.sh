@@ -14,9 +14,17 @@ function run_manifest {
 
 
     echo "Working on VM ["$vm_name"] with snapshot ["$snapshot_name"] and testing with manifest "$manifest_name
-    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
-    #Save result to global array
-    RESULTS_ARRAY[$iteration]=$manifest_name" "$vm_name" result ["$?"]"
+#    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
+    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name'' 2> $manifest_name"_"$vm_name"-errors.txt"
+    RESULT=$?
+    # Save result to global array
+    echo "Renaming error file to reflect exit code "$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
+    mv $manifest_name"_"$vm_name"-errors.txt" $manifest_name"_"$vm_name"-errors-"$RESULT".txt"
+    if [ $RESULT == 0 ];then
+        echo "Removing empty error file "$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
+        rm $manifest_name"_"$vm_name"-errors-"$RESULT".txt"
+    fi
+    RESULTS_ARRAY[$iteration]=$manifest_name" "$vm_name" result ["$RESULT"]"
     echo "Result in array "${RESULTS_ARRAY[$iteration]}
 }
 
@@ -59,7 +67,7 @@ function run_vm {
 #        port=$(vagrant ssh-config $vm_name | grep Port | awk '{ print $2 }')
 #        ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
         echo "Manifest ${MANIFESTS[i]}"
-#        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
+        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
 
         #Reset the snapshot
         echo "Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
