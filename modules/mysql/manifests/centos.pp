@@ -170,13 +170,15 @@ class mysql::centos (
   }
 
   if ("${os}" == "CentOS7"){
-    service {"mysqld":
+    service {"mysql":
+      name => "mysqld",
       ensure => running,
       enable => true,
       require => Package["mysql-community-server"],
     }
   } elsif "${os}" == "CentOS6" {
-    service {"mysqld":
+    service {"mysql":
+      name => "mysqld",
       ensure => running,
       enable => true,
       require => Package["mysql-community-server"],
@@ -198,7 +200,7 @@ class mysql::centos (
       before => File["my.cnf"],
     }
 
-    exec {"reset password":
+    exec {"confirm root password":
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
@@ -214,7 +216,7 @@ class mysql::centos (
       before => File["my.cnf"],
     }
 
-    exec {"reset password":
+    exec {"confirm root password":
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",

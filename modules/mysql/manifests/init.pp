@@ -86,7 +86,7 @@ define mysql::create_user(
     command => "/bin/echo \"CREATE USER '${dbusername}'@'localhost' IDENTIFIED BY '${dbpassword}';\" | mysql -u${rootusername} -p${rootpassword}",
     unless => "mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/",
-    require => [Package["mysql-community-server"], Exec["reset password"]]
+    require => [Service["mysql"], Exec["confirm root password"]]
   }
   ->
   exec{"Grant_privileges_for_user ${dbusername}":
@@ -115,7 +115,7 @@ define mysql::create_database(
     command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/",
-    require => [Package["mysql-community-server"], Exec["reset password"]]
+    require => [Service["mysql"], Exec["confirm root password"]]
   }
 }
 

@@ -116,6 +116,7 @@ class mysql::ubuntu(
     ]
   }
   service{"mysql":
+    name => "mysql",
     ensure => running,
     enable => true,
     require => Exec["mysql-community-server"],
