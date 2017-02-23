@@ -18,14 +18,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.hostname = "kanboard.vm"
 	config.vm.synced_folder "../", 	"/etc/puppet/modules"
 	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
-#	config.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup", "/vagrant/backups"
-
-# 	config.vm.provision :shell, :path => "files/install.sh"    
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file default.pp in the manifests_path directory.
-
+    
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
   config.vm.provision "puppet" do |puppet|
   	puppet.manifests_path = "manifests"
   	puppet.manifest_file  = "kanboard.pp"
@@ -48,4 +44,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	local.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/kanboard/backup/test/", "/vagrant/backups" 
   end
   
+    config.vm.define "CentOS_7_test" do |centos7|
+    	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
+    	centos7.vm.box_version = "1.0.1"
+    	centos7.vm.box_check_update = false
+    end
+  
+    config.vm.define "CentOS_6_test" do |centos6|
+    	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
+    	centos6.vm.box_version = "1.0.1"
+    	centos6.vm.box_check_update = false
+    end
+  
+    config.vm.define "Ubuntu_15_test" do |ubuntu|
+      ubuntu.vm.box = "ubuntu/wily64"
+      ubuntu.vm.box_check_update = false
+    end   
 end

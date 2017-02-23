@@ -63,26 +63,35 @@ class kanboard (
 
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
-  $kanboard_file = "kanboard-${major_version}-${minor_version}-${patch_version}.zip"
+  $kanboard_name = "kanboard-${major_version}.${minor_version}.${patch_version}"
+  $kanboard_file_zip = "${kanboard_name}.zip"
 
   file{
-    "${kanboard_file}":
+    "${kanboard_file_zip}":
     ensure => present,
-    path => "/var/www/html/${kanboard_file}",
-    source => ["puppet:///${puppet_file_dir}${kanboard_file}"],
+    path => "/var/www/html/${kanboard_file_zip}",
+    source => ["puppet:///${puppet_file_dir}${kanboard_file_zip}"],
     require => Class["php"],
   }
 
   exec{
     "unzip":
-    require => [Package["unzip"],File["${kanboard_file}"]],
-    command => "unzip -u /var/www/html/${kanboard_file}",
+    require => [Package["unzip"],File["${kanboard_file_zip}"]],
+    command => "unzip -uo /var/www/html/${kanboard_file_zip}",
     cwd => "/var/www/html",
   }
   
+#  exec {
+#    "rename":
+#      command => "mv -f /var/www/html/${kanboard_name} /var/www/html/kanboard",
+#      cwd => "/var/www/html",
+#      require => [Exec["unzip"]]
+#  }
+#  
   exec{
     "chown":
-    require => Exec["unzip"],
+    require => [Exec["unzip"]],
+#    , Exec["rename"]],
     command => "chown -R apache:apache kanboard/data",
     cwd => "/var/www/html",
   }
@@ -94,7 +103,7 @@ class kanboard (
   Class["mysql"]
   ->
   mysql::create_database{
-    "create_lanboard_database":
+    "create_kanboard_database":
     dbname => "${dbname}",
     dbusername => "${dbusername}",
     dbpassword => "${dbpassword}",
