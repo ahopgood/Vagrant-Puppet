@@ -1,4 +1,4 @@
-# Class: ufw
+# Class: unzip
 #
 # This module manages unzip
 #
@@ -16,6 +16,9 @@ class unzip (
 ) {
   $puppet_file_dir      = "modules/unzip/"
   $file_location        = "${operatingsystem}/${operatingsystemmajrelease}/"
+
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
 
   if ("${operatingsystem}" == "CentOS"){
     $provider = "rpm"

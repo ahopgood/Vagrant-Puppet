@@ -16,6 +16,17 @@ Installs the unzip binary.
 class {"unzip":}
 ```
 
+Requires the presence of a directory called **/etc/puppet/installers/** to install files from the puppet master onto the local machine, an example declared via puppet would be: 
+```
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+
+  file {
+    "${local_install_dir}":
+    path       =>  "${local_install_dir}",
+    ensure     =>  directory,
+  } 
+```
 ## Testing performed
 * CentOS 6 - single call to class{"unzip":}
 * CentOS 7 - single call to class{"unzip":}
