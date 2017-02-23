@@ -44,4 +44,4 @@ Within this version check you will need to instantiate the **$platform** variabl
 * Expand to allow for other versions of unzip to be used?
 * Replace call in Kanboard & add dependency on `class{"unzip":}` to Kanboard module
 * Add dependency within JCE definition, update test manifests
-* Failure scenario for unsupported operating systems
+* **done** Failure scenario for unsupported operating systems
