@@ -14,11 +14,19 @@ class mysql::ubuntu(
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
   $os = "$operatingsystem$operatingsystemmajrelease"
   $extension = ".deb"
+
+  $mysql_common_file = "mysql-common_${major_version}.${minor_version}.${patch_version}${os_platform}"
+  $mysql_community_client_file = "mysql-community-client_${major_version}.${minor_version}.${patch_version}${os_platform}"
+  $mysql_client_file = "mysql-client_5.7.13${os_platform}"
+  $mysql_community_server_file = "mysql-community-server_${major_version}.${minor_version}.${patch_version}${os_platform}"
+
   $os_platform = "-1ubuntu14.04_amd64${extension}"
 
   if (versioncmp("${major_version}", 5) == 0) {
     if (versioncmp("${minor_version}", 7) == 0) {
-
+      debug("In MYSQL ${major_version} ${minor_version}")
+    } elsif (versioncmp("${minor_version}", 6) == 0){
+      debug("In MYSQL ${major_version} ${minor_version}")
     } else {
       fail("Minor Version ${minor_version} isn't currently supported for MySQL ${major_version} on ${os}")
     }
@@ -26,8 +34,6 @@ class mysql::ubuntu(
     fail("Major Version ${major_version} isn't currently supported for ${os}")
   }
 
-
-  $mysql_common_file = "mysql-common_5.7.13${os_platform}"
   file {"${mysql_common_file}":
     ensure => present,
     path => "${local_install_dir}${mysql_common_file}",
@@ -41,7 +47,6 @@ class mysql::ubuntu(
       require     =>  [File["${mysql_common_file}"]]
   }
 
-  $mysql_community_client_file = "mysql-community-client_5.7.13${os_platform}"
   file {"${mysql_community_client_file}":
     ensure => present,
     path => "${local_install_dir}${mysql_community_client_file}",
@@ -56,7 +61,6 @@ class mysql::ubuntu(
   }
 
   #Seems to hang, perhaps this is a splash screen?
-  $mysql_client_file = "mysql-client_5.7.13${os_platform}"
   file {"${mysql_client_file}":
     ensure => present,
     path => "${local_install_dir}${mysql_client_file}",
@@ -104,8 +108,6 @@ class mysql::ubuntu(
   }
 
   #How to reset when running again?
-  $mysql_community_server_file = "mysql-community-server_5.7.13${os_platform}"
-
   file {"${mysql_community_server_file}":
     ensure => present,
     path => "${local_install_dir}${mysql_community_server_file}",
