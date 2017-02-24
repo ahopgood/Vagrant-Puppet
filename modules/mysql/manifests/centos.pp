@@ -32,11 +32,24 @@ class mysql::centos (
     $os_platform          = "-1.el6.x86_64.rpm"
   }
 
-  $MySQL_common = "mysql-community-common-${major_version}.${minor_version}.${patch_version}${os_platform}"
-  $MySQL_server = "mysql-community-server-${major_version}.${minor_version}.${patch_version}${os_platform}"
-  $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}"
-  $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}"
-  $MySQL_shared_compat = "mysql-community-libs-compat-${major_version}.${minor_version}.${patch_version}${os_platform}"
+  if (versioncmp("${major_version}", 5) == 0) {
+    if (versioncmp("${minor_version}", 7) == 0) {
+      $MySQL_common = "mysql-community-common-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_server = "mysql-community-server-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_shared_compat = "mysql-community-libs-compat-${major_version}.${minor_version}.${patch_version}${os_platform}"
+    } elsif (versioncmp("${minor_version}", 6) == 0){
+      $MySQL_server = "MySQL-server-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_client = "MySQL-client-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_libs   = "MySQL-shared-${major_version}.${minor_version}.${patch_version}${os_platform}"
+      $MySQL_shared_compat = "MySQL-shared-compat-${major_version}.${minor_version}.${patch_version}${os_platform}"
+    } else {
+      fail("Minor Version ${minor_version} isn't currently supported for MySQL ${major_version} on ${os}")
+    }
+  } else {
+    fail("Major Version ${major_version} isn't currently supported for ${os}")
+  }
 
   #Load the installers from the puppet fileserver into the local filesystem
   #Try giving the file a name and separate target location so we don't need to fully qualify the path
@@ -59,7 +72,8 @@ class mysql::centos (
         provider    =>  'rpm',
         source      =>  "${local_install_dir}/${libaio}",
         require     =>  File["${libaio}"],
-        before      =>  [Package['mysql-community-common'], Package['mysql-community-server'], Package['mysql-community-client']],
+#        before      =>  [Package['mysql-community-libs'], Package['mysql-community-server'], Package['mysql-community-client']],
+        before      =>  [Package['mysql-community-libs'], Package['mysql-community-client']],
     }
     package {
       "postfix":
@@ -70,31 +84,36 @@ class mysql::centos (
       'mariadb-libs':
         ensure      =>  absent,
         provider    =>  'rpm',
-        before      =>  [Package['mysql-community-common'], Package['mysql-community-server'], Package['mysql-community-client']],
+#        before      =>  [Package['mysql-community-libs'], Package['mysql-community-server'], Package['mysql-community-client']],
+        before      =>  [Package['mysql-community-libs'], Package['mysql-community-client']],
         require     =>  Package["postfix"]
     }
   } elsif "${os}" == "CentOS6" {
     package {"mysql-libs":
       provider => "rpm",
       ensure => absent,
-      before => Package["mysql-community-common"],
+#      before => Package["mysql-community-common"],
+      before => [Package['mysql-community-libs']],
       uninstall_options => ["--nodeps"]
     }
   }
 
-  file {
-    "${MySQL_common}":
-      path    =>  "${local_install_dir}/${MySQL_common}",
-      ensure  =>  present,
-      source  =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_common}"],
-  }
-
-  package {
-    'mysql-community-common':
-      ensure      =>  installed,
-      provider    =>  'rpm',
-      source      =>  "${local_install_dir}/${MySQL_common}",
-      require     =>  [File["${MySQL_common}"]],
+  #Only install the mysql-community-common packag for version 5.7 of mysql
+  if (versioncmp("${minor_version}", 7) == 0) {
+    file {
+      "${MySQL_common}":
+        path    =>  "${local_install_dir}/${MySQL_common}",
+        ensure  =>  present,
+        source  =>  ["puppet:///${puppet_file_dir}${file_location}${MySQL_common}"],
+    }
+    package {
+      'mysql-community-common':
+        ensure      =>  installed,
+        provider    =>  'rpm',
+        source      =>  "${local_install_dir}/${MySQL_common}",
+        require     =>  [File["${MySQL_common}"]],
+        before      =>  [Package["mysql-community-server"],Package["mysql-community-libs"]]
+    }
   }
 
   file {
@@ -109,8 +128,7 @@ class mysql::centos (
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_libs}",
-      require     =>  [File["${MySQL_libs}"],
-        Package["mysql-community-common"]],
+      require     =>  [File["${MySQL_libs}"]],
   }
 
   file {
@@ -160,7 +178,6 @@ class mysql::centos (
       require     =>  [File["${MySQL_server}"],
         Package["mysql-community-libs-compat"],
         Package["mysql-community-client"],
-        Package["mysql-community-common"]
       ],
       notify      => Service["mysqld"],
   }
@@ -207,11 +224,11 @@ class mysql::centos (
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }
-  } elsif (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and ("${os}" == "CentOS7")) {
+  } elsif (("${major_version}.${minor_version}.${patch_version}" == "5.6.35") and (("${os}" == "CentOS7") or ("${os}" == "CentOS6"))) {
     exec {"reset temp password":
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
-      command => "mysqladmin -uroot --password=\$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{print \$11}') password '${password}'",
+      command => "mysqladmin -uroot --password=\$(sudo cat $HOME/.mysqlsecret | awk '{print \$18}') password '${password}'",
       require => [Service["mysqld"]],
       before => File["my.cnf"],
     }

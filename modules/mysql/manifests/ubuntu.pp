@@ -12,9 +12,20 @@ class mysql::ubuntu(
   $puppet_file_dir      = "modules/mysql/"
 
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
-  $os = "-1ubuntu14.04_amd64"
+  $os = "$operatingsystem$operatingsystemmajrelease"
   $extension = ".deb"
-  $os_platform = "${os}${extension}"
+  $os_platform = "-1ubuntu14.04_amd64${extension}"
+
+  if (versioncmp("${major_version}", 5) == 0) {
+    if (versioncmp("${minor_version}", 7) == 0) {
+
+    } else {
+      fail("Minor Version ${minor_version} isn't currently supported for MySQL ${major_version} on ${os}")
+    }
+  } else {
+    fail("Major Version ${major_version} isn't currently supported for ${os}")
+  }
+
 
   $mysql_common_file = "mysql-common_5.7.13${os_platform}"
   file {"${mysql_common_file}":
@@ -93,7 +104,7 @@ class mysql::ubuntu(
   }
 
   #How to reset when running again?
-  $mysql_community_server_file = "mysql-community-server_5.7.13${os}${extension}"
+  $mysql_community_server_file = "mysql-community-server_5.7.13${os_platform}"
 
   file {"${mysql_community_server_file}":
     ensure => present,

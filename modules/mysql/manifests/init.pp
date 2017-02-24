@@ -14,15 +14,15 @@
 class mysql (
   $password = "rootR00?s",
   $root_home = "/home/vagrant",
+  $major_version        = "5",
+  $minor_version        = "7",
+  $patch_version        = "13",
 ){  
   #Modify this into a class that we can pass args into, e.g. mysql version number, os speciic installer classes etc.
   #NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/mysql/"
 
-  $major_version        = "5"
-  $minor_version        = "7"
-  $patch_version        = "13"
   $os = "$operatingsystem$operatingsystemmajrelease"
   notify{"Found ${os}":}
 
