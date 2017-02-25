@@ -46,5 +46,32 @@ class ddclient{
       enable => true, 
       require => Package["ddclient"]
     }
+
+    $entries = [
+    "set protocol namecheap",
+    "set use web, web=dynamicdns.park-your-domain.com/getip",
+    "set ssl yes",
+    "set server dynamicdns.park-your-domain.com",
+    "set login katherinemorley.net", 
+    "set password 'e8089f5428474eb29261337c54715f9d' @.katherinemorley.net,www.katherinemorley.net",
+    ]
+    
+#    augeas{ "add-entry":
+#      incl => "/etc/ddclient.conf",
+#      lens => "Simplevars.lns",
+#      context => "/files/etc/ddclient.conf/",
+#      changes => $entries,
+#    }
+#    set /augeas/load/Simplevars/lens/ Simplevars.lns
+#    set /augeas/load/Simplevars/incl/ /etc/ddclient.conf
+    #  protocol=namecheap
+#  use=web, web=dynamicdns.park-your-domain.com/getip
+#  ssl=yes
+#  server=dynamicdns.park-your-domain.com
+#  login=katherinemorley.net, password='e8089f5428474eb29261337c54715f9d' \
+#  @.katherinemorley.net,www.katherinemorley.net
+
+    # Install lens file, where?
+    # Load lens
   } #end Ubuntu 15 check
 }
