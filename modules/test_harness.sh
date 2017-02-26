@@ -133,12 +133,12 @@ echo -e $PREFIX"Working in directory "$(pwd)
 
 VAGRANT_PROFILE=""
 TEST_MANIFESTS=""
-MODULES=""
+MODULES=($(ls -m | tr "," " "))
 while getopts m:p:t: FLAG; do
     case $FLAG in
         m)
             if [ -z $OPTARG ]; then
-                MODULES=($(ls -m | tr "," " "))
+                MODULES=""
             else
                 MODULES=($OPTARG)
             fi
@@ -171,7 +171,7 @@ while getopts m:p:t: FLAG; do
     esac
 done
 
-#echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
+echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
 
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
