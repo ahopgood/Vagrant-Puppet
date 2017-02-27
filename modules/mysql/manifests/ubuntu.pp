@@ -15,12 +15,13 @@ class mysql::ubuntu(
   $os = "$operatingsystem$operatingsystemmajrelease"
   $extension = ".deb"
 
+  $os_platform = "-1ubuntu14.04_amd64${extension}"
+
   $mysql_common_file = "mysql-common_${major_version}.${minor_version}.${patch_version}${os_platform}"
   $mysql_community_client_file = "mysql-community-client_${major_version}.${minor_version}.${patch_version}${os_platform}"
-  $mysql_client_file = "mysql-client_5.7.13${os_platform}"
+  $mysql_client_file = "mysql-client_${major_version}.${minor_version}.${patch_version}${os_platform}"
   $mysql_community_server_file = "mysql-community-server_${major_version}.${minor_version}.${patch_version}${os_platform}"
 
-  $os_platform = "-1ubuntu14.04_amd64${extension}"
 
   if (versioncmp("${major_version}", 5) == 0) {
     if (versioncmp("${minor_version}", 7) == 0) {

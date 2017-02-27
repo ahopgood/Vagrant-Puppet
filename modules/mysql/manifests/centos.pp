@@ -161,6 +161,7 @@ class mysql::centos (
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_libs}",
       require     =>  [File["${MySQL_libs}"]],
+      before      =>  [Package["mysql-community-client"]]
   }
 
   file {
@@ -224,7 +225,7 @@ class mysql::centos (
   if (versioncmp("${major_version}.${minor_version}","5.7") == 0 ){
     $service_name = "mysqld"
   } elsif (versioncmp("${major_version}.${minor_version}","5.6") == 0 ) {
-      $service_name = "mysql"
+    $service_name = "mysql"
   }
   service {"mysql":
     name => "${service_name}",
@@ -240,7 +241,7 @@ class mysql::centos (
   #4. Set root password in the my.cnf template file and place it in the /home/root directory
   #5. Create regular mysql users using the root user, not sure if vagrant can do this?
 
-  if (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and ("${os}" == "CentOS6")){
+  if (("${major_version}.${minor_version}.${patch_version}" == "5.7.13") and (("${os}" == "CentOS7") or ("${os}" == "CentOS6"))){
     exec {"reset temp password":
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",

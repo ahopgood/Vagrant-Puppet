@@ -32,27 +32,27 @@ class mysql (
 
   if "${os}" == "CentOS7"{
     class{"mysql::centos":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
     contain mysql::centos
   } elsif "${os}" == "CentOS6" {
     class{"mysql::centos":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
     contain mysql::centos
   } elsif ("${os}" == "Ubuntu15.10"){
     class{"mysql::ubuntu":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
