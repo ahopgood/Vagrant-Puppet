@@ -10,12 +10,29 @@ It will also uninstall the old shared libraries from centos systems.
 Currently supports MySQL versions:
 
 * 5.7.13
+* 5.6.35
 
 Makes use of the *.my.cnf* file to set the root password and allows us to reset it later, protected by being present in the home directory of the user running the command.
 ### CentOS 6
 This module also:
 
 * **Removes** the mysql-libs dependency
+#### MySQL 5.6.35 package names
+Puppet reports the package names as follows:
+```
+package { 'MySQL-client':
+  ensure => '5.6.35-1.el6',
+}
+package { 'MySQL-server':
+  ensure => '5.6.35-1.el6',
+}
+package { 'MySQL-shared':
+  ensure => '5.6.35-1.el6',
+}
+package { 'MySQL-shared-compat':
+  ensure => '5.6.35-1.el6',
+}
+```
 
 ### CentOS 7
 This module also:  
@@ -23,6 +40,7 @@ This module also:
 * **Installs** libaio 0.3.109 dependency
 * **Removes** the postfix dependency
 * **Removes** the mariadb dependency
+* **Installs** perl-Data-Dumper for MySQL 5.6.35  
 
 Makes use of **systemctl** to start the mysql daemon (mysqld).
 

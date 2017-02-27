@@ -18,6 +18,7 @@ class mysql::centos (
   $password = undef,
   $root_home = undef,
 ){
+
   #Modify this into a class that we can pass args into, e.g. mysql version number, os speciic installer classes etc.
   #NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_dir    = "${local_install_path}installers"
@@ -39,11 +40,23 @@ class mysql::centos (
       $MySQL_client = "mysql-community-client-${major_version}.${minor_version}.${patch_version}${os_platform}"
       $MySQL_libs   = "mysql-community-libs-${major_version}.${minor_version}.${patch_version}${os_platform}"
       $MySQL_shared_compat = "mysql-community-libs-compat-${major_version}.${minor_version}.${patch_version}${os_platform}"
+
+      $MySQL_common_package_name = "mysql-community-common"
+      $MySQL_server_package_name = "mysql-community-server"
+      $MySQL_client_package_name = "mysql-community-client"
+      $MySQL_libs_package_name = "mysql-community-libs"
+      $MySQL_shared_compat_package_name = "mysql-community-libs-compat"
+
     } elsif (versioncmp("${minor_version}", 6) == 0){
       $MySQL_server = "MySQL-server-${major_version}.${minor_version}.${patch_version}${os_platform}"
       $MySQL_client = "MySQL-client-${major_version}.${minor_version}.${patch_version}${os_platform}"
       $MySQL_libs   = "MySQL-shared-${major_version}.${minor_version}.${patch_version}${os_platform}"
       $MySQL_shared_compat = "MySQL-shared-compat-${major_version}.${minor_version}.${patch_version}${os_platform}"
+
+      $MySQL_server_package_name = "MySQL-server"
+      $MySQL_client_package_name = "MySQL-client"
+      $MySQL_libs_package_name = "MySQL-shared"
+      $MySQL_shared_compat_package_name = "MySQL-shared-compat"
     } else {
       fail("Minor Version ${minor_version} isn't currently supported for MySQL ${major_version} on ${os}")
     }
@@ -88,6 +101,23 @@ class mysql::centos (
         before      =>  [Package['mysql-community-libs'], Package['mysql-community-client']],
         require     =>  Package["postfix"]
     }
+    if (versioncmp("${minor_version}", 6) == 0) and (versioncmp("${os}", "CentOS7") == 0) {
+      $perl_data_dumper_file = "perl-Data-Dumper-2.145-3.el7.x86_64.rpm"
+      file {
+        "${perl_data_dumper_file}":
+          path    =>  "${local_install_dir}/${perl_data_dumper_file}",
+          ensure  =>  present,
+          source  =>  ["puppet:///${puppet_file_dir}${file_location}${perl_data_dumper_file}"],
+      }
+      package {
+        'perl-Data-Dumper':
+          ensure      =>  installed,
+          provider    =>  'rpm',
+          source      =>  "${local_install_dir}/${perl_data_dumper_file}",
+          require     =>  [File["${perl_data_dumper_file}"]],
+          before      =>  [Package["mysql-community-server"]]
+      }
+    }
   } elsif "${os}" == "CentOS6" {
     package {"mysql-libs":
       provider => "rpm",
@@ -108,6 +138,7 @@ class mysql::centos (
     }
     package {
       'mysql-community-common':
+        name        =>  "${MySQL_common_package_name}",
         ensure      =>  installed,
         provider    =>  'rpm',
         source      =>  "${local_install_dir}/${MySQL_common}",
@@ -125,6 +156,7 @@ class mysql::centos (
 
   package {
     'mysql-community-libs':
+      name        =>  "${MySQL_libs_package_name}",
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_libs}",
@@ -140,10 +172,11 @@ class mysql::centos (
 
   package {
     'mysql-community-libs-compat':
+      name        =>  "${MySQL_shared_compat_package_name}",
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_shared_compat}",
-      require     =>  [File["${MySQL_shared_compat}"],
+      require     =>  [ File["${MySQL_shared_compat}"],
         Package["mysql-community-libs"]
       ],
   }
@@ -157,6 +190,7 @@ class mysql::centos (
 
   package {
     'mysql-community-client':
+      name        =>  "${MySQL_client_package_name}",
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_client}",
@@ -172,6 +206,7 @@ class mysql::centos (
 
   package {
     'mysql-community-server':
+      name        =>  "${MySQL_server_package_name}",
       ensure      =>  installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}/${MySQL_server}",
@@ -179,28 +214,25 @@ class mysql::centos (
         Package["mysql-community-libs-compat"],
         Package["mysql-community-client"],
       ],
-      notify      => Service["mysqld"],
+      notify      => Service["mysql"],
   }
 
   notify{"Starting mysqld":
     require => Package["mysql-community-server"]
   }
 
-  if ("${os}" == "CentOS7"){
-    service {"mysql":
-      name => "mysqld",
-      ensure => running,
-      enable => true,
-      require => Package["mysql-community-server"],
-    }
-  } elsif "${os}" == "CentOS6" {
-    service {"mysql":
-      name => "mysqld",
-      ensure => running,
-      enable => true,
-      require => Package["mysql-community-server"],
-    }
+  if (versioncmp("${major_version}.${minor_version}","5.7") == 0 ){
+    $service_name = "mysqld"
+  } elsif (versioncmp("${major_version}.${minor_version}","5.6") == 0 ) {
+      $service_name = "mysql"
   }
+  service {"mysql":
+    name => "${service_name}",
+    ensure => running,
+    enable => true,
+    require => Package["mysql-community-server"],
+  }
+
 
   #1. Find the previous password in the my.cnf
   #2. If .my.cnf doesn't exist then find the temporary password
@@ -213,7 +245,7 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'temporary password' /var/log/mysqld.log | awk '{ print \$11 }')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
-      require => [Service["mysqld"]],
+      require => [Service["mysql"]],
       before => File["my.cnf"],
     }
 
@@ -221,15 +253,15 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysql -uroot --password=\"$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}')\"  --connect-expired-password -e\"SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${password}');\"",
-      require => [Service["mysqld"]],
+      require => [Service["mysql"]],
       before => File["my.cnf"],
     }
   } elsif (("${major_version}.${minor_version}.${patch_version}" == "5.6.35") and (("${os}" == "CentOS7") or ("${os}" == "CentOS6"))) {
     exec {"reset temp password":
       path => "/usr/bin/",
       onlyif => "test ! -f ${root_home}/.my.cnf",
-      command => "mysqladmin -uroot --password=\$(sudo cat $HOME/.mysqlsecret | awk '{print \$18}') password '${password}'",
-      require => [Service["mysqld"]],
+      command => "mysqladmin -uroot --password=\$(sudo cat /.mysql_secret | awk '{print \$18}') password '${password}'",
+      require => [Service["mysql"]],
       before => File["my.cnf"],
     }
 
@@ -237,7 +269,7 @@ class mysql::centos (
       path => "/usr/bin/",
       onlyif => "test -f ${root_home}/.my.cnf",
       command => "mysqladmin -uroot --password=\$(sudo grep 'password=' ${root_home}/.my.cnf | awk '{print \$2}') password '${password}'",
-      require => [Service["mysqld"]],
+      require => [Service["mysql"]],
       before => File["my.cnf"],
     }
   } else {
@@ -251,7 +283,7 @@ class mysql::centos (
       ensure  =>  present,
       mode => 0655,
       content => template("${module_name}/my.cnf.erb"),
-      require => [Service["mysqld"]],
+      require => [Service["mysql"]],
   }
 }
 
