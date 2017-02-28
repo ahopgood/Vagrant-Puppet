@@ -48,6 +48,7 @@ Makes use of **systemctl** to start the mysql daemon (mysqld).
 Currently supports MySQL versions:
 
 * 5.7.13
+* 5.6.35
 
 Makes use of the *.my.cnf* file to set the root password and allows us to reset it later, protected by being present in the home directory of the user running the command.
 ### Ubuntu 15.10 (Wily)
@@ -73,12 +74,16 @@ Currently only version 5.1.40 is supported on:
  * **done** CentOS 6
  * **done** CentOS 7
  * **done** Ubuntu
- * **done** Add tests for java connector
-* Add test for create_database
-* Add test for create_user
+* **done** Add tests for java connector
+* **done** Add test for create_database
+* **done** Add test for create_user
+* **done**  Add support for 5.6.x
+ * **done** Create mysql user and group (definitely needed for 5.6.35)
+ * **done** Create exec for reading the password from /root/.mysql_secret 
+ * **done** Create and run tests for create_database
+ * **done** Create and run tests for create_users
 * Add tests for the differential_backup and differential_restore definitions
 * Add support for 5.5.x
-* Add support for 5.6.x
 * Add package dependency diagrams for each version of MySQL and OS
  * 5.7.13
   * CentOS 6
@@ -89,9 +94,3 @@ Currently only version 5.1.40 is supported on:
   * CentOS 7
   * Ubuntu 15
   * Add tests for create_database, create_user definitions
-* Add support for 5.6.x
- * Create mysql user and group (definitely needed for 5.6.35)
- * Create exec for reading the password from /root/.mysql_secret 
- * Create and run tests for create_database
- * Create and run tests for create_users
-* Add support for Ubuntu
