@@ -16,7 +16,7 @@ function run_manifest {
 
     echo -e $RUN_MANIFEST_PREFIX"Working on VM ["$vm_name"] with snapshot ["$snapshot_name"] and testing with manifest "$manifest_name
 #    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
-    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name'' 2> $manifest_name"_"$vm_name"-errors.txt"
+    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
     RESULT=$?
     # Save result to global array
     OUTPUT_FILE=$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
@@ -133,12 +133,12 @@ echo -e $PREFIX"Working in directory "$(pwd)
 
 VAGRANT_PROFILE=""
 TEST_MANIFESTS=""
-MODULES=""
+MODULES=($(ls -m | tr "," " "))
 while getopts m:p:t: FLAG; do
     case $FLAG in
         m)
             if [ -z $OPTARG ]; then
-                MODULES=($(ls -m | tr "," " "))
+                MODULES=""
             else
                 MODULES=($OPTARG)
             fi
@@ -171,7 +171,7 @@ while getopts m:p:t: FLAG; do
     esac
 done
 
-#echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
+echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
 
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
