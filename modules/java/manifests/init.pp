@@ -1033,7 +1033,10 @@ define java::jce(
 ) {
 
   # Require java with a specific major major_version, how to check this?
-  Java <<| |>> ->Java::Jce['jce']
+  Java <<| |>> -> Java::Jce["${name}"]
+
+  #Require unzip (mostly for CentOS 7 but let's not take any chances
+  Class['unzip']-> Java::Jce["${name}"]
 
   # Derive jdk location based on OS
   if ($::operatingsystem == "Ubuntu"){

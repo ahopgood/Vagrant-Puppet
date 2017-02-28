@@ -20,7 +20,7 @@ function run_manifest {
     # Save result to global array
     OUTPUT_FILE=$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
     echo -e $RUN_MANIFEST_PREFIX"Renaming error file to reflect exit code "$OUTPUT_FILE
-    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE
+    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE**done**
 
     #Check for benign "known" warnings and errors and remove from file
     grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE
@@ -144,12 +144,12 @@ echo -e $PREFIX"Working in directory "$(pwd)
 
 VAGRANT_PROFILE=""
 TEST_MANIFESTS=""
-MODULES=""
+MODULES=($(ls -m | tr "," " "))
 while getopts m:p:t: FLAG; do
     case $FLAG in
         m)
             if [ -z $OPTARG ]; then
-                MODULES=($(ls -m | tr "," " "))
+                MODULES=""
             else
                 MODULES=($OPTARG)
             fi
@@ -182,7 +182,7 @@ while getopts m:p:t: FLAG; do
     esac
 done
 
-#echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
+echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
 
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
