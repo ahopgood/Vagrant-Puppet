@@ -15,17 +15,28 @@ function run_manifest {
     RUN_MANIFEST_PREFIX=$PREFIX"\e[32mrun_manifest: \e[39m"
 
     echo -e $RUN_MANIFEST_PREFIX"Working on VM ["$vm_name"] with snapshot ["$snapshot_name"] and testing with manifest "$manifest_name
-#    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --noop --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
     /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
     RESULT=$?
     # Save result to global array
     OUTPUT_FILE=$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
     echo -e $RUN_MANIFEST_PREFIX"Renaming error file to reflect exit code "$OUTPUT_FILE
-    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE
+    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE**done**
+
+    #Check for benign "known" warnings and errors and remove from file
+    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE
+    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' ([RSA|ECDSA]) to the list of known hosts." $OUTPUT_FILE > $OUTPUT_FILE
+
+    FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
+
+    if [ $FILE_SIZE == 0 ];then
+        echo -e $RUN_MANIFEST_PREFIX"Removing empty error file "$OUTPUT_FILE
+        rm $OUTPUT_FILE
+    fi
     if [ $RESULT == 0 ];then
         echo -e $RUN_MANIFEST_PREFIX"Removing empty error file "$OUTPUT_FILE
         rm $OUTPUT_FILE
     fi
+
     RESULTS_ARRAY[$iteration]=$manifest_name" "$vm_name" result ["$RESULT"]"
     echo -e $RUN_MANIFEST_PREFIX"Result in array "${RESULTS_ARRAY[$iteration]}
 }
@@ -69,7 +80,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
 
         #Reset the snapshot
         echo -e $RUN_VM_PREFIX"Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
-#        vagrant snapshot restore $vm_name virgin
+        vagrant snapshot restore $vm_name virgin
 #        vagrant destroy $vm_name -f
     done
 
@@ -182,5 +193,8 @@ do
     echo -e $PREFIX"exiting ${MODULES[k]}"
 done
 echo -e $PREFIX"Test results:"
-echo ${RESULTS_ARRAY[@]}
+for each in "${RESULTS_ARRAY[@]}"
+do
+  echo "$each"
+done
 
