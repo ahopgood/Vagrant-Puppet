@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.memory = "1024"
   end
   config.vm.provision "puppet" do |puppet|
-  	puppet.manifests_path = "manifests"
+  	puppet.manifests_path = "tests"
   	puppet.manifest_file  = "kanboard.pp"
   	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
   end

@@ -34,18 +34,18 @@ class kanboard (
 #  ->  
 #  Class["kanboard"]
  
-  $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
-  file{
-    "${local_install_dir}${unzip_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${unzip_file}",
-  }
-  package {"unzip":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${unzip_file}",
-    require => File["${local_install_dir}${unzip_file}"],
-  }
+#  $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
+#  file{
+#    "${local_install_dir}${unzip_file}":
+#    ensure => present,
+#    source => "puppet:///${puppet_file_dir}${unzip_file}",
+#  }
+#  package {"unzip":
+#    ensure => present,
+#    provider => 'rpm',
+#    source => "${local_install_dir}${unzip_file}",
+#    require => File["${local_install_dir}${unzip_file}"],
+#  }
   
   $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
   file{
@@ -60,7 +60,8 @@ class kanboard (
     require => File["${local_install_dir}${wget_file}"],
     #1.12
   }
-
+  class{"unzip":}
+  
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
   $kanboard_name = "kanboard-${major_version}.${minor_version}.${patch_version}"
@@ -76,7 +77,7 @@ class kanboard (
 
   exec{
     "unzip":
-    require => [Package["unzip"],File["${kanboard_file_zip}"]],
+    require => [Class["unzip"],File["${kanboard_file_zip}"]],
     command => "unzip -uo /var/www/html/${kanboard_file_zip}",
     cwd => "/var/www/html",
   }
