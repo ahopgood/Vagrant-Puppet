@@ -20,11 +20,12 @@ function run_manifest {
     # Save result to global array
     OUTPUT_FILE=$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
     echo -e $RUN_MANIFEST_PREFIX"Renaming error file to reflect exit code "$OUTPUT_FILE
-    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE**done**
+    mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE
 
     #Check for benign "known" warnings and errors and remove from file
-    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE
-    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' ([RSA|ECDSA]) to the list of known hosts." $OUTPUT_FILE > $OUTPUT_FILE
+    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE".mod"
+    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' ([RSA|ECDSA]) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
+    rm $OUTPUT_FILE".mod"
 
     FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
 
