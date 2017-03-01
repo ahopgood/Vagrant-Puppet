@@ -33,20 +33,7 @@ class kanboard (
 #  Class["php"]
 #  ->  
 #  Class["kanboard"]
- 
-#  $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
-#  file{
-#    "${local_install_dir}${unzip_file}":
-#    ensure => present,
-#    source => "puppet:///${puppet_file_dir}${unzip_file}",
-#  }
-#  package {"unzip":
-#    ensure => present,
-#    provider => 'rpm',
-#    source => "${local_install_dir}${unzip_file}",
-#    require => File["${local_install_dir}${unzip_file}"],
-#  }
-  
+    
   $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
   file{
     "${local_install_dir}${wget_file}":

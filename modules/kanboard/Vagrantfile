@@ -22,11 +22,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
-  config.vm.provision "puppet" do |puppet|
-  	puppet.manifests_path = "tests"
-  	puppet.manifest_file  = "kanboard.pp"
-  	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
-  end
+#  config.vm.provision "puppet" do |puppet|
+#  	puppet.manifests_path = "tests"
+#  	puppet.manifest_file  = "kanboard.pp"
+#  	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
+#  end
   
   config.vm.define "server" do |server|
     server.vm.network "public_network", :mac => "080027D3418E", :bridge => "Realtek PCIe GBE Family Controller"
