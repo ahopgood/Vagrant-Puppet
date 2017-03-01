@@ -94,7 +94,7 @@ class wordpress (
   #Setup wordpress database
   #Setup root user and password on mysql
   #
-  #Unzipping of wordpres-4.3.1.tar.gz into html shared folder
+  #Unzipping of wordpress-4.3.1.tar.gz into html shared folder
   #Set firewall port in iptables
   #generate a wp-config.php with the database values inside
   #Backup 
