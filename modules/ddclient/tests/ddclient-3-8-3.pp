@@ -11,9 +11,6 @@ file {
     ensure     =>  directory,
 }
 
+class {"augeas":}
+->
 class{"ddclient":}
-
-package{"augeas-tools":
-  provider => "apt",
-  ensure => present,
-}
