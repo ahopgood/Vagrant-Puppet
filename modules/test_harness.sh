@@ -24,7 +24,7 @@ function run_manifest {
 
     #Check for benign "known" warnings and errors and remove from file
     grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE".mod"
-    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' ([RSA|ECDSA]) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
+    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
     rm $OUTPUT_FILE".mod"
 
     FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
