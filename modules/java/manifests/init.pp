@@ -1111,7 +1111,7 @@ define java::jce(
       Exec["move Java ${major_version} default ${local_policy} files"],
     ]
   }
-
+  ->
   file {"${securityLocation}${local_policy}":
     ensure => present,
     path => "${securityLocation}${local_policy}",
