@@ -11,6 +11,4 @@ file {
     ensure     =>  directory,
 }
 
-class {"augeas":}
-->
-class{"ddclient":}
+class{"augeas":}

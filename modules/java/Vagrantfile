@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "CentOS_6_test" do |centos|
     centos.vm.hostname = "java-dev-centos6"
   	centos.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	  centos.vm.box_version = "1.0.1"
+    centos.vm.box_version = "1.0.1"
     centos.vm.network "private_network", ip: "192.168.33.16"
   end
 
