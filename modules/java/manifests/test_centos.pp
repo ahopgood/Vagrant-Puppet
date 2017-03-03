@@ -5,52 +5,52 @@
     
 #  java{"java-8":
 #    version => "8",
-#    updateVersion => "31",
+#    update_version => "31",
 ##    multiTenancy => true,
 #  }
 
 #  java{"java-8":
 #    version => "8",
-#    updateVersion => "112",
+#    update_version => "112",
 ##    multiTenancy => true,
 #  }
 
 #  java{"java-7":
 #    version => '7',
-#    updateVersion => '80',
+#    update_version => '80',
 ##    multiTenancy => true,
 ##    isDefault => true,
 #  }
 
 #  java{"java-7":
 #    version => '7',
-#    updateVersion => '76',
+#    update_version => '76',
 ##    multiTenancy => true,
 ##    isDefault => true,
 #  }
   
 #  java{"java-6":
 #    version => "6",
-#    updateVersion => "45",
+#    update_version => "45",
 ##    multiTenancy => true,
 #  }
 
   java{"java-6":
     version => "6",
-    updateVersion => "34",
+    update_version => "34",
 #    multiTenancy => true,
   }
 
 #  java{"java-5":
 #    version => "5",
-#    updateVersion => "22",
+#    update_version => "22",
 ##    isDefault => true,
 ##    multiTenancy => true,
 #  }
   
 #  java{"java-5":
 #    version => "5",
-#    updateVersion => "20",
+#    update_version => "20",
 ##    isDefault => true,
 ##    multiTenancy => true,
 #  }

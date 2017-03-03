@@ -9,3 +9,4 @@
 /modules/*/files/*.rpm
 /modules/*/files/*.rpm.bin
 /modules/*/files/*.tar.gz
+/modules/*/files/*.zip

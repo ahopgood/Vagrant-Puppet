@@ -13,7 +13,7 @@
 
 java { 'java-6':
   version => '6',
-  updateVersion => '45'
+  update_version => '45'
 }
 
 class { 'tomcat':

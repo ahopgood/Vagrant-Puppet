@@ -1,5 +1,5 @@
 java::version: 6
-java::updateVersion: 45
+java::update_version: 45
 java::is64bit: true
 
 #tomcat::tomcat_manager_username: ''
