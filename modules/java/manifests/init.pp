@@ -1083,6 +1083,7 @@ define java::jce(
     path => "/usr/bin/",
     command => "unzip -q ${jce_file} -d ${zipLocation}jce-${major_version}",
     unless => "/bin/ls -1 ${zipLocation} | /bin/grep jce-${major_version}",
+    creates => "${zipLocation}jce-${major_version}",
     require => File["${jce_file}"],
   }
 
