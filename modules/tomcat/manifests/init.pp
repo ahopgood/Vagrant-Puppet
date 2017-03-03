@@ -46,12 +46,14 @@ class tomcat (
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
   $tomcat_server_config = "${catalina_home}/conf/server.xml"
-  $tomcat_env_file		  = "setenv.sh" 
-  
+  $tomcat_env_file		  = "setenv.sh"
+
   if ("{$operatingsystem}" == "CentOS") {
     notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/java/default"
   } elsif ("${operatingsystem}" == "Ubuntu"){
     notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/lib/jvm/default"
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
   }
@@ -130,7 +132,7 @@ class tomcat (
     owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     path      =>  "/etc/profile.d/java.sh",
-    content   =>  "#!/bin/bash export JAVA_HOME=/usr/java/default",
+    content   =>  "export JAVA_HOME=/usr/java/default",
     require   =>  Exec["Unpack tomcat archive"],
   }
 

@@ -53,4 +53,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.box = "ubuntu/wily64"
     ubuntu.vm.box_check_update = false
   end
-
+end

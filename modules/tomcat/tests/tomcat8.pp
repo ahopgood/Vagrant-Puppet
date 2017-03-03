@@ -12,8 +12,8 @@
 #
 
 java { 'java-7':
-  version => '7',
-  update_version => '71'
+  major_version => '7',
+  update_version => '80'
 }
 
 class { 'tomcat':
