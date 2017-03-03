@@ -13,7 +13,8 @@
 
 java { 'java-7':
   major_version => '7',
-  update_version => '80'
+  update_version => '80',
+  isDefault => true,
 }
 
 class { 'tomcat':
