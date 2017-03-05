@@ -1,0 +1,9 @@
+(* DDClient .conf module for Augeas *)
+module DDClientConf =
+autoload xfm
+
+let lns = 
+
+let filter = incl "/var/ddclient.conf"
+
+let xfm = transform lns filter

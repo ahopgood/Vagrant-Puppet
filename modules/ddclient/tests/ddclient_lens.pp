@@ -33,3 +33,11 @@
     target => "/vagrant/files/test_ddclientconf.aug",
     require => File["/usr/share/augeas/lenses/tests/"]
   }
+  #Run lens test
+#  augparse /usr/share/augeas/lenses/tests/test_ddclientconf.aug
+
+    file {"/usr/share/augeas/lenses/DDClientConf.lns":
+    ensure => "link",
+    target => "/vagrant/files/DDClientConf.lns",
+    require => File["/usr/share/augeas/lenses/tests/test_ddclientconf.aug"]
+  }
