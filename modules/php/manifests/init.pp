@@ -16,15 +16,13 @@ class php (
   $patch_version = '16'
 ) {
   notify{"PHP Module running":}
-
+  
+  
+  
   Class["mysql"]
   ->
   Class["php"]
-  
-#  Class["httpd"]
-#  ->
-#  Class["php"]
-#  include ::httpd
+  contain 'httpd'
   
   $puppet_file_dir = "modules/${module_name}/"
   $local_install_dir = "${local_install_path}installers/"
@@ -104,7 +102,7 @@ class php (
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${php_file}",
-    require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Class["httpd"]],
+    require => [File["${local_install_dir}${php_file}"], Package["php-common"], Package["php-cli"], Package["httpd"]],
 #    notify => Service["httpd"],
   }
   exec {

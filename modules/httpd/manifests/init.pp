@@ -20,8 +20,7 @@ class httpd {
 
   $httpd_user = "apache"
   $httpd_group = "apache"
-
-#  Class["httpd"] -> Class["iptables"]
+  
   $os = "$operatingsystem$operatingsystemmajrelease"  
   group { "${httpd_group}":
     ensure    =>  present,

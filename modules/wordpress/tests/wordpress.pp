@@ -17,11 +17,11 @@ Package{
   #restricted db username
   #restricted db password
   class {"httpd":}
-  ->
+
   class {"iptables": port => "80"}
-  ->
+  
   class {"mysql":}
-  ->
+  
   class {"php":
     major_version => '5',
     minor_version => '4',
