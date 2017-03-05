@@ -88,7 +88,8 @@ class wordpress (
     dbusername => "${database_username}",
     dbpassword => "${database_password}",
     backup_path => "/vagrant/backups/",
-    minute => "*/2"
+    hour => "*",  
+    minute => "0",
   } 
   #Install mysql
   #Setup wordpress database
