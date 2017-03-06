@@ -32,26 +32,6 @@ class ddclient{
   } elsif (versioncmp("${OS}","CentOS") == 0){
     $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
     $provider = "rpm"
-
-#    exec { "perl-install":
-##      command => "rpm -e perl perl-podlators ",
-#      command => "rpm -U /vagrant/files/CentOS/7/perl-5.16.3-291.el7.x86_64.rpm \
-#      /vagrant/files/CentOS/7/perl-libs-5.16.3-291.el7.x86_64.rpm \
-#      /vagrant/files/CentOS/7/perl-Time-HiRes-1.9725-3.el7.x86_64.rpm \
-#      /vagrant/files/CentOS/7/perl-IO-Socket-SSL-1.94-5.el7.noarch.rpm \
-#      /vagrant/files/CentOS/7/perl-Digest-SHA1-2.13-9.el7.x86_64.rpm",
-#      path    => "/usr/bin/",
-##      before  => [Package["perl-libs"]]
-#    }
-    
-#    package {"perl-removal": 
-##      name => "5.16.3-283.el7",
-##      name => "perl.x86_64",
-#      name => "perl",
-#      ensure => absent,
-#      before => [Package["perl-libs"]],
-#      uninstall_options => ["--nodeps"]
-#    }
     
     $perl_libs="perl-libs-5.16.3-291.el7.x86_64.rpm"
     file {"${perl_libs}":
@@ -60,30 +40,12 @@ class ddclient{
       path => "${local_install_dir}/${perl_libs}",
     }
 
-#    package {"perl-libs":
-#      source => "${local_install_dir}/${perl_libs}",
-#      ensure => "5.16.3-291.el7",
-#      provider => "${provider}",
-#      require => File["${perl_libs}"],
-#      install_options => "--force",
-#      before => [Package["ddclient"], Package["perl"]]
-#    }
-
     $perl_Time_HiRes="perl-Time-HiRes-1.9725-3.el7.x86_64.rpm"
     file {"${perl_Time_HiRes}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Time_HiRes}",
       path => "${local_install_dir}/${perl_Time_HiRes}",
     }
-
-#    package {"perl_Time_HiRes":
-#      source => "${local_install_dir}/${perl_Time_HiRes}",
-#      ensure => "1.9725-3.el7",
-#      provider => "${provider}",
-#      require => File["${perl_Time_HiRes}"],
-#      install_options => "--force",
-#      before => [Package["ddclient"], Package["perl"]]
-#    }
 
     $perl="perl-5.16.3-291.el7.x86_64.rpm"
     file {"${perl}":
@@ -95,7 +57,6 @@ class ddclient{
     package {["perl","perl-libs","perl_Time_HiRes"]:
       source => ["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"],
       ensure => ["5.16.3-291.el7","5.16.3-291.el7","1.9725-3.el7"],
-#      ensure => installed,
       provider => "${provider}",
       require => [File["${perl}"],File["${perl_libs}"], File["${perl_Time_HiRes}"]],
       install_options => "--force",
@@ -180,7 +141,6 @@ class ddclient{
       ensure          => "1.94-5.el7",
       provider        => "${provider}",
       require         => [File["${perl_IO_Socket_SSL}"], Package["perl-IO-Socket-IP"], Package["perl-Net-LibIDN"], Package["perl-Net-SSLeay"] ],
-#      install_options => "--force",
       before          => Package["ddclient"],
     }
   }
