@@ -1,5 +1,6 @@
 define httpd::virtual_host(
   $server_name = undef,
+  $document_root = undef,
 ){
 
   Httpd::Virtual_host <| |>
@@ -41,6 +42,11 @@ define httpd::virtual_host(
   if ("${server_name}" == undef){
     fail("A server_name is needed for creating a virtual host")
   }
+  if ("${document_root}" == undef){
+    fail("A document_root is needed for creating a virtual host")
+  }
+
+
   file {"${server_name}.conf":
     ensure => present,
     path => "/etc/httpd/sites-available/${server_name}.conf",
@@ -65,22 +71,23 @@ define httpd::virtual_host(
   $virtual_host_changes = [
     "set VirtualHost/arg *:80",
     "set VirtualHost/directive[1] DocumentRoot",
-    "set VirtualHost/directive[1]/arg /var/www/alex/",
+    "set VirtualHost/directive[1]/arg ${document_root}",
     "set VirtualHost/directive[2] ServerName",
-    "set VirtualHost/directive[2]/arg www.alex.com",
+    "set VirtualHost/directive[2]/arg ${server_name}",
   ]
   augeas { "${server_name}.conf VirtualHost setup":
     incl    => "/etc/httpd/sites-available/${server_name}.conf",
     lens    => "Httpd.lns",
     context => "/files/etc/httpd/sites-available/${server_name}.conf/",
     changes => $virtual_host_changes,
-    onlyif  => "match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[1]/arg[. = '/var/www/alex/'] size == 0",
+    onlyif  => "match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
     require => File["${server_name}.conf"]
   }
 
-#  file {"${server_name}.conf ":
+#  file {"enable ${server_name}.conf":
 #    ensure => link,
-#    source => "",
-#    target => "",
+#    source => "/etc/httpd/sites-available/${server_name}.conf",
+#    target => "/etc/httpd/sites-enabled/${server_name}.conf",
+##    notify => Service["httpd"],
 #  }
 }
