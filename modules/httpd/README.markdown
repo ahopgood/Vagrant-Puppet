@@ -138,6 +138,16 @@ an example would be:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
 
+## Virtual Hosts
+Required parameters:
+
+* server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
+* document_root - the location of the web resources you will be serving via your virtual host
+
+### ToDo
+* Add support for alias names
+* 
+
 ## ToDo
 * Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
 	* CentOS6 current - 2.2.15 this is the latest in the CentOS6

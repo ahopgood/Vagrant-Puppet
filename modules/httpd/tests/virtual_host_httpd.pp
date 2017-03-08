@@ -19,7 +19,16 @@ Package{
   
   class { "augeas": }
 
+  file {"/var/www/alexander/":
+    ensure => directory,
+  }
+  ->
+  file {"/var/www/alexander/index.html":
+    ensure => present,
+    content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
+  }
+  ->
   httpd::virtual_host{"test":
-    server_name => "www.alex.com",
-#    document_root => "/var/www/alex",
+    server_name => "www.alexander.com",
+    document_root => "/var/www/alexander/",
   }

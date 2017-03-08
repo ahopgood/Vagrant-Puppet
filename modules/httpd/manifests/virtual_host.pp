@@ -50,6 +50,7 @@ define httpd::virtual_host(
   file {"${server_name}.conf":
     ensure => present,
     path => "/etc/httpd/sites-available/${server_name}.conf",
+    mode => 0777,
   }
 
   #Create sitename.conf file with virtual host conf in it.
@@ -68,26 +69,49 @@ define httpd::virtual_host(
   ServerName www.alex.com
   </VirtualHost>
   */
-  $virtual_host_changes = [
+
+#"set VirtualHost/arg *:80",
+#augeas { "${server_name}.conf VirtualHost DocumentRoot setup":
+#incl    => "/etc/httpd/sites-available/${server_name}.conf",
+#lens    => "Httpd.lns",
+#context => "/files/etc/httpd/sites-available/${server_name}.conf/",
+#changes => $virtual_host_document_root_changes,
+#onlyif  => "match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[. = 'DocumentRoot']/arg[. = '${document_root}'] size == 0",
+#require => File["${server_name}.conf"]
+#}
+
+  $virtual_host_document_root_changes = [
     "set VirtualHost/arg *:80",
     "set VirtualHost/directive[1] DocumentRoot",
     "set VirtualHost/directive[1]/arg ${document_root}",
-    "set VirtualHost/directive[2] ServerName",
-    "set VirtualHost/directive[2]/arg ${server_name}",
   ]
-  augeas { "${server_name}.conf VirtualHost setup":
+  augeas { "${server_name}.conf VirtualHost DocumentRoot setup":
     incl    => "/etc/httpd/sites-available/${server_name}.conf",
     lens    => "Httpd.lns",
     context => "/files/etc/httpd/sites-available/${server_name}.conf/",
-    changes => $virtual_host_changes,
-    onlyif  => "match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
-    require => File["${server_name}.conf"]
+    changes => $virtual_host_document_root_changes,
+    onlyif  => ["match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[. = 'DocumentRoot']/arg[. = '${document_root}'] size == 0"],
+    require => File["${server_name}.conf"],
+    before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
   }
 
-#  file {"enable ${server_name}.conf":
-#    ensure => link,
-#    source => "/etc/httpd/sites-available/${server_name}.conf",
-#    target => "/etc/httpd/sites-enabled/${server_name}.conf",
-##    notify => Service["httpd"],
-#  }
+  $virtual_host_server_name_changes = [
+    "set VirtualHost/directive[2] ServerName",
+    "set VirtualHost/directive[2]/arg ${server_name}",
+  ]
+  augeas { "${server_name}.conf VirtualHost ServerName setup":
+    incl    => "/etc/httpd/sites-available/${server_name}.conf",
+    lens    => "Httpd.lns",
+    context => "/files/etc/httpd/sites-available/${server_name}.conf/",
+    changes => $virtual_host_server_name_changes,
+    onlyif  => "match /files/etc/httpd/sites-available/${server_name}.conf/VirtualHost/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
+    require => [File["${server_name}.conf"]]
+  }
+
+  file {"enable ${server_name}.conf":
+    ensure => link,
+    target => "/etc/httpd/sites-available/${server_name}.conf",
+    path => "/etc/httpd/sites-enabled/${server_name}.conf",
+    notify => Service["httpd"],
+  }
 }
