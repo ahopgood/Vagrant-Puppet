@@ -123,6 +123,19 @@ The installer will need to follow the same naming conventions as found in [CentO
 If the dependencies change between versions then a new conditional section will need to be added to include these dependencies for your specific version of Apache.  
 
 ## Ubuntu
+Installs apache to the following locations:
+* `/usr/sbin/apache2` executable file
+* `/var/log/apache2/` logging directory
+* `/etc/apache2/` main application & configuration directory
+* `/etc/apache2/apache2.conf` main configuration file for apache web server 
+* `/var/www/html/` default document root for serving web pages
+
+Command line service calls are as follows:  
+* `sudo service apache2 start` to start the service
+* `sudo service apache2 stop` to stop the service
+* `sudo service apache2 restart` to restart the service
+* `sudo service apache2 status` to get the current status of the service
+
 ### <a href="Ubuntu_known_issues">Ubuntu known issues</a>
 * iptables isn't supported by default on Ubuntu 15.10 - modular dependency between httpd and iptables will cause module to fail.
 * Ubuntu support is still under development
@@ -137,6 +150,38 @@ an example would be:
 -->
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
+
+## Terry Pratchett x-clacks header
+Support has been added for the following HTTP header:
+`X-Clacks-Overhead "GNU Terry Pratchett"`
+An explanation can be found [here](http://www.gnuterrypratchett.com/).
+### Usage
+```
+  class { "httpd": }
+  ->
+  httpd::xclacks{"x-clacks":}
+```
+This will add a directive on the `/var/www/html` directory (support for other document roots could be added at a later point).
+The directive looks like this on Ubuntu:
+```
+<Directory "/var/www/html/">
+<IfModule headers_module>
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</IfModule>
+</Directory>
+```
+And this on CentOS:
+```
+<IfModule mod_headers.c>
+<Directory "/var/www/html/">
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</Directory>
+</IfModule>
+</IfModule>
+```
+#### Depdendencies
+This will only work if the headers module is installed.
+
 
 ## Virtual Hosts
 Required parameters:  
@@ -159,7 +204,6 @@ The document root / web page assets are not instantiated through this definition
 	* Ubuntu - 2.4.12
 * Ubuntu support
 * Raspberian support
-* Terry Pratchett x-clacks header
 * Virtual Host configuration
 * SSL Configuration
 * Custom error pages; 404, 401, 403, 500 etc
