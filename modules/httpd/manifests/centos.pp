@@ -1,6 +1,6 @@
 class httpd::centos($httpd_user = undef, $httpd_group = undef){
 
-  $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"  
+  $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"
 
   $os = "$operatingsystem$operatingsystemmajrelease"
   $apr_file = $os ? {

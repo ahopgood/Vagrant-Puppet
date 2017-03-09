@@ -9,26 +9,25 @@ Package{
     "${local_install_dir}":
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
-  } 
-
+  }
+#  class { "augeas": }
   class { "iptables":
     port => "80",
   }
   
   class { "httpd": }
-  
-  class { "augeas": }
 
+  httpd::virtual_host{"test":
+    server_name => "www.alexander.com",
+    document_root => "/var/www/alexander/",
+  }
+  ->
   file {"/var/www/alexander/":
     ensure => directory,
+    #    require => Class["httpd"]
   }
   ->
   file {"/var/www/alexander/index.html":
     ensure => present,
     content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
-  }
-  ->
-  httpd::virtual_host{"test":
-    server_name => "www.alexander.com",
-    document_root => "/var/www/alexander/",
   }

@@ -20,5 +20,5 @@ Package{
   class { "augeas": }
 
   httpd::virtual_host{"test":
-
+    document_root => "/var/www/alexander/",
   }
