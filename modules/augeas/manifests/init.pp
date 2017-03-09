@@ -1,18 +1,23 @@
 class augeas {
-
-  $major_version = "1"
-  $minor_version = "4"
-  $patch_version = "0"
-
   $puppet_file_dir      = "modules/augeas/"
   $file_location        = "${operatingsystem}/${operatingsystemmajrelease}/"
 
   if (versioncmp("${operatingsystem}", "CentOS") == 0 ){
     if (versioncmp("${operatingsystemmajrelease}", "7") == 0){
+      $major_version = "1"
+      $minor_version = "4"
+      $patch_version = "0"
 
       $package = "-2.el7"
       $platform = "${package}.${architecture}.rpm"
 
+    } elsif (versioncmp("${operatingsystemmajrelease}", "6") == 0) {
+      $major_version = "1"
+      $minor_version = "0"
+      $patch_version = "0"
+
+      $package = "-10.el6"
+      $platform = "${package}.${architecture}.rpm"
     } else {
       fail ("${operatingsystem} ${operatingsystemmajrelease} is currently not supported for the augeas module")
     }
