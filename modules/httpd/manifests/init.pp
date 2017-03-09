@@ -20,7 +20,7 @@ class httpd {
 
   $httpd_user = "apache"
   $httpd_group = "apache"
-  
+
   $os = "$operatingsystem$operatingsystemmajrelease"  
   group { "${httpd_group}":
     ensure    =>  present,
