@@ -23,9 +23,9 @@ class tomcat (
   $port = null,
   $java_opts = '',
   $catalina_opts = '' ) {
-
+    
   #Java required
-  Class['java'] -> Class['tomcat']
+  Java <| |> -> Class['tomcat']
      
   notify {
     "${module_name} installation completed":
@@ -46,10 +46,14 @@ class tomcat (
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
   $tomcat_server_config = "${catalina_home}/conf/server.xml"
-  $tomcat_env_file		  = "setenv.sh" 
-  
-  if $::operatingsystem == 'CentOS' {
+  $tomcat_env_file		  = "setenv.sh"
+
+  if ("{$operatingsystem}" == "CentOS") {
     notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/java/default"
+  } elsif ("${operatingsystem}" == "Ubuntu"){
+    notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/lib/jvm/default"
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
   }
@@ -128,7 +132,7 @@ class tomcat (
     owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     path      =>  "/etc/profile.d/java.sh",
-    content   =>  "#!/bin/bash export JAVA_HOME=/usr/java/default",
+    content   =>  "export JAVA_HOME=/usr/java/default",
     require   =>  Exec["Unpack tomcat archive"],
   }
 
@@ -153,11 +157,21 @@ class tomcat (
   }
 
   if ("${port}" != null){ 
-  	#Create an iptables (firewall) exception, persist and restart iptables 
-    class { 'iptables':
-      port => "${port}",
-      require => File["Set CATALINA_HOME"]
+    if ("${operatingsystem}"=="CentOS") {
+      #Create an iptables (firewall) exception, persist and restart iptables 
+      class { 'iptables':
+        port => "${port}",
+        require => File["Set CATALINA_HOME"]
+      }
+    } elsif ("${operatingsystem}"=="Ubuntu"){
+      ufw {"test":
+        port => '8080',
+        isTCP => true
+      }
+    } else {
+      fail("Operating system not supported:$::operatingsystem")  
     }
+
   }
 
   file {  "${tomcat_users}":
@@ -167,7 +181,7 @@ class tomcat (
   }
   
   file { "${tomcat_server_config}":
-    content => template("${module_name}/server.xml.erb"),
+    content => template("${module_name}/server.xml.${tomcat_short_ver}.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"] 
   }
@@ -187,7 +201,7 @@ class tomcat (
   #Tomcat service startup script
   file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
-    content =>  template("${module_name}/tomcat.erb"),
+    content =>  template("${module_name}/${operatingsystem}/tomcat.erb"),
     ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],

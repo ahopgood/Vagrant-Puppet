@@ -65,8 +65,8 @@ class jenkins (
   
   #Requires java to be installed
   java{"install-java":
-    version => '7',
-    updateVersion => '76',
+    major_version => '7',
+    update_version => '76',
   }
   
   $daemon = "daemon_0.6.4-1_amd64.deb"

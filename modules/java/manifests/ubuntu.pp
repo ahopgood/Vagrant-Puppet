@@ -1,6 +1,6 @@
 define java::ubuntu(
-  $version = "6",
-  $updateVersion = "45",
+  $major_version = "6",
+  $update_version = "45",
   $is64bit = true,
   $multiTenancy = undef
 ){
@@ -20,18 +20,18 @@ define java::ubuntu(
   }
 
     #create name of java deb file
-    $jdk = "oracle-java${$version}-jdk_${$version}u${$updateVersion}_${platform}-${::operatingsystem}_${::operatingsystemmajrelease}.deb"
+    $jdk = "oracle-java${major_version}-jdk_${major_version}u${update_version}_${platform}-${::operatingsystem}_${::operatingsystemmajrelease}.deb"
     #Java deb format example oracle_java8-jdk_8u112_amd64-Ubuntu_15.10.deb
     
     if $::operatingsystemmajrelease == "15.10" {
       notify{"We're on Ubuntu wiley trying to use Java package ${jdk}":}
  
       if ($multiTenancy){
-        notify{"Java ${version}":
+        notify{"Java ${major_version}":
           message => "Multi tenancy JVMs allowed"
         }
       } else {
-        notify{"Java ${version}":
+        notify{"Java ${major_version}":
           message => "Multi tenancy JVMs not supported"
         }
       
@@ -42,7 +42,7 @@ define java::ubuntu(
         }   
       
         package {
-          $versionsToRemove["${version}"]:
+          $versionsToRemove["${major_version}"]:
           ensure      => "purged",
           provider    =>  'dpkg',
         }
@@ -67,7 +67,7 @@ define java::ubuntu(
 
       #Clear any previous update versions
       package {
-      "oracle-java${version}-jdk":
+      "oracle-java${major_version}-jdk":
         ensure      => "purged",
         provider    =>  'dpkg',
       }
@@ -79,7 +79,7 @@ define java::ubuntu(
         source      =>  "${local_install_dir}${jdk}",
         require     =>  [
           File["${jdk}"],
-          Package["oracle-java${version}-jdk"]]
+          Package["oracle-java${major_version}-jdk"]]
       }
     }
 }

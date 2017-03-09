@@ -1,272 +1,331 @@
-# Class: jekyll
-#
-# This module manages jekyll
-#
-# Parameters: none
-#
-# Actions:
-#
-# Requires: see Modulefile
-#
-# Sample Usage:
-#
-class jekyll {
-  notify {
-    "Jekyll and Hyde":
-  }
+class jekyll::gem (
+  $blog_source_directory = "/blog/",
+  $blog_output_directory = "/published_blog/",
+  $blog_host_address = "192.168.33.25",
+  $showDrafts = "false",
+) {
+  #gem install -i tmp jekyll -v 3.3.1
+  #tmp/cache/*.gem
+  #gem install -f --local /vagrant/files/*.gem
+  
+  #ubuntu/wily (15.10)
+  #Ruby version 2.1.5p273
+  #Check the gem addressable (for example) is installed locally
+  #gem list addressable 
+  
+  #Perform ubuntu 15.10 check
+  #Perform ruby check
+  #Perform rubygems check
+  
+  #Start server
+  #jekyll serve --host 192.168.33.24 -s /blog/ -d /published_blog/ --watch --drafts --force_polling --detach
+  #Kill server
+  #Server detached with pid '1933'. Run `pkill -f jekyll' or `kill -9 1933' to stop the server.
   
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/jekyll/"
   
+  if ("${operatingsystem}" == "Ubuntu"){
+    if ("${operatingsystemmajrelease}" == "15.10"){
+      notify{"Installing Jekyll for ${operatingsystem} ${operatingsystemmajrelease}":}
+    } else {
+      fail("The version ${operatingsystemmajrelease} of ${operatingsystem} is not supported")
+    }
+  } else {
+    fail("${operatingsystem} is not supported")
+  }
+  
   file {"${local_install_dir}":
     ensure => directory,
   }
   
-  $ruby_version = "1.8.7.374-4"
-  $ruby_file = "ruby-${ruby_version}.el6_6.x86_64.rpm"
-  $ruby_libs_version = "1.8.7.374-4"
-  $ruby_libs_file = "ruby-libs-${ruby_version}.el6_6.x86_64.rpm"
+  $addressable_gem_file = "addressable-2.5.0.gem"
+  file {"${addressable_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${addressable_gem_file}",
+    source => "puppet:///${puppet_file_dir}${addressable_gem_file}",
+  }
   
-  $python_libs_version = "2.6.6-64"
-  $python_libs_file = "python-libs-${python_libs_version}.el6.x86_64.rpm"
+  package { 'addressable':
+    source => "${local_install_dir}${addressable_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
   
-  $python_version = "2.6.6-64"
-  $python_file = "python-${python_version}.el6.x86_64.rpm"
-  
-  $glibc_i686_file = "glibc-2.12-1.166.el6.i686.rpm"
-  $glibc_x64_file = "glibc-2.12-1.166.el6_7.3.x86_64.rpm"
-
-  $rubygem_version = "1.3.7-5"
-  $rubygem_file = "rubygems-${rubygem_version}.el6.noarch.rpm"
-
-  $node_ver = "node-v4.2.0-linux-x64"
-  $node_file_tar = "${node_ver}.tar"
-  $node_file_gzip = "${node_file_tar}.gz"
-
-  $patch_version = "3"
-  $minor_version = "0"
-  $major_version = "3"
-  $jekyll_version = "jekyll-${major_version}.${minor_version}.${patch_version}"
-  $jekyll_file_zip = "${jekyll_version}.zip"
-/*
-  file {"${$local_install_dir}${ruby_libs_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${ruby_libs_file}",
+  $colorator_gem_file = "colorator-1.1.0.gem"
+  file {"${colorator_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${colorator_gem_file}",
+    source => "puppet:///${puppet_file_dir}${colorator_gem_file}",
+  }
+  package { 'colorator':
+    source => "${local_install_dir}${colorator_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
   }
 
-  package {"ruby-libs":
-    source => "${$local_install_dir}${ruby_libs_file}",
-    provider => "rpm",
-    ensure => present,
-#    ensure => "${ruby_libs_version}"
+  $ffi_gem_file = "ffi-1.9.14.gem"
+  file {"${ffi_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${ffi_gem_file}",
+    source => "puppet:///${puppet_file_dir}${ffi_gem_file}",
+  }
+  package { 'ffi':
+    source => "${local_install_dir}${ffi_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
   }
   
-  file {"${$local_install_dir}${ruby_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${ruby_file}",
-    require => File["${$local_install_dir}${ruby_libs_file}"]
+  $forwardable_extended_gem_file = "forwardable-extended-2.6.0.gem"
+  file {"${forwardable_extended_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${forwardable_extended_gem_file}",
+    source => "puppet:///${puppet_file_dir}${forwardable_extended_gem_file}",
   }
- 
-  #1.8.7 is the default for centos 6.6-64
-  package {"ruby":
-    source => "${$local_install_dir}${ruby_file}",
-    provider => "rpm",
-    ensure => present,
-#    ensure => "${ruby_version}",
-  }
-  #requires ruby-libs 1.8.7.374-4.el6_6
-  
-  */ 
-/*  
-repoquery --require --resolve ruby
-ruby-0:1.8.7.374-4.el6_6.x86_64
-glibc-0:2.12-1.166.el6.i686
-ruby-libs-0:1.8.7.374-4.el6_6.i686
-ruby-libs-0:1.8.7.374-4.el6_6.x86_64
-glibc-0:2.12-1.166.el6_7.3.x86_64
-*/
-
-/*
-  file { "${local_install_dir}${glibc_i686_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${glibc_i686_file}"
+  package { 'forwardable-extended':
+    source => "${local_install_dir}${forwardable_extended_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
   }
 
-  package {"${glibc_i686_file}":
-    source => "${local_install_dir}${glibc_i686_file}",
-    provider => "rpm",
-    ensure => present,
+  $jekyll_gem_file = "jekyll-3.3.1.gem"
+  file {"${jekyll_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${jekyll_gem_file}",
+    source => "puppet:///${puppet_file_dir}${jekyll_gem_file}",
   }
-*/
-  #Need to try these installers without the fixed package names to see if we have all possible dependencies
-
-  file {"${$local_install_dir}${python_libs_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${python_libs_file}",  
-  }
-  
-  package {"python-libs":
-    source => "${$local_install_dir}${python_libs_file}",
-    provider => "rpm",
-#    ensure => "{$python_libs_version}",
-    ensure => present,
-    require => File["${$local_install_dir}${python_libs_file}"] 
-  }
-
-  file {"${$local_install_dir}${python_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${$python_file}",
-  } 
-
-  package {"python":
-    source => "${$local_install_dir}${python_file}",
-    provider => "rpm",
-#    ensure => "${python_version}",
-    ensure => present,
-    require => [File["${$local_install_dir}${python_file}"],
-      Package["python-libs"]]
-#      Package["glibc"]]
-  }
-  #requires python-libs(x86-64) = 2.6.6-64.el6
-  #Supplied already apparently
-/*
-repoquery --require --resolve python
-python-0:2.6.6-64.el6.x86_64
-glibc-0:2.12-1.166.el6.i686
-python-libs-0:2.6.6-64.el6.x86_64
-glibc-0:2.12-1.166.el6_7.3.x86_64
-*/   
-/*     
-  file {"${$local_install_dir}${rubygem_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${$rubygem_file}",  
-  }
-  
-  package {"rubygems":
-    source => "${local_install_dir}${rubygem_file}",
-    provider => "rpm",
-    ensure => present,
-#    ensure => "${rubygem_version}"
-  }
-*/
-/*
-  file {"${$local_install_dir}${node_file_gzip}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${node_file_gzip}"]  
-  }
-  
-  exec{"gunzip of node":
-    cwd => "/bin/",
-    path => "/bin/",
-    command => "gunzip -dc ${local_install_dir}${node_file_gzip} > ${local_install_dir}${node_file_tar}",
-    require => File["${$local_install_dir}${node_file_gzip}"]
+  package { 'jekyll':
+    source => "${local_install_dir}${jekyll_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+    install_options => ["--force"],
+    require => [
+      Package["addressable"],
+      Package["colorator"],
+      Package["ffi"],
+      Package["forwardable-extended"],
+      Package["jekyll-sass-converter"],
+      Package["jekyll-watch"],
+      Package["kramdown"],
+      Package["liquid"],
+      Package["listen"],
+      Package["mercenary"],
+      Package["pathutil"],
+      Package["public_suffix"],
+      Package["rb-fsevent"],
+      Package["rb-inotify"],
+      Package["rouge"],
+      Package["safe_yaml"],
+      Package["sass"],
+      Package["sass-listen"],
+    ]
   }
 
-  #Move node to /bin/ folder
-  exec {"tar decompression of node":
-    cwd => "/bin/",
-    path => "/bin/",
-    command => "tar -xf ${local_install_dir}${node_file_tar}",
-    require => Exec["gunzip of node"]
+  $jekyll_sass_converter_gem_file = "jekyll-sass-converter-1.5.0.gem"
+  file {"${jekyll_sass_converter_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${jekyll_sass_converter_gem_file}",
+    source => "puppet:///${puppet_file_dir}${jekyll_sass_converter_gem_file}",
   }
-  #link to the node install
-  #sudo ln -s /etc/puppet/installers/node-v4.2.0-linux-x64/bin/node /bin/node
+  package { 'jekyll-sass-converter':
+    source => "${local_install_dir}${jekyll_sass_converter_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $jekyll_watch_gem_file = "jekyll-watch-1.5.0.gem"
+  file {"${jekyll_watch_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${jekyll_watch_gem_file}",
+    source => "puppet:///${puppet_file_dir}${jekyll_watch_gem_file}",
+  }
+  package { 'jekyll-watch':
+    source => "${local_install_dir}${jekyll_watch_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $kramdown_gem_file = "kramdown-1.13.2.gem"
+  file {"${kramdown_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${kramdown_gem_file}",
+    source => "puppet:///${puppet_file_dir}${kramdown_gem_file}",
+  }
+  package { 'kramdown':
+    source => "${local_install_dir}${kramdown_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $liquid_gem_file = "liquid-3.0.6.gem"
+  file {"${liquid_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${liquid_gem_file}",
+    source => "puppet:///${puppet_file_dir}${liquid_gem_file}",
+  }
+  package { 'liquid':
+    source => "${local_install_dir}${liquid_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $listen_gem_file = "listen-3.0.8.gem"
+  file {"${listen_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${listen_gem_file}",
+    source => "puppet:///${puppet_file_dir}${listen_gem_file}",
+  }
+  package { 'listen':
+    source => "${local_install_dir}${listen_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $mercenary_gem_file = "mercenary-0.3.6.gem"
+  file {"${mercenary_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${mercenary_gem_file}",
+    source => "puppet:///${puppet_file_dir}${mercenary_gem_file}",
+  }
+  package { 'mercenary':
+    source => "${local_install_dir}${mercenary_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $pathutil_gem_file = "pathutil-0.14.0.gem"
+  file {"${pathutil_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${pathutil_gem_file}",
+    source => "puppet:///${puppet_file_dir}${pathutil_gem_file}",
+  }
+  package { 'pathutil':
+    source => "${local_install_dir}${pathutil_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $public_suffix_gem_file = "public_suffix-2.0.5.gem"
+  file {"${public_suffix_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${public_suffix_gem_file}",
+    source => "puppet:///${puppet_file_dir}${public_suffix_gem_file}",
+  }
+  package { 'public_suffix':
+    source => "${local_install_dir}${public_suffix_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $rb_fsevent_gem_file = "rb-fsevent-0.9.8.gem"
+  file {"${rb_fsevent_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${rb_fsevent_gem_file}",
+    source => "puppet:///${puppet_file_dir}${rb_fsevent_gem_file}",
+  }
+  package { 'rb-fsevent':
+    source => "${local_install_dir}${rb_fsevent_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $rb_inotify_gem_file = "rb-inotify-0.9.7.gem"
+  file {"${rb_inotify_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${rb_inotify_gem_file}",
+    source => "puppet:///${puppet_file_dir}${rb_inotify_gem_file}",
+  }
+  package { 'rb-inotify':
+    source => "${local_install_dir}${rb_inotify_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $rouge_gem_file = "rouge-1.11.1.gem"
+  file {"${rouge_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${rouge_gem_file}",
+    source => "puppet:///${puppet_file_dir}${rouge_gem_file}",
+  }
+  package { 'rouge':
+    source => "${local_install_dir}${rouge_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $safe_yaml_gem_file = "safe_yaml-1.0.4.gem"
+  file {"${safe_yaml_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${safe_yaml_gem_file}",
+    source => "puppet:///${puppet_file_dir}${safe_yaml_gem_file}",
+  }
+  package { 'safe_yaml':
+    source => "${local_install_dir}${safe_yaml_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $sass_gem_file = "sass-3.5.0.pre.rc.1.gem"
+  file {"${sass_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${sass_gem_file}",
+    source => "puppet:///${puppet_file_dir}${sass_gem_file}",
+  }
+  package { 'sass':
+    source => "${local_install_dir}${sass_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  $sass_listen_gem_file = "sass-listen-3.0.7.gem"
+  file {"${sass_listen_gem_file}":
+    ensure => present, 
+    path => "${local_install_dir}${sass_listen_gem_file}",
+    source => "puppet:///${puppet_file_dir}${sass_listen_gem_file}",
+  }
+  package { 'sass-listen':
+    source => "${local_install_dir}${sass_listen_gem_file}",
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
+  if ("${showDrafts}" == "true"){
+    $drafts = "--drafts"
+  } else {
+    $drafts = ""
+  }
   
-  */
-/*
-  #Install rake so that we can build bundler
-  $rake_gem = "rake-10.5.0.gem"
-  file {"${local_install_dir}${rake_gem}":
+  file{"stop-jekyll-script":
     ensure => present,
-    mode => 777,
-    source => ["puppet:///${puppet_file_dir}${$rubygem_file}"] 
+    path => "${local_install_dir}stop-jekyll.sh",
+    source => "puppet:///${puppet_file_dir}stop-jekyll.sh",
   }
-  
-  #Install bundler so that we can build jekyll
-  $bundler_gem =  "bundler-1.11.2.gem"
-  file {"${local_install_dir}${bundler_gem}":
-     ensure => present,
-     mode => 777,
-     source => ["puppet:///${puppet_file_dir}${bundler_gem}"]
-  }
-  */
-  #chmod /usr/bin and /usr/lib to install bundler as non-root
-  
-  #Unzip jekyll  
-  file {"${local_install_dir}${jekyll_file_zip}":
-    ensure => present,
-    mode => 777,
-    source => ["puppet:///${puppet_file_dir}${jekyll_file_zip}"],
-  }
-  
-  exec {"unzip jekyll":
-    cwd => "/usr/bin/",
+#SIGTERM causes issues, try this as a script instead
+  exec {"stop-jekyll":
     path => "/usr/bin/",
-    command => "unzip -o ${local_install_dir}${jekyll_file_zip}",
-    require => File["${local_install_dir}${jekyll_file_zip}"]
+    command => "${local_install_dir}stop-jekyll.sh",
+    require => File["stop-jekyll-script"],
+    onlyif => "/bin/ps -aux | /bin/grep jekyll | /bin/grep -v grep",
+    returns => [143,1],
+  
   }
-  
-  #bundler is required before jekyll can be run, this is built using  
-  #Need to check out bundler from the git repository and build it
-  #git clone git://github.com/carlhuda/bundler.git
-  #cd bundler
-  #rake install
-
-  #cd jekyll
-  #sh script/bootstrap
-  #exec script/bootstrap
-  #bundle exec rake build
-  #ls pkg/*.gem | head -n 1 | xargs gem install -l
-  
-  #bundle is provided by ruby on rails
-  #Ruby 2.2.3
-  #Ruby Gems 2.4.8
-  #Node 4.2.0
-  #Python
-  
-  $ruby_archive = "ruby-2.3.0.tar.gz"
-  file {"${local_install_dir}${ruby_archive}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${ruby_archive}"]
+  exec {"start-jekyll-server":
+    path => "/usr/local/bin/",   
+    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} --force_polling &",
+    require => Package["jekyll"],
   }
+#exec
+#jekyll serve --host 192.168.33.25 -s /blog/ -d /published_blog/ --watch --drafts --force_polling
 
-  $ruby_gem_archive = "rubygems-2.6.0.tar.gz"
-  file {"${local_install_dir}${ruby_gem_archive}":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}${ruby_gem_archive}"]
-  }
+#get pid of jekyll
+#ps -aux | grep jekyll | grep -v grep | awk '{ print $2 }'
+#Kill jekyll
+#pkill -f jekyll
 
-  file {"${local_install_dir}ruby.sh":
-    ensure => present,
-    source => ["puppet:///${puppet_file_dir}ruby.sh"]
-  }
+#Serve can take any args that build can
+#jekyll build --watch --drafts --force_polling
 
-  #install ruby and rubygems
-/* 
-  exec {"run ruby.sh":
-    cwd => "/usr/bin/",
-    path => "/usr/bin/",
-    command => "sudo sh /etc/puppet/installers/ruby.sh",
-  }  
-*/
-  #Unzip the ruby.tar.gz
-  #tar xvzf ruby.tar.gz
-  #chmod 777 -R ruby
-  #cd ruby
-  #./configure
-  #make
-  #sudo make install
-  
-  #sudo tar xvzf rubygems.tar.gz
-  #cd rubygems
-  #sudo ruby setup.rb
-  
-  #try using RVM to update ruby
-  #sudo gem install ffi*.gem -> requires the ruby devel headers
-  #sudo gem install rb-inotify*.gem
-  #sudo gem install listen*.gem
-  #sudo gem install jekyll-watch*.gem
-  #sudo gem install jekyll.gem
+#Note serve's --detach option breaks incremental builds
 
 }

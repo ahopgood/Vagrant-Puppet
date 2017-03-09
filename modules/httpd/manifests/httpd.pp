@@ -11,9 +11,9 @@ Package{
     ensure     =>  directory,
   } 
 
-  class { "iptables": 
-    port => "80", 
-  }
+#  class { "iptables": 
+#    port => "80", 
+#  }
   
   class { "httpd": }
   ->

@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
-find . \( -name '*.deb' -o -name '*.rpm' \) -exec cp --parents {\} $1 \;
+# This script is for copying the .rpm and .deb installer files from the puppet modules to a specified directory.
+# Makes use of the 'find' command to scour the modules/{module_name}/files/{os}/{version}/ directory structure
 
-# Java 8 creates a new package for every update version, they get installed side by side
-# remove old versions of Java 8
-# sudo rpm -e $(ls -1 /usr/java/ | grep jdk)
-# sudo rpm -e $(ls -1 /usr/java/ | grep "jdk1.8.*")
-# sudo rpm -e $(rpm -q jdk1.8*)
 
-# Remove old versions of Java 7
-# sudo rpm -e $(rpm -q jdk-1.7*)
+#$1 is the location to copy to
+if [ -z "$1" -o ! -d "$1" ]; then
+	echo "Search directory [$1] is null or doesn't exist, please enter a search directory"
+	exit 1
+#elif [ -z "$2" -o ! -d "$2" ]; then
+#	echo "Target directory [$2] is null or doesn't exist, please enter a target directory"
+#	exit 1
+else
+	#echo "Searching directory $1"
+	echo "Transferring to target directory $1"
+	find . \( -name '*.deb' -o -name '*.rpm' -o -name '*.tar.gz' -o -name '*.zip' \) -exec cp --parents {\} "$1" \;
+fi
