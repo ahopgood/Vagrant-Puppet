@@ -42,18 +42,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "CentOS_7_test" do |centos7|
   	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
+    centos7.vm.network "private_network", ip: "192.168.33.27"
   	centos7.vm.box_version = "1.0.1"
   	centos7.vm.box_check_update = false
   end
 
   config.vm.define "CentOS_6_test" do |centos6|
   	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
+    centos6.vm.network "private_network", ip: "192.168.33.26"
   	centos6.vm.box_version = "1.0.1"
   	centos6.vm.box_check_update = false
   end
 
   config.vm.define "Ubuntu_15_test" do |ubuntu|
-    ubuntu.vm.network "private_network", ip: "192.168.33.15"
+    ubuntu.vm.network "private_network", ip: "192.168.33.25"
     ubuntu.vm.box = "ubuntu/wily64"
     ubuntu.vm.box_check_update = false
   end
