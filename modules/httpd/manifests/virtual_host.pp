@@ -1,6 +1,7 @@
 define httpd::virtual_host(
   $server_name = undef,
   $document_root = undef,
+  $server_alias = undef,
 ){
 
   #Add error logs
@@ -30,7 +31,7 @@ define httpd::virtual_host(
     $httpd_conf_location = "/etc/apache2/apache2.conf"
     $sites_available_location = "/etc/apache2/sites-available/"
     $sites_enabled_location = "/etc/apache2/sites-enabled/"
-#    $conf_file_name = "apache2"
+
     $conf_file_name = "${server_name}"
     $httpd_package_name = "apache2"
 
@@ -49,11 +50,6 @@ define httpd::virtual_host(
   }
 
   if (versioncmp("${httpd_major_version}.${httpd_minor_version}","2.4") == 0) {
-#      $httpd_conf_location = "/etc/httpd/conf/httpd.conf"
-#      $sites_available_location = "/etc/httpd/sites-available/"
-#      $sites_enabled_location = "/etc/httpd/sites-enabled/"
-#      $conf_file_name = "${server_name}"
-
       #Using apache 2.4.x
       #Use augeas to add the following to the /etc/httpd/conf/httpd.conf file if not present
       #IncludeOptional sites-enabled/*.conf
@@ -111,10 +107,12 @@ define httpd::virtual_host(
         "set VirtualHost/directive[2] ServerName",
         "set VirtualHost/directive[2]/arg ${server_name}",
       ]
+      #Add server alias
+      $virtual_host_server_alias_changes = [
+        "set VirtualHost/directive[3] ServerAlias",
+        "set VirtualHost/directive[3]/arg ${server_alias}",
+      ]
     } elsif (versioncmp("${httpd_major_version}.${httpd_minor_version}","2.2") == 0) {
-#      $httpd_conf_location = "/etc/httpd/conf/httpd.conf"
-#      $sites_available_location = "/etc/httpd/conf/"
-#      $conf_file_name = "httpd"
       #Add Document Root
       $virtual_host_document_root_changes = [
         "set VirtualHost[last()+1]/arg *:80",
@@ -125,6 +123,12 @@ define httpd::virtual_host(
       $virtual_host_server_name_changes = [
         "set VirtualHost[last()]/directive[2] ServerName",
         "set VirtualHost[last()]/directive[2]/arg ${server_name}",
+      ]
+
+      #Add server alias
+      $virtual_host_server_alias_changes = [
+        "set VirtualHost[last()]/directive[3] ServerAlias",
+        "set VirtualHost[last()]/directive[3]/arg ${server_alias}",
       ]
     } else {
       fail("${operatingsystem} ${operatingsystemmajrelease} not currently supported")
