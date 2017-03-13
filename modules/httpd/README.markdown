@@ -187,15 +187,20 @@ This will only work if the headers module is installed.
 Required parameters:  
 * server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
 * document_root - the location of the web resources you will be serving via your virtual host
+* server_alias - an array of strings that represent the server aliase
 
 This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
 The document root / web page assets are not instantiated through this definition, you create those elsewhere however you want.
-
+A list of server aliases can be used to setup separate `ServerAlias` entries in the configuration file for a site.
 ### Support
 * CentOS 7
+* CentOS 6
+* Ubuntu 15.10
 
 ### ToDo
-* Add support for alias names
+* Add support for error log
+* Add support for custom log
+* SSL support
 
 ## ToDo
 * Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
@@ -204,7 +209,7 @@ The document root / web page assets are not instantiated through this definition
 	* Ubuntu - 2.4.12
 * Ubuntu support
 * Raspberian support
-* Virtual Host configuration
+* **done** Virtual Host configuration
 * SSL Configuration
 * Custom error pages; 404, 401, 403, 500 etc
 * Removal of Operating System information from error pages 
