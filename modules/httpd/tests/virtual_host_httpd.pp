@@ -15,7 +15,7 @@ Package{
   httpd::virtual_host{"test":
     server_name => "www.alexander.com",
     document_root => "/var/www/alexander/",
-    server_alias => ["alexander.com","@alexander.com"]
+    server_alias => ["alexander.com","alexander.net"]
   }
   ->
   file {"/var/www/alexander/":

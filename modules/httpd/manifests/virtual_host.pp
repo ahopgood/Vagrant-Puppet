@@ -99,37 +99,38 @@ define httpd::virtual_host(
       #Add Document Root
       $virtual_host_document_root_changes = [
         "set VirtualHost/arg *:80",
-        "set VirtualHost/directive[1] DocumentRoot",
-        "set VirtualHost/directive[1]/arg ${document_root}",
+        "set VirtualHost/directive[last()+1] DocumentRoot",
+        "set VirtualHost/directive[last()]/arg ${document_root}",
       ]
       #Add server name
       $virtual_host_server_name_changes = [
-        "set VirtualHost/directive[2] ServerName",
-        "set VirtualHost/directive[2]/arg ${server_name}",
+        "set VirtualHost/directive[last()+1] ServerName",
+        "set VirtualHost/directive[last()]/arg ${server_name}",
       ]
-      #Add server alias
-      $virtual_host_server_alias_changes = [
-        "set VirtualHost/directive[3] ServerAlias",
-        "set VirtualHost/directive[3]/arg ${server_alias}",
-      ]
+    
+#      #Add server alias
+#      $virtual_host_server_alias_changes = [
+#        "set VirtualHost/directive[3] ServerAlias",
+#        "set VirtualHost/directive[3]/arg ${alias}",
+#      ]
     } elsif (versioncmp("${httpd_major_version}.${httpd_minor_version}","2.2") == 0) {
       #Add Document Root
       $virtual_host_document_root_changes = [
         "set VirtualHost[last()+1]/arg *:80",
-        "set VirtualHost[last()]/directive[1] DocumentRoot",
-        "set VirtualHost[last()]/directive[1]/arg ${document_root}",
+        "set VirtualHost[last()]/directive[last()+1] DocumentRoot",
+        "set VirtualHost[last()]/directive[last()]/arg ${document_root}",
       ]
       #Add server name
       $virtual_host_server_name_changes = [
-        "set VirtualHost[last()]/directive[2] ServerName",
-        "set VirtualHost[last()]/directive[2]/arg ${server_name}",
+        "set VirtualHost[last()]/directive[last()+1] ServerName",
+        "set VirtualHost[last()]/directive[last()]/arg ${server_name}",
       ]
 
       #Add server alias
-      $virtual_host_server_alias_changes = [
-        "set VirtualHost[last()]/directive[3] ServerAlias",
-        "set VirtualHost[last()]/directive[3]/arg ${server_alias}",
-      ]
+#      $virtual_host_server_alias_changes = [
+#        "set VirtualHost[last()]/directive[3] ServerAlias",
+#        "set VirtualHost[last()]/directive[3]/arg ${alias}",
+#      ]
     } else {
       fail("${operatingsystem} ${operatingsystemmajrelease} not currently supported")
     }
@@ -145,7 +146,15 @@ define httpd::virtual_host(
       require => Package["${httpd_package_name}"]
     }
 
-    #Add server name
+  httpd::virtual_host::server_alias{$server_alias:
+    sites_available_location => $sites_available_location,
+    sites_enabled_location => $sites_enabled_location,
+    conf_file_name => $conf_file_name,
+    server_name => $server_name,
+    before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
+  }
+
+  #Add server name
     augeas { "${server_name}.conf VirtualHost ServerName setup":
       incl    => "${sites_available_location}${conf_file_name}.conf",
       lens    => "Httpd.lns",
@@ -156,3 +165,23 @@ define httpd::virtual_host(
     }
 }
 
+define httpd::virtual_host::server_alias($alias = $title,
+  $sites_available_location,
+  $sites_enabled_location,
+  $conf_file_name,
+  $server_name,
+){
+#  notify{"in server alias ${alias}":}
+  #Add server Alias name
+  augeas { "${server_name}.conf VirtualHost ServerAlias  ${alias} setup":
+    incl    => "${sites_available_location}${conf_file_name}.conf",
+    lens    => "Httpd.lns",
+    context => "/files${sites_available_location}${conf_file_name}.conf/",
+    changes => [
+      "set VirtualHost[last()]/directive[last()+1] ServerAlias",
+      "set VirtualHost[last()]/directive[last()]/arg ${alias}",
+    ],
+    onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerAlias']/arg[. = '${alias}'] size == 0",
+#   notify => Service["${httpd_package_name}"]
+  }
+}
