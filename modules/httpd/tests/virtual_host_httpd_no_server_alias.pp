@@ -19,7 +19,6 @@ Package{
   ->
   file {"/var/www/alexander/":
     ensure => directory,
-    #    require => Class["httpd"]
   }
   ->
   file {"/var/www/alexander/index.html":

@@ -107,12 +107,6 @@ define httpd::virtual_host(
         "set VirtualHost/directive[last()+1] ServerName",
         "set VirtualHost/directive[last()]/arg ${server_name}",
       ]
-    
-#      #Add server alias
-#      $virtual_host_server_alias_changes = [
-#        "set VirtualHost/directive[3] ServerAlias",
-#        "set VirtualHost/directive[3]/arg ${alias}",
-#      ]
     } elsif (versioncmp("${httpd_major_version}.${httpd_minor_version}","2.2") == 0) {
       #Add Document Root
       $virtual_host_document_root_changes = [
@@ -125,12 +119,6 @@ define httpd::virtual_host(
         "set VirtualHost[last()]/directive[last()+1] ServerName",
         "set VirtualHost[last()]/directive[last()]/arg ${server_name}",
       ]
-
-      #Add server alias
-#      $virtual_host_server_alias_changes = [
-#        "set VirtualHost[last()]/directive[3] ServerAlias",
-#        "set VirtualHost[last()]/directive[3]/arg ${alias}",
-#      ]
     } else {
       fail("${operatingsystem} ${operatingsystemmajrelease} not currently supported")
     }
@@ -145,7 +133,7 @@ define httpd::virtual_host(
       before => Augeas["${server_name}.conf VirtualHost ServerName setup"],
       require => Package["${httpd_package_name}"]
     }
-
+->
   httpd::virtual_host::server_alias{$server_alias:
     sites_available_location => $sites_available_location,
     sites_enabled_location => $sites_enabled_location,
@@ -153,7 +141,7 @@ define httpd::virtual_host(
     server_name => $server_name,
     before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
   }
-
+->
   #Add server name
     augeas { "${server_name}.conf VirtualHost ServerName setup":
       incl    => "${sites_available_location}${conf_file_name}.conf",
@@ -171,17 +159,21 @@ define httpd::virtual_host::server_alias($alias = $title,
   $conf_file_name,
   $server_name,
 ){
-#  notify{"in server alias ${alias}":}
-  #Add server Alias name
-  augeas { "${server_name}.conf VirtualHost ServerAlias  ${alias} setup":
-    incl    => "${sites_available_location}${conf_file_name}.conf",
-    lens    => "Httpd.lns",
-    context => "/files${sites_available_location}${conf_file_name}.conf/",
-    changes => [
-      "set VirtualHost[last()]/directive[last()+1] ServerAlias",
-      "set VirtualHost[last()]/directive[last()]/arg ${alias}",
-    ],
-    onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerAlias']/arg[. = '${alias}'] size == 0",
-#   notify => Service["${httpd_package_name}"]
+  if ("${alias}" == undef){
+    notify{"No alias defined":}
+  } else {
+    #  notify{"in server alias ${alias}":}
+    #Add server Alias name
+    augeas { "${server_name}.conf VirtualHost ServerAlias  ${alias} setup":
+      incl    => "${sites_available_location}${conf_file_name}.conf",
+      lens    => "Httpd.lns",
+      context => "/files${sites_available_location}${conf_file_name}.conf/",
+      changes => [
+        "set VirtualHost[last()]/directive[last()+1] ServerAlias",
+        "set VirtualHost[last()]/directive[last()]/arg ${alias}",
+      ],
+      onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerAlias']/arg[. = '${alias}'] size == 0",
+      #   notify => Service["${httpd_package_name}"]
+    }
   }
 }
