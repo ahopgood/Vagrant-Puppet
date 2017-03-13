@@ -18,7 +18,7 @@ password='00000000000000000000000000000000'
 @.altairbob.com,www.altairbob.com
 "
 
-test DDClientConf.lns get conf =
+test Ddclientconf.lns get conf =
 { "1"
     { "prootocol" = "namecheap" }
     { "use" = "web"

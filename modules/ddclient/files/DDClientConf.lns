@@ -1,9 +1,44 @@
 (* DDClient .conf module for Augeas *)
-module DDClientConf =
+
+module Ddclientconf =
 autoload xfm
 
-let lns = 
+(* define empty line *)
+let empty = Util.empty
+let equals = Util.del_str "="
+let eol = Util.del_str "\n"
+let value_to_eol = store /[^\n]*/
 
-let filter = incl "/var/ddclient.conf"
+let protocol = [ key "protocol" . equals . value_to_eol . eol ]
+let use = [ key "use" . equals . value_to_eol . eol ]
+(* web  web=blah *)
+
+let ssl = [ key "ssl" . equals . value_to_eol . eol ]
+(* yes or no *)
+
+let server = [ key "server" . equals . value_to_eol . eol ]
+let login = [ key "login" . equals . value_to_eol . eol ]
+let password = [ key "password" . equals . value_to_eol . eol ]
+
+(*
+let domain = [ value_to_eol ]
+let domains = domain
+            | domain key "," domain+
+*)
+let entries = protocol
+            | use
+            | ssl
+            | server
+            | login
+            | password
+
+let record = [ seq "record" . entries+ . eol ]
+
+(* define lens *)
+let lns = ( record | empty )*
+
+
+let filter = incl "/etc/ddclient.conf"
+           . Util.stdexcl
 
 let xfm = transform lns filter
