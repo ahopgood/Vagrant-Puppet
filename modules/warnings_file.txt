@@ -1,0 +1,5 @@
+Warning: alias is a metaparam; this value will inherit to all contained resources in the httpd::virtual_hosts::server_alias definition
+
+Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line 1036 in file /etc/puppet/modules/java/manifests/init.pp
+
+Warning: Not collecting exported resources without storeconfigs
