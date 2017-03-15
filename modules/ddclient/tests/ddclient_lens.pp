@@ -36,6 +36,13 @@
     require => File["/usr/share/augeas/lenses/tests/"]
   }
 
+  file {"/usr/share/augeas/lenses/tests/test_interim_ddclientconf.aug":
+    ensure => "link",
+    target => "/vagrant/files/test_interim_ddclientconf.aug",
+    require => File["/usr/share/augeas/lenses/tests/"]
+  }
+
+  #Link the lens file so it can be changed in situ
   file {"/usr/share/augeas/lenses/ddclientconf.aug":
     ensure => "link",
     target => "/vagrant/files/DDClientConf.lns",

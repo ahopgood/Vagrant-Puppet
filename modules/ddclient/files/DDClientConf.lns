@@ -6,25 +6,28 @@ autoload xfm
 (* define empty line *)
 let empty = Util.empty
 let equals = Util.del_str "="
-let eol = Util.del_str "\n"
-let value_to_eol = store /[^\n]*/
+let eol = Util.eol
+let value_to_eol = store Rx.space_in
 
-let protocol = [ key "protocol" . equals . value_to_eol . eol ]
+let simple_entry (kw:string) = [ key kw . equals . value_to_eol . eol ]
+
+let protocol = simple_entry "protocol"
 let use = [ key "use" . equals . value_to_eol . eol ]
 (* web  web=blah *)
 
-let ssl = [ key "ssl" . equals . value_to_eol . eol ]
+let ssl = simple_entry "ssl"
 (* yes or no *)
 
-let server = [ key "server" . equals . value_to_eol . eol ]
-let login = [ key "login" . equals . value_to_eol . eol ]
-let password = [ key "password" . equals . value_to_eol . eol ]
+let server = simple_entry "server"
+let login = simple_entry "login"
+let password = simple_entry "password"
 
 (*
 let domain = [ value_to_eol ]
 let domains = domain
             | domain key "," domain+
 *)
+
 let entries = protocol
             | use
             | ssl
@@ -32,10 +35,10 @@ let entries = protocol
             | login
             | password
 
-let record = [ seq "record" . entries+ . eol ]
+let record = [ seq "record" . entries+ ]
 
 (* define lens *)
-let lns = ( record | empty )*
+let lns = empty* . ( record . empty )* . record?
 
 
 let filter = incl "/etc/ddclient.conf"
