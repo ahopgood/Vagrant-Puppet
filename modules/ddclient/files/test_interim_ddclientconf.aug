@@ -6,7 +6,7 @@ ssl=yes
 server=dynamicdns.park-your-domain.com
 login=alexanderhopgood.com
 password='ffffffffffffffffffffffffffffffff'
-www.alexanderhopgood.com
+www.alexanderhopgood.com,@.alexanderhopgood.com,@.sub.alexanderhopgood.com
 
 protocol=namecheap
 use=web, web=dynamicdns.park-your-domain.com/getip
@@ -25,7 +25,7 @@ test Ddclientconf.lns get conf =
     { "server" = "dynamicdns.park-your-domain.com" }
     { "login" = "alexanderhopgood.com" } 
     { "password" = "'ffffffffffffffffffffffffffffffff'" }
-    { "domain" = "www.alexanderhopgood.com" } }
+    { "domain" = "www.alexanderhopgood.com,@.alexanderhopgood.com,@.sub.alexanderhopgood.com" } }
 {}
 { "2"
     { "protocol" = "namecheap" }
