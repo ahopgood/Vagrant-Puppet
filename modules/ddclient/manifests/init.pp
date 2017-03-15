@@ -10,8 +10,15 @@
 #
 # Sample Usage:
 #
-class ddclient{
-
+class ddclient(
+  $protocol = undef,
+  $use = undef,
+  $ssl = undef,
+  $server = undef,
+  $login = undef,
+  $password = undef,
+  $domain = undef,
+){
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/ddclient/"
 
@@ -163,21 +170,47 @@ class ddclient{
       require => Package["ddclient"]
     }
 
-    $entries = [
-    "set protocol namecheap",
-    "set use web, web=dynamicdns.park-your-domain.com/getip",
-    "set ssl yes",
-    "set server dynamicdns.park-your-domain.com",
-    "set login katherinemorley.net", 
-    "set password 'e8089f5428474eb29261337c54715f9d' @.katherinemorley.net,www.katherinemorley.net",
+  file {"/usr/share/augeas/lenses/dist/ddclientconf.aug":
+    ensure => "present",
+    source => "puppet:///${puppet_file_dir}DDClientConf.lns",
+    mode => 0777,
+    require => [Service["ddclient"]],
+  }
+
+  exec {"remove ddclient.conf":
+    path => "/usr/bin/",
+    command => "rm /etc/ddclient.conf",
+    require => [File["/usr/share/augeas/lenses/dist/ddclientconf.aug"]],
+    onlyif => "/usr/bin/ls /etc/ | /bin/grep ddclient"
+  }
+
+  file {"/etc/ddclient.conf":
+    ensure => present,
+    mode => 0777,
+    require => [Exec["remove ddclient.conf"]]
+  }
+  
+  #
+  $entries = [
+    "set 2/protocol ${protocol}",
+    "set 2/use \"${use}\"",
+    "set 2/ssl ${ssl}",
+    "set 2/server ${server}",
+    "set 2/login ${login}", 
+    "set 2/password \"'${password}'",
+    "set 2/domain ${domain}",
     ]
     
-#    augeas{ "add-entry":
-#      incl => "/etc/ddclient.conf",
-#      lens => "Simplevars.lns",
-#      context => "/files/etc/ddclient.conf/",
-#      changes => $entries,
-#    }
+    augeas{ "add-entry":
+      incl => "/etc/ddclient.conf",
+      lens => "Ddclientconf.lns",
+      context => "/files/etc/ddclient.conf/",
+      changes => $entries,
+      require => [Service["ddclient"],
+        File["/usr/share/augeas/lenses/dist/ddclientconf.aug"],
+        File["/etc/ddclient.conf"]]
+    }
+  
 #    set /augeas/load/Simplevars/lens/ Simplevars.lns
 #    set /augeas/load/Simplevars/incl/ /etc/ddclient.conf
     #  protocol=namecheap

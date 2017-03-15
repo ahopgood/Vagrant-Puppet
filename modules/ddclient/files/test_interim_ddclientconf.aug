@@ -14,7 +14,7 @@ ssl=yes
 server=dynamicdns.park-your-domain.com
 login=altairbob.com
 password='00000000000000000000000000000000'
-@.altairbob.com
+sub.domain.altairbob.com
 "
 
 test Ddclientconf.lns get conf =
@@ -34,4 +34,4 @@ test Ddclientconf.lns get conf =
     { "server" = "dynamicdns.park-your-domain.com" }
     { "login" = "altairbob.com" }
     { "password" = "'00000000000000000000000000000000'" }
-    { "domain" = "@.altairbob.com" } }
+    { "domain" = "sub.domain.altairbob.com" } }

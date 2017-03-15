@@ -23,7 +23,7 @@ let server = simple_entry "server"
 let login = simple_entry "login"
 let password = simple_entry "password"
 
-let domain = [ label "domain" . store /((\@|www).[a-zA-Z\.]+)(,(\@|www).[a-zA-Z\.]+)*/ . eol ]
+let domain = [ label "domain" . store /((\@|[a-zA-Z]+).[a-zA-Z\.]+)(,(\@|[a-zA-Z]+).[a-zA-Z\.]+)*/ . eol ]
 
 (*
 let domains = domain

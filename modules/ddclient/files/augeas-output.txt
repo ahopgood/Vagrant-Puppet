@@ -1,0 +1,9 @@
+/files/etc/ddclient.conf
+/files/etc/ddclient.conf/1
+/files/etc/ddclient.conf/1/protocol = "namecheap"
+/files/etc/ddclient.conf/1/use = "web, web=dynamicdns.park-your-domain.com/getip"
+/files/etc/ddclient.conf/1/ssl = "yes"
+/files/etc/ddclient.conf/1/server = "dynamicdns.park-your-domain.com"
+/files/etc/ddclient.conf/1/login = "alexanderhopgood.com"
+/files/etc/ddclient.conf/1/password = "'ffffffffffffffffffffffffffffffff'"
+/files/etc/ddclient.conf/1/domain = "www.alexanderhopgood.com,@.alexanderhopgood.com,@.sub.alexanderhopgood.com"
