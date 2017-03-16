@@ -10,80 +10,72 @@
 #
 # Sample Usage:
 #
-class ddclient(
-  $protocol = undef,
-  $use = undef,
-  $ssl = undef,
-  $server = undef,
-  $login = undef,
-  $password = undef,
-  $domains = undef,
-){
+class ddclient{
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/ddclient/"
 
   $major_version        = "3"
   $minor_version        = "8"
   $patch_version        = "3"
-  
+
   $OS = $operatingsystem
   $OS_version = $operatingsystemmajrelease
-  notify {"In ${OS} ${OS_version}":}
-  
+  notify { "In ${OS} ${OS_version}": }
+
   if (versioncmp("${OS}","Ubuntu") == 0){
     #    ddclient::ubuntu{"":}
     #    contain ddclient::ubuntu
 
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
-   } elsif (versioncmp("${OS}","CentOS") == 0){
+  } elsif (versioncmp("${OS}","CentOS") == 0){
     $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
     $provider = "rpm"
-    
+
     $perl_libs="perl-libs-5.16.3-291.el7.x86_64.rpm"
-    file {"${perl_libs}":
+    file { "${perl_libs}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_libs}",
-      path => "${local_install_dir}/${perl_libs}",
+      path   => "${local_install_dir}/${perl_libs}",
     }
 
     $perl_Time_HiRes="perl-Time-HiRes-1.9725-3.el7.x86_64.rpm"
-    file {"${perl_Time_HiRes}":
+    file { "${perl_Time_HiRes}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Time_HiRes}",
-      path => "${local_install_dir}/${perl_Time_HiRes}",
+      path   => "${local_install_dir}/${perl_Time_HiRes}",
     }
 
     $perl="perl-5.16.3-291.el7.x86_64.rpm"
-    file {"${perl}":
+    file { "${perl}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl}",
-      path => "${local_install_dir}/${perl}",
+      path   => "${local_install_dir}/${perl}",
     }
-    
-    package {["perl","perl-libs","perl_Time_HiRes"]:
-      source => ["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"],
-      ensure => ["5.16.3-291.el7","5.16.3-291.el7","1.9725-3.el7"],
-      provider => "${provider}",
-      require => [File["${perl}"],File["${perl_libs}"], File["${perl_Time_HiRes}"]],
+
+    package { ["perl","perl-libs","perl-Time-HiRes"]:
+      source          => ["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"],
+      ensure          => ["5.16.3-291.el7","5.16.3-291.el7","1.9725-3.el7"],
+      provider        => "${provider}",
+      require         => [File["${perl}"],File["${perl_libs}"], File["${perl_Time_HiRes}"]],
       install_options => "--force",
-      before => Package["ddclient"]
+      before          => Package["ddclient"]
     }
-    
+
     $perl_digest="perl-Digest-SHA1-2.13-9.el7.x86_64.rpm"
-    file {"${perl_digest}":
+    file { "${perl_digest}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_digest}",
-      path => "${local_install_dir}/${perl_digest}",
+      path   => "${local_install_dir}/${perl_digest}",
     }
 
 
-    package {"perl-Digest-SHA1":
-      source => "${local_install_dir}/${perl_digest}",
-      ensure => "2.13-9.el7",
+    package { "perl-Digest-SHA1":
+      source   => "${local_install_dir}/${perl_digest}",
+      ensure   => "2.13-9.el7",
       provider => "${provider}",
-      require => File["${perl_digest}"],
-      before => Package["ddclient"],
+      require  => File["${perl_digest}"],
+      before   => Package["ddclient"],
     }
 
     #Requires:
@@ -91,32 +83,32 @@ class ddclient(
     #   provider: perl-IO-Socket-IP.noarch 0.21-4.el7
 
     $perl_IO_Socket_IP = "perl-IO-Socket-IP-0.21-4.el7.noarch.rpm"
-    file {"${perl_IO_Socket_IP}":
+    file { "${perl_IO_Socket_IP}":
       ensure => present,
-      path => "${local_install_dir}/${perl_IO_Socket_IP}",
+      path   => "${local_install_dir}/${perl_IO_Socket_IP}",
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_IP}",
     }
 
-    package {"perl-IO-Socket-IP":
-      ensure => "0.21-4.el7",
+    package { "perl-IO-Socket-IP":
+      ensure   => "0.21-4.el7",
       provider => "${provider}",
-      source => "${local_install_dir}/${perl_IO_Socket_IP}",
-      require => File["${perl_IO_Socket_IP}"],
+      source   => "${local_install_dir}/${perl_IO_Socket_IP}",
+      require  => File["${perl_IO_Socket_IP}"],
     }
 
     #perl(Net::LibIDN) is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #   provider: perl-Net-LibIDN.x86_64 0.12-15.el7
     $perl_Net_LibIDN = "perl-Net-LibIDN-0.12-15.el7.x86_64.rpm"
-    file {"${perl_Net_LibIDN}":
+    file { "${perl_Net_LibIDN}":
       ensure => present,
-      path => "${local_install_dir}/${perl_Net_LibIDN}",
+      path   => "${local_install_dir}/${perl_Net_LibIDN}",
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_LibIDN}",
     }
-    package{"perl-Net-LibIDN":
-      ensure => "0.12-15.el7",
+    package{ "perl-Net-LibIDN":
+      ensure   => "0.12-15.el7",
       provider => "${provider}",
-      source => "${local_install_dir}/${perl_Net_LibIDN}",
-      require => File["${perl_Net_LibIDN}"]
+      source   => "${local_install_dir}/${perl_Net_LibIDN}",
+      require  => File["${perl_Net_LibIDN}"]
     }
 
 
@@ -124,25 +116,25 @@ class ddclient(
     #perl(Net::SSLeay) >= 1.21 is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #    provider: perl-Net-SSLeay.x86_64 1.55-3.el7
     $perl_Net_SSLeay = "perl-Net-SSLeay-1.55-4.el7.x86_64.rpm"
-    file {"${perl_Net_SSLeay}":
+    file { "${perl_Net_SSLeay}":
       ensure => present,
-      path => "${local_install_dir}/${perl_Net_SSLeay}",
+      path   => "${local_install_dir}/${perl_Net_SSLeay}",
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_SSLeay}",
     }
-    package{"perl-Net-SSLeay":
-      ensure => "1.55-4.el7",
+    package{ "perl-Net-SSLeay":
+      ensure   => "1.55-4.el7",
       provider => "${provider}",
-      source => "${local_install_dir}/${perl_Net_SSLeay}",
-      require => File["${perl_Net_SSLeay}"],
+      source   => "${local_install_dir}/${perl_Net_SSLeay}",
+      require  => File["${perl_Net_SSLeay}"],
     }
 
     $perl_IO_Socket_SSL="perl-IO-Socket-SSL-1.94-5.el7.noarch.rpm"
-    file {"${perl_IO_Socket_SSL}":
+    file { "${perl_IO_Socket_SSL}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_SSL}",
-      path => "${local_install_dir}/${perl_IO_Socket_SSL}",
+      path   => "${local_install_dir}/${perl_IO_Socket_SSL}",
     }
-    
+
     package { "perl-IO-Socket-SSL":
       source          => "${local_install_dir}/${perl_IO_Socket_SSL}",
       ensure          => "1.94-5.el7",
@@ -152,43 +144,70 @@ class ddclient(
     }
   }#end CentOS check
 
-    file{"${ddclient_file}":
-      ensure => present,
-      path => "${local_install_dir}/${ddclient_file}",
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${ddclient_file}",
-    }
-    
-    package {"ddclient":
-      ensure => present,
-      provider => "${provider}",
-      source => "${local_install_dir}/${ddclient_file}",
-      require => File["${ddclient_file}"],
-    }
-    
-    service {"ddclient":
-      ensure => running,
-      enable => true, 
-      require => Package["ddclient"]
-    }
+  file{ "${ddclient_file}":
+    ensure => present,
+    path   => "${local_install_dir}/${ddclient_file}",
+    source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${ddclient_file}",
+  }
 
-  file {"/usr/share/augeas/lenses/dist/ddclientconf.aug":
+  package { "ddclient":
+    ensure   => present,
+    provider => "${provider}",
+    source   => "${local_install_dir}/${ddclient_file}",
+    require  => File["${ddclient_file}"],
+  }
+
+  service { "ddclient":
+    ensure  => running,
+    enable  => true,
+    require => Package["ddclient"]
+  }
+
+  file { "/usr/share/augeas/lenses/dist/ddclientconf.aug":
     ensure => "present",
     source => "puppet:///${puppet_file_dir}DDClientConf.lns",
-    mode => 0777,
-#    require => [Service["ddclient"]],
+    mode   => 0777,
+    #    require => [Service["ddclient"]],
   }
 
-  exec {"remove ddclient.conf":
-    path => "/usr/bin/",
-    command => "rm /etc/ddclient.conf",
-    require => [File["/usr/share/augeas/lenses/dist/ddclientconf.aug"]],
-    onlyif => "/usr/bin/ls /etc/ | /bin/grep ddclient"
-  }
+#    set /augeas/load/Simplevars/lens/ Simplevars.lns
+#    set /augeas/load/Simplevars/incl/ /etc/ddclient.conf
+    #  protocol=namecheap
+#  use=web, web=dynamicdns.park-your-domain.com/getip
+#  ssl=yes
+#  server=dynamicdns.park-your-domain.com
+#  login=katherinemorley.net, password='e8089f5428474eb29261337c54715f9d' \
+#  @.katherinemorley.net,www.katherinemorley.net
 
-  file {"/etc/ddclient.conf":
-    ensure => present,
-    mode => 0777,
-    require => [Exec["remove ddclient.conf"]]
+    # Install lens file, where?
+    # Load lens
+}
+
+define ddclient::entry(
+  $protocol = undef,
+  $use = undef,
+  $ssl = undef,
+  $server = undef,
+  $login = undef,
+  $password = undef,
+  $domains = undef,
+  $remove_package_conf = false,
+){
+  if ($remove_package_conf == true){
+    exec {"remove ddclient.conf ${name}":
+      path => "/usr/bin/",
+      command => "rm /etc/ddclient.conf",
+      require => [File["/usr/share/augeas/lenses/dist/ddclientconf.aug"]],
+      onlyif => "/usr/bin/ls /etc/ | /bin/grep ddclient"
+    }
+
+    file {"/etc/ddclient.conf  ${name}":
+      path => "/etc/ddclient.conf",
+      ensure => present,
+      mode => 0777,
+      require => [Exec["remove ddclient.conf ${name}"]]
+    }
+
   }
   if ($protocol == undef){
     fail("A protocol is required to setup a ddclient entry")
@@ -223,37 +242,24 @@ class ddclient(
   #Need to add more granular error reporting for puppet
 
   $entries = [
-    "set 1/protocol ${protocol}",
-    "set 1/use \"${use}\"",
-    "set 1/ssl ${ssl}",
-    "set 1/server ${server}",
-    "set 1/login ${login}",
-    "set 1/password \"'${password}'",
-    "set 1/domain ${domains}",
+    "set entry[last()+1]/protocol ${protocol}",
+    "set entry[last()]/use \"${use}\"",
+    "set entry[last()]/ssl ${ssl}",
+    "set entry[last()]/server ${server}",
+    "set entry[last()]/login ${login}",
+    "set entry[last()]/password \"'${password}'",
+    "set entry[last()]/domain ${domains}",
   ]
 
-  augeas{ "add-entry":
+  augeas{ "add-entry ${name}":
     incl => "/etc/ddclient.conf",
     lens => "Ddclientconf.lns",
     context => "/files/etc/ddclient.conf/",
     changes => $entries,
     require => [
-      #        Service["ddclient"],
+      Service["ddclient"],
       File["/usr/share/augeas/lenses/dist/ddclientconf.aug"],
       File["/etc/ddclient.conf"]],
-    notify => Service["ddclient"],
+#    notify => Service["ddclient"],
   }
-
-
-#    set /augeas/load/Simplevars/lens/ Simplevars.lns
-#    set /augeas/load/Simplevars/incl/ /etc/ddclient.conf
-    #  protocol=namecheap
-#  use=web, web=dynamicdns.park-your-domain.com/getip
-#  ssl=yes
-#  server=dynamicdns.park-your-domain.com
-#  login=katherinemorley.net, password='e8089f5428474eb29261337c54715f9d' \
-#  @.katherinemorley.net,www.katherinemorley.net
-
-    # Install lens file, where?
-    # Load lens
 }

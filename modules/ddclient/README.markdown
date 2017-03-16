@@ -40,10 +40,14 @@ Installs ddclient to the following locations:
 ### CentOS6
 Command line service calls are as follows:  
 * `/etc/init.d/ddclient start`
+* `/etc/init.d/ddclient restart`
+* `/etc/init.d/ddclient stop`
 
 ### CentOS7
 Command line service calls are as follows:
 * `service ddclient start`
+* `service ddclient restart`
+* `service ddclient stop`
 
 ### <a href="CentOS_known_issues">Known issues</a>
 * 
@@ -138,6 +142,12 @@ an example would be:
   * Update support to include version 3.8.3 of ddclient as it provides multiple domain support
   * Create a section for the ddclient lens
 * Extract setup of ddclient entries to a define
+  * Test multiple declarations of entries 
 * Add comment support to the ddclient lens
+* Have lens setup in the ddclient class
 * Create a define section in `augeas` class for supporting writing of lenses.
 * Only run lens addition of ddclient entry if the entry doesn't already exist, unless changed.
+* Move perl pieces to separate module
+* Reset /etc/ddclient.conf permissions to something sensible (r+w owner only, ddclient owner & group)
+* Pull lens development support pieces into the augeas module
+* ddclient::entry name field used as the login unless specified otherwise
