@@ -1,6 +1,7 @@
 module Test_interim_ddclientconf =
 
-let conf ="protocol=namecheap
+let conf ="
+protocol=namecheap
 use=web, web=dynamicdns.park-your-domain.com/getip
 ssl=yes
 server=dynamicdns.park-your-domain.com
@@ -18,7 +19,8 @@ sub.domain.altairbob.com
 "
 
 test Ddclientconf.lns get conf =
-{ "1"
+{}
+{ "entry"
     { "protocol" = "namecheap" }
     { "use" = "web, web=dynamicdns.park-your-domain.com/getip" }
     { "ssl" = "yes" }
@@ -27,7 +29,7 @@ test Ddclientconf.lns get conf =
     { "password" = "'ffffffffffffffffffffffffffffffff'" }
     { "domain" = "www.alexanderhopgood.com,@.alexanderhopgood.com,@.sub.alexanderhopgood.com" } }
 {}
-{ "2"
+{ "entry"
     { "protocol" = "namecheap" }
     { "use" = "web, web=dynamicdns.park-your-domain.com/getip" }
     { "ssl" = "yes" }
