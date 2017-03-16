@@ -17,7 +17,7 @@ class ddclient(
   $server = undef,
   $login = undef,
   $password = undef,
-  $domain = undef,
+  $domains = undef,
 ){
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/ddclient/"
@@ -36,7 +36,7 @@ class ddclient(
 
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
-  } elsif (versioncmp("${OS}","CentOS") == 0){
+   } elsif (versioncmp("${OS}","CentOS") == 0){
     $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
     $provider = "rpm"
     
@@ -150,7 +150,8 @@ class ddclient(
       require         => [File["${perl_IO_Socket_SSL}"], Package["perl-IO-Socket-IP"], Package["perl-Net-LibIDN"], Package["perl-Net-SSLeay"] ],
       before          => Package["ddclient"],
     }
-  }
+  }#end CentOS check
+
     file{"${ddclient_file}":
       ensure => present,
       path => "${local_install_dir}/${ddclient_file}",
@@ -174,7 +175,7 @@ class ddclient(
     ensure => "present",
     source => "puppet:///${puppet_file_dir}DDClientConf.lns",
     mode => 0777,
-    require => [Service["ddclient"]],
+#    require => [Service["ddclient"]],
   }
 
   exec {"remove ddclient.conf":
@@ -189,28 +190,61 @@ class ddclient(
     mode => 0777,
     require => [Exec["remove ddclient.conf"]]
   }
-  
-  #
+  if ($protocol == undef){
+    fail("A protocol is required to setup a ddclient entry")
+  }
+
+  if ($use == undef){
+    fail("A use is required to setup a ddclient entry")
+  }
+
+  if ($ssl == undef){
+    fail("An ssl value is required to setup a ddclient entry")
+  }
+
+  if ($server == undef){
+    fail("A server value is required to setup a ddclient entry")
+  }
+
+  if ($login == undef){
+    fail("A login value is required to setup a ddclient entry")
+  }
+
+  if ($password == undef){
+    fail("A password value is required to setup a ddclient entry")
+  }
+
+  if ($domains == undef){
+    fail("A list of domains is required to setup a ddclient entry")
+  }
+
+  #Entry needs to be added after service is installed
+  #Then restart the service after the entry has been added to the ddclient.conf file.
+  #Need to add more granular error reporting for puppet
+
   $entries = [
-    "set 2/protocol ${protocol}",
-    "set 2/use \"${use}\"",
-    "set 2/ssl ${ssl}",
-    "set 2/server ${server}",
-    "set 2/login ${login}", 
-    "set 2/password \"'${password}'",
-    "set 2/domain ${domain}",
-    ]
-    
-    augeas{ "add-entry":
-      incl => "/etc/ddclient.conf",
-      lens => "Ddclientconf.lns",
-      context => "/files/etc/ddclient.conf/",
-      changes => $entries,
-      require => [Service["ddclient"],
-        File["/usr/share/augeas/lenses/dist/ddclientconf.aug"],
-        File["/etc/ddclient.conf"]]
-    }
-  
+    "set 1/protocol ${protocol}",
+    "set 1/use \"${use}\"",
+    "set 1/ssl ${ssl}",
+    "set 1/server ${server}",
+    "set 1/login ${login}",
+    "set 1/password \"'${password}'",
+    "set 1/domain ${domains}",
+  ]
+
+  augeas{ "add-entry":
+    incl => "/etc/ddclient.conf",
+    lens => "Ddclientconf.lns",
+    context => "/files/etc/ddclient.conf/",
+    changes => $entries,
+    require => [
+      #        Service["ddclient"],
+      File["/usr/share/augeas/lenses/dist/ddclientconf.aug"],
+      File["/etc/ddclient.conf"]],
+    notify => Service["ddclient"],
+  }
+
+
 #    set /augeas/load/Simplevars/lens/ Simplevars.lns
 #    set /augeas/load/Simplevars/incl/ /etc/ddclient.conf
     #  protocol=namecheap
@@ -222,4 +256,4 @@ class ddclient(
 
     # Install lens file, where?
     # Load lens
-  } #end Ubuntu 15 check
+}

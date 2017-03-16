@@ -13,4 +13,12 @@ file {
 
 class {"augeas":}
 ->
-class{"ddclient":}
+class{"ddclient":
+  protocol => "namecheap",
+  use => "web, web=dynamicdns.park-your-domain.com/getip",
+  ssl => "yes",
+  server => "dynamicdns.park-your-domain.com",
+  login => "alexanderhopgood.com",
+  password => "ffffffffffffffffffffffffffffffff",
+  domains => "projects.alexanderhopgood.com",
+}

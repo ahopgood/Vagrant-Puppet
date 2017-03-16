@@ -25,27 +25,28 @@ Can be declared via the *ddclient* class:
 ## Dependencies
 * A Domain Name System (DNS) provider/registrar that supports dynamic DNS.
 * Account details from said DNS provider/registrar
+* The `augeas` class is required to ensure that entries can be added to the `ddclient.conf` file.
 
 ## Testing performed:
 * Install on a fresh system
 	* CentOS6
 	* CentOS7
 	* Ubuntu
-	* Raspberian
 	
 ## CentOS
-Installs apache to the following locations:
+Installs ddclient to the following locations:
+* `/etc/ddclient.conf` the configuration file
 
 ### CentOS6
 Command line service calls are as follows:  
-* 
+* `/etc/init.d/ddclient start`
 
 ### CentOS7
 Command line service calls are as follows:
-* 
+* `service ddclient start`
 
 ### <a href="CentOS_known_issues">Known issues</a>
-* CentOS 6 is on a very out of date version of apache (2.2.15), the repositories for this version of CentOS are no longer being updated.
+* 
 
 ### <a href="CentOS_file_naming_conventions">CentOS file naming conventions</a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct apache httpd version.  
@@ -122,17 +123,21 @@ an example would be:
 
 
 ## ToDo
-* Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
-	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
-	* CentOS7 - 2.4.6  
-	* Ubuntu - 2.4.12
-* Ubuntu support
-* Raspberian support
-* Terry Pratchett x-clacks header
-* Virtual Host configuration
-* SSL Configuration
-* Custom error pages; 404, 401, 403, 500 etc
-* Removal of Operating System information from error pages 
-* Removal of apache version information from error pages
-* Have all files saved to `/etc/puppet/installers/httpd/`
-* In the case of an upgrade from one version of apache to another, remove old package files from `/etc/puppet/installers/httpd` folder
+* Add support for:
+  * CentOS 6
+  * CentOS 7
+  * Ubuntu 15.10
+* Update readme with informaiton on:
+  * File format for centos
+  * File format for ubuntu
+  * Service calls for CentOS 6
+  * Service calls for CentOS 7
+  * Service calls for Ubuntu 15.10
+  * Parameters required for ddclient entries 
+  * Update support to include **only** namecheap
+  * Update support to include version 3.8.3 of ddclient as it provides multiple domain support
+  * Create a section for the ddclient lens
+* Extract setup of ddclient entries to a define
+* Add comment support to the ddclient lens
+* Create a define section in `augeas` class for supporting writing of lenses.
+* Only run lens addition of ddclient entry if the entry doesn't already exist, unless changed.
