@@ -143,7 +143,7 @@ an example would be:
   * Create a section for the ddclient lens
 * Extract setup of ddclient entries to a define
   * Test multiple declarations of entries 
-* Add comment support to the ddclient lens
+* Add comment support to the ddclient lens [see dealing with comments](https://github.com/hercules-team/augeas/wiki/Dealing-with-comments)
 * Have lens setup in the ddclient class
 * Create a define section in `augeas` class for supporting writing of lenses.
 * Only run lens addition of ddclient entry if the entry doesn't already exist, unless changed.

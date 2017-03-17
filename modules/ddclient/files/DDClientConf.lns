@@ -35,10 +35,10 @@ let entries = protocol
             | password
             | domain
 
-let record = [ label "entry" . entries+ ]
+let record = [ label "entry" . entries . entries . entries . entries . entries . entries . entries ]
 
 (* define lens *)
-let lns = ( empty )* . ( record . empty )* . (record)?
+let lns = ( empty )* . ( record )*
 
 
 let filter = incl "/etc/ddclient.conf"
