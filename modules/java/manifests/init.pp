@@ -1094,6 +1094,7 @@ define java::jce(
   file {"${securityBackupLocation}":
     ensure => directory,
     mode => 777,
+    require => Exec["unzip ${jce_file}"]
   }
 
   $US_export_policy = "US_export_policy.jar"
