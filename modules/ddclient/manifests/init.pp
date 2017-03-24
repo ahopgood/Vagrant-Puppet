@@ -28,6 +28,8 @@ class ddclient{
 
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
+
+
   } elsif (versioncmp("${OS}","CentOS") == 0){
     if (versioncmp("${OS_version}", "7") == 0) {
       $perl_libs_package="5.16.3-291.el7"
@@ -47,18 +49,6 @@ class ddclient{
       $perl_Net_SSLeay_package = "1.35-10.el6_8.1"
       $perl_IO_Socket_SSL_package="1.31-3.el6_8.2"
       $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-1.el6.noarch.rpm"
-
-
-#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Pod-Escapes-1:1.04-136.el6_6.1.x86_64
-#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-version-3:0.77-136.el6_6.1.x86_64
-#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Module-Pluggable-1:3.90-136.el6_6.1.x86_64
-#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Pod-Simple-1:3.13-136.el6_6.1.x86_64
-#    -rw-r--r-- 1 root root  41384 Nov 10  2015 perl-Module-Pluggable-3.90-141.el6_7.1.x86_64.rpm
-#    -rw-r--r-- 1 root root  33740 Nov 10  2015 perl-Pod-Escapes-1.04-141.el6_7.1.x86_64.rpm
-#    -rw-r--r-- 1 root root 217676 Nov 10  2015 perl-Pod-Simple-3.13-141.el6_7.1.x86_64.rpm
-#    -rw-r--r-- 1 root root  53108 Nov 10  2015 perl-version-0.77-141.el6_7.1.x86_64.rpm
-
-
     }
     $perl_libs="perl-libs-${perl_libs_package}.x86_64.rpm"
     $perl_digest="perl-Digest-SHA1-${perl_digest_package}.x86_64.rpm"
@@ -229,7 +219,8 @@ define ddclient::entry(
 ){
 
 
-  if (versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS6") == 0){
+  if ((versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS6") == 0)
+     or (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu15.10") == 0)){
     $ls_path = "/bin/"
     $rm_path = "/bin/"
   } else {
