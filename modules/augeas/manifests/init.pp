@@ -5,7 +5,8 @@ class augeas {
   if (versioncmp("${operatingsystem}", "CentOS") == 0 ){
     $provider = "rpm"
     $augeas = "augeas"
-    $augeas_libs="augeas-libs"
+    $augeas_libs = "augeas-libs"
+    $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
     if (versioncmp("${operatingsystemmajrelease}", "7") == 0){
       $major_version = "1"
       $minor_version = "4"
@@ -35,8 +36,8 @@ class augeas {
     $minor_version = "3"
     $patch_version = "0"
 
-    $package = "-0ubuntu1_"
-    $platform = "${package}${architecture}.deb"
+    $package = "-0ubuntu1"
+    $platform = "${package}_${architecture}.deb"
     $provider = "dpkg"
 
     $augeas = "augeas-tools"
@@ -46,7 +47,9 @@ class augeas {
     $augeas_libs_file="${augeas_libs}_${major_version}.${minor_version}.${patch_version}${platform}"
 
     $augeas_lenses="augeas-lenses"
-    $augeas_lenses_file = "${augeas_lenses}_${major_version}.${minor_version}.${patch_version}${package}all.deb"
+    $augeas_lenses_file = "${augeas_lenses}_${major_version}.${minor_version}.${patch_version}${package}_all.deb"
+
+    $ensure = "present"
 
     file {"${augeas_lenses_file}":
       ensure => present,
@@ -56,7 +59,7 @@ class augeas {
     }
     package{"${augeas_lenses}":
       provider => "${provider}",
-#      ensure => "${major_version}.${minor_version}.${patch_version}${package}",
+      ensure => "${ensure}",
       source => "${local_install_dir}${augeas_lenses_file}",
       require => [File["${augeas_lenses_file}"]],
       before => Package["${augeas_libs}"]
@@ -73,7 +76,7 @@ class augeas {
   }
   package{"${augeas_libs}":
     provider => "${provider}",
-#    ensure => "${major_version}.${minor_version}.${patch_version}${package}",
+    ensure => "${ensure}",
     source => "${local_install_dir}${augeas_libs_file}",
     require => [File["${augeas_libs_file}"]],
     before => Package["${augeas}"]
@@ -87,7 +90,7 @@ class augeas {
   }
   package{"${augeas}":
     provider => "${provider}",
-#    ensure => "${major_version}.${minor_version}.${patch_version}${package}",
+    ensure => "${ensure}",
     source => "${local_install_dir}${augeas_file}",
     require => [File["${augeas_file}"]],
   }
