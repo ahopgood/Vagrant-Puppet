@@ -240,7 +240,8 @@ define ddclient::entry(
       path => "/etc/ddclient.conf",
       ensure => present,
       mode => 0777,
-      require => [Exec["remove ddclient.conf ${name}"]]
+      require => [Exec["remove ddclient.conf ${name}"]],
+      before => Augeas["add-entry ${name}"]
     }
 
   }
@@ -293,8 +294,7 @@ define ddclient::entry(
     changes => $entries,
     require => [
       Service["ddclient"],
-      File["/usr/share/augeas/lenses/dist/ddclientconf.aug"],
-      File["/etc/ddclient.conf"]],
+      File["/usr/share/augeas/lenses/dist/ddclientconf.aug"]],
 #    notify => Service["ddclient"],
   }
 }
