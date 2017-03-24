@@ -29,24 +29,59 @@ class ddclient{
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
   } elsif (versioncmp("${OS}","CentOS") == 0){
-    $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
+    if (versioncmp("${OS_version}", "7") == 0) {
+      $perl_libs_package="5.16.3-291.el7"
+      $perl_digest_package="2.13-9.el7"
+      $perl_Time_HiRes_package="1.9725-3.el7"
+      $perl_package="5.16.3-291.el7"
+      $perl_Net_LibIDN_package = "0.12-15.el7"
+      $perl_Net_SSLeay_package = "1.55-4.el7"
+      $perl_IO_Socket_SSL_package="1.94-5.el7"
+      $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
+    } elsif (versioncmp("${OS_version}", "6") == 0) {
+      $perl_libs_package="5.10.1-141.el6_7.1"
+      $perl_digest_package="2.12-2.el6"
+      $perl_Time_HiRes_package="1.9721-141.el6_7.1"
+      $perl_package="5.10.1-141.el6_7.1"
+      $perl_Net_LibIDN_package="0.12-3.el6"
+      $perl_Net_SSLeay_package = "1.35-10.el6_8.1"
+      $perl_IO_Socket_SSL_package="1.31-3.el6_8.2"
+      $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-1.el6.noarch.rpm"
+
+
+#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Pod-Escapes-1:1.04-136.el6_6.1.x86_64
+#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-version-3:0.77-136.el6_6.1.x86_64
+#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Module-Pluggable-1:3.90-136.el6_6.1.x86_64
+#    perl = 4:5.10.1-136.el6_6.1 is needed by (installed) perl-Pod-Simple-1:3.13-136.el6_6.1.x86_64
+#    -rw-r--r-- 1 root root  41384 Nov 10  2015 perl-Module-Pluggable-3.90-141.el6_7.1.x86_64.rpm
+#    -rw-r--r-- 1 root root  33740 Nov 10  2015 perl-Pod-Escapes-1.04-141.el6_7.1.x86_64.rpm
+#    -rw-r--r-- 1 root root 217676 Nov 10  2015 perl-Pod-Simple-3.13-141.el6_7.1.x86_64.rpm
+#    -rw-r--r-- 1 root root  53108 Nov 10  2015 perl-version-0.77-141.el6_7.1.x86_64.rpm
+
+
+    }
+    $perl_libs="perl-libs-${perl_libs_package}.x86_64.rpm"
+    $perl_digest="perl-Digest-SHA1-${perl_digest_package}.x86_64.rpm"
+    $perl_Time_HiRes="perl-Time-HiRes-${perl_Time_HiRes_package}.x86_64.rpm"
+    $perl="perl-${perl_package}.x86_64.rpm"
+    $perl_Net_LibIDN = "perl-Net-LibIDN-${perl_Net_LibIDN_package}.x86_64.rpm"
+    $perl_Net_SSLeay = "perl-Net-SSLeay-${perl_Net_SSLeay_package}.x86_64.rpm"
+    $perl_IO_Socket_SSL="perl-IO-Socket-SSL-${perl_IO_Socket_SSL_package}.noarch.rpm"
+
     $provider = "rpm"
 
-    $perl_libs="perl-libs-5.16.3-291.el7.x86_64.rpm"
     file { "${perl_libs}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_libs}",
       path   => "${local_install_dir}/${perl_libs}",
     }
 
-    $perl_Time_HiRes="perl-Time-HiRes-1.9725-3.el7.x86_64.rpm"
     file { "${perl_Time_HiRes}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Time_HiRes}",
       path   => "${local_install_dir}/${perl_Time_HiRes}",
     }
 
-    $perl="perl-5.16.3-291.el7.x86_64.rpm"
     file { "${perl}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl}",
@@ -55,14 +90,14 @@ class ddclient{
 
     package { ["perl","perl-libs","perl-Time-HiRes"]:
       source          => ["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"],
-      ensure          => ["5.16.3-291.el7","5.16.3-291.el7","1.9725-3.el7"],
+      ensure          => ["${perl_package}","${perl_libs_package}","${perl_Time_HiRes_package}"],
       provider        => "${provider}",
       require         => [File["${perl}"],File["${perl_libs}"], File["${perl_Time_HiRes}"]],
       install_options => "--force",
       before          => Package["ddclient"]
     }
 
-    $perl_digest="perl-Digest-SHA1-2.13-9.el7.x86_64.rpm"
+
     file { "${perl_digest}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_digest}",
@@ -72,7 +107,7 @@ class ddclient{
 
     package { "perl-Digest-SHA1":
       source   => "${local_install_dir}/${perl_digest}",
-      ensure   => "2.13-9.el7",
+      ensure   => "${perl_digest_package}",
       provider => "${provider}",
       require  => File["${perl_digest}"],
       before   => Package["ddclient"],
@@ -81,54 +116,53 @@ class ddclient{
     #Requires:
     #perl(IO::Socket::IP) >= 0.20 is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #   provider: perl-IO-Socket-IP.noarch 0.21-4.el7
+#CentOS 7 only
+    if (versioncmp("${OS}${OS_version}","CentOS7") == 0){
+      $perl_IO_Socket_IP = "perl-IO-Socket-IP-0.21-4.el7.noarch.rpm"
+      file { "${perl_IO_Socket_IP}":
+        ensure => present,
+        path   => "${local_install_dir}/${perl_IO_Socket_IP}",
+        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_IP}",
+      }
 
-    $perl_IO_Socket_IP = "perl-IO-Socket-IP-0.21-4.el7.noarch.rpm"
-    file { "${perl_IO_Socket_IP}":
-      ensure => present,
-      path   => "${local_install_dir}/${perl_IO_Socket_IP}",
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_IP}",
-    }
-
-    package { "perl-IO-Socket-IP":
-      ensure   => "0.21-4.el7",
-      provider => "${provider}",
-      source   => "${local_install_dir}/${perl_IO_Socket_IP}",
-      require  => File["${perl_IO_Socket_IP}"],
+      package { "perl-IO-Socket-IP":
+        ensure   => "0.21-4.el7",
+        provider => "${provider}",
+        source   => "${local_install_dir}/${perl_IO_Socket_IP}",
+        require  => File["${perl_IO_Socket_IP}"],
+        before => Package["perl-IO-Socket-SSL"],
+      }
     }
 
     #perl(Net::LibIDN) is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #   provider: perl-Net-LibIDN.x86_64 0.12-15.el7
-    $perl_Net_LibIDN = "perl-Net-LibIDN-0.12-15.el7.x86_64.rpm"
     file { "${perl_Net_LibIDN}":
       ensure => present,
       path   => "${local_install_dir}/${perl_Net_LibIDN}",
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_LibIDN}",
     }
     package{ "perl-Net-LibIDN":
-      ensure   => "0.12-15.el7",
+      ensure   => "${perl_Net_LibIDN_package}",
       provider => "${provider}",
       source   => "${local_install_dir}/${perl_Net_LibIDN}",
       require  => File["${perl_Net_LibIDN}"]
     }
 
-
     #perl(Net::SSLeay) is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #perl(Net::SSLeay) >= 1.21 is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #    provider: perl-Net-SSLeay.x86_64 1.55-3.el7
-    $perl_Net_SSLeay = "perl-Net-SSLeay-1.55-4.el7.x86_64.rpm"
     file { "${perl_Net_SSLeay}":
       ensure => present,
       path   => "${local_install_dir}/${perl_Net_SSLeay}",
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_SSLeay}",
     }
     package{ "perl-Net-SSLeay":
-      ensure   => "1.55-4.el7",
+      ensure   => "${perl_Net_SSLeay_package}",
       provider => "${provider}",
       source   => "${local_install_dir}/${perl_Net_SSLeay}",
       require  => File["${perl_Net_SSLeay}"],
     }
 
-    $perl_IO_Socket_SSL="perl-IO-Socket-SSL-1.94-5.el7.noarch.rpm"
     file { "${perl_IO_Socket_SSL}":
       ensure => present,
       source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_SSL}",
@@ -137,9 +171,9 @@ class ddclient{
 
     package { "perl-IO-Socket-SSL":
       source          => "${local_install_dir}/${perl_IO_Socket_SSL}",
-      ensure          => "1.94-5.el7",
+      ensure          => "${perl_IO_Socket_SSL_package}",
       provider        => "${provider}",
-      require         => [File["${perl_IO_Socket_SSL}"], Package["perl-IO-Socket-IP"], Package["perl-Net-LibIDN"], Package["perl-Net-SSLeay"] ],
+      require         => [File["${perl_IO_Socket_SSL}"], Package["perl-Net-LibIDN"], Package["perl-Net-SSLeay"] ],
       before          => Package["ddclient"],
     }
   }#end CentOS check
@@ -193,12 +227,22 @@ define ddclient::entry(
   $domains = undef,
   $remove_package_conf = false,
 ){
+
+
+  if (versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS6") == 0){
+    $ls_path = "/bin/"
+    $rm_path = "/bin/"
+  } else {
+    $ls_path = "/usr/bin/"
+    $rm_path = "/usr/bin/"
+  }
+
   if ($remove_package_conf == true){
     exec {"remove ddclient.conf ${name}":
-      path => "/usr/bin/",
+      path => "${rm_path}",
       command => "rm /etc/ddclient.conf",
       require => [File["/usr/share/augeas/lenses/dist/ddclientconf.aug"]],
-      onlyif => "/usr/bin/ls /etc/ | /bin/grep ddclient"
+      onlyif => "${ls_path}ls /etc/ | /bin/grep ddclient"
     }
 
     file {"/etc/ddclient.conf  ${name}":
