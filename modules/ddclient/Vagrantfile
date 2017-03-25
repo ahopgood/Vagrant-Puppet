@@ -8,7 +8,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "base"
   config.vm.box_check_update = false
-
   # config.vm.network "forwarded_port", guest: 80, host: 8080
   # config.vm.network "private_network", ip: "192.168.33.10"
   # config.vm.network "public_network"
@@ -42,7 +41,19 @@ Vagrant.configure("2") do |config|
       centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
 	    centos7.vm.network "private_network", ip: "192.168.33.27"
 	    centos7.vm.box_version = "1.0.1"
-    	centos7.vm.hostname = "httpd.centos7.vm"
+    	centos7.vm.hostname = "ddclient.centos7.vm"
+    end
+
+    config.vm.define "augeas" do |augeas|
+        augeas.vm.box = "puppetlabs/centos-7.0-64-puppet"
+	    augeas.vm.network "private_network", ip: "192.168.33.28"
+	    augeas.vm.box_version = "1.0.1"
+    	augeas.vm.hostname = "ddclientaugeaslens.centos7.vm"
+    	augeas.ssh.insert_key = false
+    	augeas.vm.provider "puppet" do |puppet|
+  	        puppet.manifests_path = "test"
+ 	        puppet.manifest_file  = "ddclient-lens.pp"
+    	end
     end
 
 end

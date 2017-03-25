@@ -1,0 +1,3 @@
+.vagrant/*
+files/CentOS/*/*.rpm
+files/Ubuntu/*/*.deb

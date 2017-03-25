@@ -1,0 +1,47 @@
+(* DDClient .conf module for Augeas *)
+
+module Ddclientconf =
+autoload xfm
+
+(* define empty line *)
+let empty = Util.empty
+let equals = Util.del_str "="
+let hash = Util.del_str "#"
+let eol = Util.eol
+let value_to_eol = store Rx.space_in
+
+
+(* create a function that takes in a keyword and an equals, storing the value after the equals and up to the eol *)
+let simple_entry (kw:string) = [ key kw . equals . value_to_eol . eol ]
+
+let protocol = simple_entry "protocol"
+let use = simple_entry "use"
+(* web  web=blah *)
+
+let ssl = simple_entry "ssl"
+(* yes or no *)
+
+let server = simple_entry "server"
+let login = simple_entry "login"
+let password = simple_entry "password"
+
+let domain = [ label "domain" . store /((\@|[a-zA-Z]+)\.[a-zA-Z\.]+)(,(\@|[a-zA-Z]+)\.[a-zA-Z\.]+)*/ . eol ]
+
+let entries = protocol
+            | use
+            | ssl
+            | server
+            | login
+            | password
+            | domain
+
+let record = [ label "entry" . entries . entries . entries . entries . entries . entries . entries ]
+
+(* define lens *)
+let lns = ( empty )* . ( record )*
+
+
+let filter = incl "/etc/ddclient.conf"
+           . Util.stdexcl
+
+let xfm = transform lns filter
