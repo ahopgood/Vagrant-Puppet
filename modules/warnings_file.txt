@@ -3,3 +3,7 @@ Warning: alias is a metaparam; this value will inherit to all contained resource
 Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line 1036 in file /etc/puppet/modules/java/manifests/init.pp
 
 Warning: Not collecting exported resources without storeconfigs
+
+Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults
+
+Warning: alias is a metaparam; this value will inherit to all contained resources in the httpd::virtual_host::server_alias definition
