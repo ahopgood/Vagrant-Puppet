@@ -15,8 +15,10 @@ class perl (
 ) {
   notify{ "perl Module running": }
 
-
-  $puppet_file_dir = "modules/${module_name}/"
+  $OS = "${operatingsystem}"
+  $OS_version = "${operatingsystemmajrelease}"
+  
+  $puppet_file_dir = "modules/perl/"
   $local_install_dir = "${local_install_path}installers/"
 
   if (versioncmp("${OS}","CentOS") == 0){
@@ -28,7 +30,7 @@ class perl (
       $perl_Net_LibIDN_package = "0.12-15.el7"
       $perl_Net_SSLeay_package = "1.55-4.el7"
       $perl_IO_Socket_SSL_package="1.94-5.el7"
-      $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
+
     } elsif (versioncmp("${OS_version}", "6") == 0) {
       $perl_libs_package="5.10.1-141.el6_7.1"
       $perl_digest_package="2.12-2.el6"
@@ -37,7 +39,46 @@ class perl (
       $perl_Net_LibIDN_package="0.12-3.el6"
       $perl_Net_SSLeay_package = "1.35-10.el6_8.1"
       $perl_IO_Socket_SSL_package="1.31-3.el6_8.2"
-      $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-1.el6.noarch.rpm"
+
+      $perl_Module_Pluggable_package="3.90-141.el6_7.1"
+      $perl_Module_Pluggable="perl-Module-Pluggable-${perl_Module_Pluggable_package}.x86_64.rpm"
+      
+      $perl_Pod_Escapes_package="1.04-141.el6_7.1"
+      $perl_Pod_Escapes="perl-Pod-Escapes-${perl_Pod_Escapes_package}.x86_64.rpm"
+
+      $perl_Pod_Simple_package="3.13-141.el6_7.1"
+      $perl_Pod_Simple="perl-Pod-Simple-${perl_Pod_Simple_package}.x86_64.rpm"
+      
+      $perl_version_package="0.77-141.el6_7.1"
+      $perl_version="perl-version-${perl_version_package}.x86_64.rpm"
+
+      file {"${perl_version}":
+        ensure => present,
+        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_version}",
+        path   => "${local_install_dir}/${perl_version}",
+        before => Package["perl"]
+      }
+      file { "${perl_Pod_Escapes}":
+        ensure => present,
+        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Pod_Escapes}",
+        path   => "${local_install_dir}/${perl_Pod_Escapes}",
+        before => Package["perl"]
+      }
+
+      file { "${perl_Module_Pluggable}":
+        ensure => present,
+        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Module_Pluggable}",
+        path   => "${local_install_dir}/${perl_Module_Pluggable}",
+        before => Package["perl"]
+      }
+
+
+      file { "${perl_Pod_Simple}":
+        ensure => present,
+        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Pod_Simple}",
+        path   => "${local_install_dir}/${perl_Pod_Simple}",
+        before => Package["perl"]
+      }
     }
     $perl_libs="perl-libs-${perl_libs_package}.x86_64.rpm"
     $perl_digest="perl-Digest-SHA1-${perl_digest_package}.x86_64.rpm"
@@ -47,6 +88,26 @@ class perl (
     $perl_Net_SSLeay = "perl-Net-SSLeay-${perl_Net_SSLeay_package}.x86_64.rpm"
     $perl_IO_Socket_SSL="perl-IO-Socket-SSL-${perl_IO_Socket_SSL_package}.noarch.rpm"
 
+    if (versioncmp("${OS}","CentOS") == 0){
+      if (versioncmp("${OS_version}", "7") == 0) {
+        $perl_package_names=["perl","perl-libs","perl-Time-HiRes"]
+        $perl_package_versions=["${perl_package}","${perl_libs_package}","${perl_Time_HiRes_package}"]
+        $perl_package_files=["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"]
+      } elsif (versioncmp("${OS_version}","6") == 0){
+        $perl_package_names=["perl","perl-libs","perl-Time-HiRes",
+          "perl-Module-Pluggable", "perl-Pod-Escapes", "perl-Pod-Simple", "perl-version"]
+
+        $perl_package_versions=["${perl_package}","${perl_libs_package}","${perl_Time_HiRes_package}",
+          "${perl_Pod_Escapes_package}", "${perl_version_package}", "${perl_Module_Pluggable_package}",
+          "${perl_Pod_Simple_package}"]
+
+        $perl_package_files=["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}",
+          "${local_install_dir}/${perl_Time_HiRes}", "${local_install_dir}/${perl_Pod_Escapes}",
+          "${local_install_dir}/${perl_version}", "${local_install_dir}/${perl_Module_Pluggable}",
+          "${local_install_dir}/${perl_Pod_Simple}"]
+      }
+    }
+    
     $provider = "rpm"
 
     file { "${perl_libs}":
@@ -67,13 +128,12 @@ class perl (
       path   => "${local_install_dir}/${perl}",
     }
 
-    package { ["perl","perl-libs","perl-Time-HiRes"]:
-      source          => ["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"],
-      ensure          => ["${perl_package}","${perl_libs_package}","${perl_Time_HiRes_package}"],
+    package { $perl_package_names:
+      source          => $perl_package_files,
+      ensure          => $perl_package_versions,
       provider        => "${provider}",
       require         => [File["${perl}"],File["${perl_libs}"], File["${perl_Time_HiRes}"]],
       install_options => "--force",
-      before          => Package["ddclient"]
     }
 
 
@@ -89,7 +149,6 @@ class perl (
       ensure   => "${perl_digest_package}",
       provider => "${provider}",
       require  => File["${perl_digest}"],
-      before   => Package["ddclient"],
     }
 
     #Requires:
