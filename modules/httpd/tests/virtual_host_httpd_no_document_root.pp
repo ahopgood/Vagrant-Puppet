@@ -11,14 +11,8 @@ Package{
     ensure     =>  directory,
   } 
 
-  class { "iptables":
-    port => "80",
-  }
-  
   class { "httpd": }
   
-  class { "augeas": }
-
   httpd::virtual_host{"test":
     server_name => "www.alexander.com",
   }

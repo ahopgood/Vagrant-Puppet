@@ -187,6 +187,8 @@ This will only work if the headers module is installed.
 Required parameters:  
 * server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
 * document_root - the location of the web resources you will be serving via your virtual host
+
+Optional parameters:  
 * server_alias - an array of strings that represent the server aliase
 
 This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
@@ -207,12 +209,15 @@ A list of server aliases can be used to setup separate `ServerAlias` entries in 
 	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
 	* CentOS7 - 2.4.6  
 	* Ubuntu - 2.4.12
-* Ubuntu support
-* Raspberian support
+* **done** Ubuntu support
 * **done** Virtual Host configuration
+* Raspberian support
 * SSL Configuration
 * Custom error pages; 404, 401, 403, 500 etc
 * Removal of Operating System information from error pages 
 * Removal of apache version information from error pages
 * Have all files saved to `/etc/puppet/installers/httpd/`
 * In the case of an upgrade from one version of apache to another, remove old package files from `/etc/puppet/installers/httpd` folder
+* Proxy pass
+* VirtualHost error log
+* VirtualHost cutom log

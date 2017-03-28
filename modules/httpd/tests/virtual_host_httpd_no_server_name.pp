@@ -9,15 +9,9 @@ Package{
     "${local_install_dir}":
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
-  } 
-
-  class { "iptables":
-    port => "80",
   }
   
   class { "httpd": }
-  
-  class { "augeas": }
 
   httpd::virtual_host{"test":
     document_root => "/var/www/alexander/",
