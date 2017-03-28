@@ -65,8 +65,8 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
     vagrant snapshot save $vm_name virgin
 
     # Get list of manifests from the tests/ directory
-    if [ ! -z $3 ]; then
-        MANIFESTS=$3
+    if [ ! -z "$3" ]; then
+        MANIFESTS=($3)
     else
         MANIFESTS=($(ls -m tests | tr "," " "))
     fi
@@ -81,7 +81,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
 #        port=$(vagrant ssh-config $vm_name | grep Port | awk '{ print $2 }')
 #        ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
         echo -e $RUN_VM_PREFIX"Manifest ${MANIFESTS[i]}"
-        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
+#        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
 
         #Reset the snapshot
         echo -e $RUN_VM_PREFIX"Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
@@ -104,19 +104,19 @@ function run_module {
                 MODULE=($OPTARG)
             ;;
             p)
-                echo -e $RUN_PREFIX"Using the vagrant profile ["$OPTARG"]"
-                if [ -z $OPTARG ]; then
+                echo -e $RUN_PREFIX"Using the vagrant profiles ["$OPTARG"]"
+                if [ -z "$OPTARG" ]; then
                     VMs=""
                 else
-                    VMs=$OPTARG
+                    VMs=($OPTARG)
                 fi
             ;;
             t)
                 echo -e $RUN_PREFIX"Using test manifests ["$OPTARG"]"
-                if [ -z $OPTARG ]; then
+                if [ -z "$OPTARG" ]; then
                     TEST_MANIFESTS=""
                 else
-                    TEST_MANIFESTS=$OPTARG
+                    TEST_MANIFESTS="$OPTARG"
                 fi
             ;;
             \?)
@@ -135,8 +135,8 @@ function run_module {
     echo -e $RUN_PREFIX"Using Vagrant Profiles:"${VMs[@]}
     for ((j=0; j < "${#VMs[*]}"; j++));
     do
-        echo -e $RUN_PREFIX"Starting run for "${VMs[j]}
-        run_vm ${VMs[j]} j $TEST_MANIFESTS
+        echo -e $RUN_PREFIX"Starting run for "${VMs[j]}" with manifests ${TEST_MANIFESTS[@]}"
+        run_vm ${VMs[j]} j "$TEST_MANIFESTS"
     done
     cd $ORIGINAL_DIR
     #Need to move out of the current directory
@@ -153,7 +153,7 @@ MODULES=($(ls -m | tr "," " "))
 while getopts m:p:t: FLAG; do
     case $FLAG in
         m)
-            if [ -z $OPTARG ]; then
+            if [ -z "$OPTARG" ];then
                 MODULES=""
             else
                 MODULES=($OPTARG)
@@ -162,18 +162,18 @@ while getopts m:p:t: FLAG; do
         ;;
         p)
             echo -e $PREFIX"Setting the vagrant profile to ["$OPTARG"]"
-            if [ -z $OPTARG ]; then
+            if [ -z "$OPTARG" ];then
                 VAGRANT_PROFILE=""
             else
-                VAGRANT_PROFILE="-p "$OPTARG
+                VAGRANT_PROFILE="$OPTARG"
             fi
         ;;
         t)
             echo -e $PREFIX"Setting the test manifests to ["$OPTARG"]"
-            if [ -z $OPTARG ];then
+            if [ -z "$OPTARG" ];then
                 TEST_MANIFESTS=""
             else
-                TEST_MANIFESTS="-t "$OPTARG
+                TEST_MANIFESTS="$OPTARG"
             fi
         ;;
         \?)
@@ -192,8 +192,8 @@ echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
     if [ -d ${MODULES[k]} ];then
-        echo -e $PREFIX"run_module [-m ${MODULES[k]}] [$VAGRANT_PROFILE] [$TEST_MANIFESTS]"
-        run_module -m ${MODULES[k]} $VAGRANT_PROFILE $TEST_MANIFESTS
+        echo -e $PREFIX"run_module [-m ${MODULES[k]}] [-p $VAGRANT_PROFILE] [-t $TEST_MANIFESTS]"
+        run_module -m ${MODULES[k]} -p "$VAGRANT_PROFILE" -t "$TEST_MANIFESTS"
     fi
     echo -e $PREFIX"exiting ${MODULES[k]}"
 done
