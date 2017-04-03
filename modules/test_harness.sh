@@ -150,7 +150,7 @@ echo -e $PREFIX"Working in directory "$(pwd)
 VAGRANT_PROFILE=""
 TEST_MANIFESTS=""
 MODULES=($(ls -m | tr "," " "))
-while getopts m:p:t: FLAG; do
+while getopts m:p:t:-: FLAG; do
     case $FLAG in
         m)
             if [ -z "$OPTARG" ];then
@@ -176,12 +176,37 @@ while getopts m:p:t: FLAG; do
                 TEST_MANIFESTS="$OPTARG"
             fi
         ;;
+        -)
+            case "${OPTARG}" in
+            h)
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+            help)
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+            *)
+                echo -e $PREFIX"Unknown option --${OPTARG}"
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+       esac;;
         \?)
-            echo "Unsupported option and/or parameter :"$OPTARG
-            echo "Supported parameters are:"
-            echo "[-m module_name] a list of module names, reflecting the directory naming of the module"
-            echo "[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
-            echo "[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+            echo -e $PREFIX"Unsupported option and/or parameter :"$OPTARG
+            echo -e $PREFIX"Supported parameters are:"
+            echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+            echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+            echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
             exit -1
         ;;
     esac
