@@ -22,6 +22,15 @@ class patch {
       $patch_file = "patch-2.6-6.el6.x86_64.rpm"
     } elsif (versioncmp("${operatingsystemmajrelease}", "7") == 0){
       $patch_file = "patch-2.7.1-8.el7.x86_64.rpm"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
+    }
+  } elsif (versioncmp("${operatingsystem}", "Ubuntu") == 0) {
+    $provider = "dpkg"
+    if (versioncmp ("${operatingsystemmajrelease}", "15.10") == 0){
+      $patch_file = "patch_2.7.5-1_amd64.deb"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
     }
   } else {
     fail("${operatingsystem} is not currently supported by the patch module")
@@ -31,11 +40,11 @@ class patch {
   file{
     "${local_install_dir}${patch_file}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${patch_file}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${patch_file}",
   }
   package {"patch":
     ensure => present,
-    provider => 'rpm',
+    provider => "${provider}",
     source => "${local_install_dir}${patch_file}",
     require => File["${local_install_dir}${patch_file}"],
     #1.12

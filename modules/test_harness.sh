@@ -4,7 +4,6 @@
 function remove_warning(){
     grep -v "$1" $OUTPUT_FILE > $OUTPUT_FILE".mod"
     mv $OUTPUT_FILE".mod" $OUTPUT_FILE
-
 }
 # Function to run a manifest on a vagrant box with the --noop command
 # 1) Takes snapshot based on arg $3 (vn_name) and arg $4 (snapshot_name)

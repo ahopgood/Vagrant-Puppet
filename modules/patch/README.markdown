@@ -20,14 +20,17 @@ Requires a directory `/etc/puppet/installers` to be present for the module to wo
 ## Testing performed
 
 ## CentOS
-### <a name="CentOS_known_issues">Ubuntu known issues</a>
+### <a name="CentOS_known_issues">CentOS known issues</a>
+Only version 2.6-6 is supported on CentOS 6.
+Only version 2.7.1-8 is supported on CentOS 7.
 
 ## Ubuntu
 ### <a name="Ubuntu_known_issues">Ubuntu known issues</a>
+Only version 2.7.5-1 is supported on Ubuntu 15.10
 
 ## To Do
-* Support for CentOS 7
-* Support for Ubuntu 15
-* Test harness vagrant profiles
+* **done** Support for CentOS 7
+* **done** Support for Ubuntu 15
+* **done** Test harness vagrant profiles
 * Multi version support
-* File structure to reflect OS version
+* **done** File structure to reflect OS version
