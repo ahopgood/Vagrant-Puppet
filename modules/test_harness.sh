@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+#function to remove a grep regex pattern from an input file
+function remove_warning(){
+    grep -v "$1" $OUTPUT_FILE > $OUTPUT_FILE".mod"
+    mv $OUTPUT_FILE".mod" $OUTPUT_FILE
+
+}
 # Function to run a manifest on a vagrant box with the --noop command
 # 1) Takes snapshot based on arg $3 (vn_name) and arg $4 (snapshot_name)
 # 2) SSH's into vagrant box on arg $1 (port) with manifest arg $2 (manifest name .pp)
@@ -23,13 +30,19 @@ function run_manifest {
     mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE
 
     #Check for benign "known" warnings and errors and remove from file
-    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE".mod"
-    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
-    #Run httpd::virtual_host::server_alias test manifest
-    grep -v "Warning: alias is a metaparam; this value will inherit to all contained resources in the [a-zA-Z:_]* definition" $OUTPUT_FILE".mod" > $OUTPUT_FILE
-    grep -v "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line [0-9]* in file [a-zA-Z/]*.pp" $OUTPUT_FILE > $OUTPUT_FILE".mod"
-    grep -v "Warning: Not collecting exported resources without storeconfigs" $OUTPUT_FILE".mod" > $OUTPUT_FILE
-    rm $OUTPUT_FILE".mod"
+#    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE".mod"
+#    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
+#    #Run httpd::virtual_host::server_alias test manifest
+#    grep -v "Warning: alias is a metaparam; this value will inherit to all contained resources in the [a-zA-Z:_]* definition" $OUTPUT_FILE".mod" > $OUTPUT_FILE
+#    grep -v "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line [0-9]* in file [a-zA-Z/]*.pp" $OUTPUT_FILE > $OUTPUT_FILE".mod"
+#    grep -v "Warning: Not collecting exported resources without storeconfigs" $OUTPUT_FILE".mod" > $OUTPUT_FILE
+#    rm $OUTPUT_FILE".mod"
+
+    remove_warning "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults"
+    remove_warning "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts."
+    remove_warning "Warning: alias is a metaparam; this value will inherit to all contained resources in the [a-zA-Z:_]* definition"
+    remove_warning "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line [0-9]* in file [a-zA-Z/]*.pp"
+    remove_warning "Warning: Not collecting exported resources without storeconfigs"
 
     FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
 
@@ -81,7 +94,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
 #        port=$(vagrant ssh-config $vm_name | grep Port | awk '{ print $2 }')
 #        ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
         echo -e $RUN_VM_PREFIX"Manifest ${MANIFESTS[i]}"
-#        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
+        run_manifest $port ${MANIFESTS[i]} $vm_name $snapshot_name $(($iterator + i))
 
         #Reset the snapshot
         echo -e $RUN_VM_PREFIX"Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"

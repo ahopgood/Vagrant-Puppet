@@ -7,3 +7,7 @@ Warning: Not collecting exported resources without storeconfigs
 Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults
 
 Warning: alias is a metaparam; this value will inherit to all contained resources in the httpd::virtual_host::server_alias definition
+
+Warning: Permanently added '[localhost]:2222' (RSA) to the list of known hosts.
+
+Warning: Permanently added '[localhost]:2222' (ECDSA) to the list of known hosts.
