@@ -16,19 +16,30 @@ class patch {
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/${module_name}/"
 
-  if (versioncmp("${operatingsystem}", "CentOS") == 0){
+
+  if (versioncmp("CentOS", "${operatingsystem}") == 0){
+    $platform = ".${architecture}.rpm"  #architecture = x86_64
     $provider = "rpm"
-    if (versioncmp("${operatingsystemmajrelease}", "6") == 0){
-      $patch_file = "patch-2.6-6.el6.x86_64.rpm"
-    } elsif (versioncmp("${operatingsystemmajrelease}", "7") == 0){
-      $patch_file = "patch-2.7.1-8.el7.x86_64.rpm"
+
+    if (versioncmp("6", "${operatingsystemmajrelease}") == 0){
+      $release = "-6.el${operatingsystemmajrelease}"
+      $patch_file = "patch-2.6${release}${platform}"
+
+    } elsif (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $release = "-8.el${operatingsystemmajrelease}"
+      $patch_file = "patch-2.7.1${release}${platform}"
+
     } else {
       fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
     }
-  } elsif (versioncmp("${operatingsystem}", "Ubuntu") == 0) {
+  } elsif (versioncmp("Ubuntu", "${operatingsystem}") == 0) {
+    $platform = "${architecture}.deb" #architecture = amd64
     $provider = "dpkg"
-    if (versioncmp ("${operatingsystemmajrelease}", "15.10") == 0){
-      $patch_file = "patch_2.7.5-1_amd64.deb"
+
+    if (versioncmp ("15.10", "${operatingsystemmajrelease}") == 0){
+      $release = "-1_"
+      $patch_file = "patch_2.7.5${release}${platform}"
+
     } else {
       fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
     }
