@@ -15,6 +15,7 @@ Supports:
 ```
 include patch
 ```
+Requires a directory `/etc/puppet/installers` to be present for the module to work.
 
 ## Testing performed
 
@@ -29,3 +30,4 @@ include patch
 * Support for Ubuntu 15
 * Test harness vagrant profiles
 * Multi version support
+* File structure to reflect OS version
