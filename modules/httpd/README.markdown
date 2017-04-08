@@ -123,6 +123,19 @@ The installer will need to follow the same naming conventions as found in [CentO
 If the dependencies change between versions then a new conditional section will need to be added to include these dependencies for your specific version of Apache.  
 
 ## Ubuntu
+Installs apache to the following locations:
+* `/usr/sbin/apache2` executable file
+* `/var/log/apache2/` logging directory
+* `/etc/apache2/` main application & configuration directory
+* `/etc/apache2/apache2.conf` main configuration file for apache web server 
+* `/var/www/html/` default document root for serving web pages
+
+Command line service calls are as follows:  
+* `sudo service apache2 start` to start the service
+* `sudo service apache2 stop` to stop the service
+* `sudo service apache2 restart` to restart the service
+* `sudo service apache2 status` to get the current status of the service
+
 ### <a href="Ubuntu_known_issues">Ubuntu known issues</a>
 * iptables isn't supported by default on Ubuntu 15.10 - modular dependency between httpd and iptables will cause module to fail.
 * Ubuntu support is still under development
@@ -138,18 +151,73 @@ an example would be:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
 
+## Terry Pratchett x-clacks header
+Support has been added for the following HTTP header:
+`X-Clacks-Overhead "GNU Terry Pratchett"`
+An explanation can be found [here](http://www.gnuterrypratchett.com/).
+### Usage
+```
+  class { "httpd": }
+  ->
+  httpd::xclacks{"x-clacks":}
+```
+This will add a directive on the `/var/www/html` directory (support for other document roots could be added at a later point).
+The directive looks like this on Ubuntu:
+```
+<Directory "/var/www/html/">
+<IfModule headers_module>
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</IfModule>
+</Directory>
+```
+And this on CentOS:
+```
+<IfModule mod_headers.c>
+<Directory "/var/www/html/">
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</Directory>
+</IfModule>
+</IfModule>
+```
+#### Depdendencies
+This will only work if the headers module is installed.
+
+
+## Virtual Hosts
+Required parameters:  
+* server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
+* document_root - the location of the web resources you will be serving via your virtual host
+
+Optional parameters:  
+* server_alias - an array of strings that represent the server aliase
+
+This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
+The document root / web page assets are not instantiated through this definition, you create those elsewhere however you want.
+A list of server aliases can be used to setup separate `ServerAlias` entries in the configuration file for a site.
+### Support
+* CentOS 7
+* CentOS 6
+* Ubuntu 15.10
+
+### ToDo
+* Add support for error log
+* Add support for custom log
+* SSL support
+
 ## ToDo
 * Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
 	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
 	* CentOS7 - 2.4.6  
 	* Ubuntu - 2.4.12
-* Ubuntu support
+* **done** Ubuntu support
+* **done** Virtual Host configuration
 * Raspberian support
-* Terry Pratchett x-clacks header
-* Virtual Host configuration
 * SSL Configuration
 * Custom error pages; 404, 401, 403, 500 etc
 * Removal of Operating System information from error pages 
 * Removal of apache version information from error pages
 * Have all files saved to `/etc/puppet/installers/httpd/`
 * In the case of an upgrade from one version of apache to another, remove old package files from `/etc/puppet/installers/httpd` folder
+* Proxy pass
+* VirtualHost error log
+* VirtualHost cutom log

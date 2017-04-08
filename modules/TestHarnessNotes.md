@@ -28,6 +28,15 @@ This Vagrant file needs to specify a `config.vm.define "<name>"` section with a 
 There must not be a newly generated ssh key added to the build as this will prevent login so add the following `CentOS_6_test.ssh.insert_key = false`.
 The box used must support puppet e.g. `CentOS_6_test.vm.box = "puppetlabs/centos-6.6-64-puppet"`
 
+## Testing
+The test_harness should remove benign errors and warnings from error output files and if a file is empty is should be removed.
+Make use of the warnings_file.txt to store warnings thar you wish to remove.
+Then you can run a command of the form:
+`grep -v "message" warnings_file.txt > ouput.txt`
+Where `message` is the message regex you want to use to remove the test message.
+The output.txt file is then checked to ensure your error message has been removed.
+
+
 ## Snapshots, why use them?
 
 ## To Do
@@ -37,9 +46,9 @@ The box used must support puppet e.g. `CentOS_6_test.vm.box = "puppetlabs/centos
     * **done** If a module name isn't provided then use the directory listing
     * **done** If a VM name isn't provided then use the vagrant status listing
     * **done** If a manifest isn't provided then use the directory listing
-* Add help file for providing useful feedback to standard out
+* **done** Add help file for providing useful feedback to standard out
     * **done** Abbreviated args list if args are missing
-    * Verbose help if the `--help` args are used
+    * **done** Verbose help if the `--help` args are used
 * Perform correct argument checking for each part / function of the test_harness.sh
 * option for verbose output
 * option for version information? (-v?)

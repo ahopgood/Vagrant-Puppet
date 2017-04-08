@@ -54,10 +54,10 @@ Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<updateVersion>
 
 Installation of a Java JDK from an RPM file.
 RPM files with the appropriate minor-major numbers need to be located in the **files** folder for the passed parameters to allow for installation of the correct java version.
-### <a href="CentOS_known_issues">Known issues</a>
+### <a name="CentOS_known_issues">Known issues</a>
 * 
 
-### <a href="CentOS_File_naming_conventions">CentOS File naming conventions</a>
+### <a name="CentOS_File_naming_conventions">CentOS File naming conventions</a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct apache httpd version.  
 Ensuring this pattern is followed will allow the module to locate files correctly, it was decided not to rename all the rpms into a common naming structure since this places the onus on the person running the module to rename files every time there is an update.  
 
@@ -68,9 +68,9 @@ This decision may be revisited in future in order to simplify the module if the 
 
 
 ## Ubuntu
-### <a href="Ubuntu_known_issues">Ubuntu known issues</a>
+### <a name="Ubuntu_known_issues">Ubuntu known issues</a>
 
-### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
+### <a namme="Debian_file_naming_conventions">Debian File naming conventions</a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct apache2 version.  
 <!--
 The naming of these *.deb* files should follow the following convention in order for the correct version to be selected:  

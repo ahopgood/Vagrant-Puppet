@@ -54,9 +54,18 @@ define java (
     fail("Operating system not supported:$::operatingsystem$::operatingsystemmajrelease")
   }
   if ($isDefault == true){
+    #IsDefault is false by default - probably should change this?
     java::default::set{"set-default-to-java-${major_version}":
       major_version => "${major_version}",
       update_version => "${update_version}",
+    }
+
+    if ($::operatingsystem == "Ubuntu"){
+      file { "create default link":
+        ensure => link,
+        path => "/usr/lib/jvm/default",
+        target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",
+      }
     }
   }
 }
@@ -1074,6 +1083,7 @@ define java::jce(
     path => "/usr/bin/",
     command => "unzip -q ${jce_file} -d ${zipLocation}jce-${major_version}",
     unless => "/bin/ls -1 ${zipLocation} | /bin/grep jce-${major_version}",
+    creates => "${zipLocation}jce-${major_version}",
     require => File["${jce_file}"],
   }
 
@@ -1084,6 +1094,7 @@ define java::jce(
   file {"${securityBackupLocation}":
     ensure => directory,
     mode => 777,
+    require => Exec["unzip ${jce_file}"]
   }
 
   $US_export_policy = "US_export_policy.jar"
@@ -1111,7 +1122,7 @@ define java::jce(
       Exec["move Java ${major_version} default ${local_policy} files"],
     ]
   }
-
+  ->
   file {"${securityLocation}${local_policy}":
     ensure => present,
     path => "${securityLocation}${local_policy}",

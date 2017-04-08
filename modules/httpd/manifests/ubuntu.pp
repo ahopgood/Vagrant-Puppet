@@ -7,6 +7,11 @@ class httpd::ubuntu (
   $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"
   $local_install_dir = "${local_install_path}installers/"
   
+  ufw{"open port 80": 
+    port => "80",
+    isTCP => true 
+  }
+  
   $platform = "amd64"
   $ubuntu_version = "-2ubuntu2.1_"
   
@@ -73,7 +78,7 @@ class httpd::ubuntu (
     source => "puppet:///${puppet_file_dir}${libapr1_file}"
   }
 
-  package{"libapr":
+  package{"libapr1":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libapr1_file}",
@@ -92,7 +97,7 @@ class httpd::ubuntu (
     ensure => installed,
     source => "${local_install_dir}${apache_bin_file}",
     require => [File["apache2-bin-file"],
-      Package["libapr"],
+      Package["libapr1"],
       Package["libaprutil"],
       Package["libaprutilldap"],
       Package["liblua"],
@@ -110,7 +115,10 @@ class httpd::ubuntu (
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${apache2_utils_file}",
-    require => [File["apache2-utils-file"],]
+    require => [File["apache2-utils-file"],
+      Package["libapr1"],
+      Package["libaprutil"]
+    ]
   }
   
   $apache2_data_file = "apache2-data_${major_version}.${minor_version}.${patch_version}${ubuntu_version}all.deb"
@@ -141,15 +149,18 @@ class httpd::ubuntu (
     require => [File["apache2-file"],
       Package["apache2-bin"],
       Package["apache2-utils"],
-      Package["apache2-data"]]
+      Package["apache2-data"]],
+    notify => Service["apache2"]
   }
 
-#   service {
-#    "apache2":
-#    require => Package["apache2"],
-#    ensure => running,
-#    enable => true
-#  }
+   service {
+    "apache2":
+    require => Package["apache2"],
+    ensure => running,
+    enable => true,
+  }
+  
+  
    
 }
 #Unpacking apache2 (2.4.12-2ubuntu2.1) ...

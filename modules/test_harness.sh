@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+#function to remove a grep regex pattern from an input file
+function remove_warning(){
+    grep -v "$1" $OUTPUT_FILE > $OUTPUT_FILE".mod"
+    mv $OUTPUT_FILE".mod" $OUTPUT_FILE
+}
 # Function to run a manifest on a vagrant box with the --noop command
 # 1) Takes snapshot based on arg $3 (vn_name) and arg $4 (snapshot_name)
 # 2) SSH's into vagrant box on arg $1 (port) with manifest arg $2 (manifest name .pp)
@@ -23,10 +29,15 @@ function run_manifest {
     mv $manifest_name"_"$vm_name"-errors.txt" $OUTPUT_FILE
 
     #Check for benign "known" warnings and errors and remove from file
-    grep -v "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults" $OUTPUT_FILE > $OUTPUT_FILE".mod"
-    grep -v "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' ([RSA|ECDSA]) to the list of known hosts." $OUTPUT_FILE".mod" > $OUTPUT_FILE
-    rm $OUTPUT_FILE".mod"
-
+    remove_warning "Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults"
+    remove_warning "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts."
+    remove_warning "Warning: alias is a metaparam; this value will inherit to all contained resources in the [a-zA-Z:_]* definition"
+    remove_warning "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line [0-9]* in file [a-zA-Z/]*.pp"
+    remove_warning "Warning: Not collecting exported resources without storeconfigs"
+    remove_warning "Warning: The package type's allow_virtual parameter will be changing its default value from false to true in a future release. If you do not want to allow virtual packages, please explicitly set allow_virtual to false."
+    remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/package.rb:430:in \`default')"
+    remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
+    remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
 
     if [ $FILE_SIZE == 0 ];then
@@ -58,11 +69,11 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
     #Just in case the port numbers have changed per server then the saved key signature will be wrong so purge
     ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
     #Take snapshot so we can work on a fresh OS per puppet manifest we apply
-    vagrant snapshot save $vm_name virgin
+    vagrant snapshot save $vm_name $snapshot_name
 
     # Get list of manifests from the tests/ directory
-    if [ ! -z $3 ]; then
-        MANIFESTS=$3
+    if [ ! -z "$3" ]; then
+        MANIFESTS=($3)
     else
         MANIFESTS=($(ls -m tests | tr "," " "))
     fi
@@ -81,7 +92,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
 
         #Reset the snapshot
         echo -e $RUN_VM_PREFIX"Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
-        vagrant snapshot restore $vm_name virgin
+        vagrant snapshot restore $vm_name $snapshot_name
 #        vagrant destroy $vm_name -f
     done
 
@@ -100,19 +111,19 @@ function run_module {
                 MODULE=($OPTARG)
             ;;
             p)
-                echo -e $RUN_PREFIX"Using the vagrant profile ["$OPTARG"]"
-                if [ -z $OPTARG ]; then
+                echo -e $RUN_PREFIX"Using the vagrant profiles ["$OPTARG"]"
+                if [ -z "$OPTARG" ]; then
                     VMs=""
                 else
-                    VMs=$OPTARG
+                    VMs=($OPTARG)
                 fi
             ;;
             t)
                 echo -e $RUN_PREFIX"Using test manifests ["$OPTARG"]"
-                if [ -z $OPTARG ]; then
+                if [ -z "$OPTARG" ]; then
                     TEST_MANIFESTS=""
                 else
-                    TEST_MANIFESTS=$OPTARG
+                    TEST_MANIFESTS="$OPTARG"
                 fi
             ;;
             \?)
@@ -131,8 +142,8 @@ function run_module {
     echo -e $RUN_PREFIX"Using Vagrant Profiles:"${VMs[@]}
     for ((j=0; j < "${#VMs[*]}"; j++));
     do
-        echo -e $RUN_PREFIX"Starting run for "${VMs[j]}
-        run_vm ${VMs[j]} j $TEST_MANIFESTS
+        echo -e $RUN_PREFIX"Starting run for "${VMs[j]}" with manifests ${TEST_MANIFESTS[@]}"
+        run_vm ${VMs[j]} j "$TEST_MANIFESTS"
     done
     cd $ORIGINAL_DIR
     #Need to move out of the current directory
@@ -146,10 +157,10 @@ echo -e $PREFIX"Working in directory "$(pwd)
 VAGRANT_PROFILE=""
 TEST_MANIFESTS=""
 MODULES=($(ls -m | tr "," " "))
-while getopts m:p:t: FLAG; do
+while getopts m:p:t:-: FLAG; do
     case $FLAG in
         m)
-            if [ -z $OPTARG ]; then
+            if [ -z "$OPTARG" ];then
                 MODULES=""
             else
                 MODULES=($OPTARG)
@@ -158,26 +169,51 @@ while getopts m:p:t: FLAG; do
         ;;
         p)
             echo -e $PREFIX"Setting the vagrant profile to ["$OPTARG"]"
-            if [ -z $OPTARG ]; then
+            if [ -z "$OPTARG" ];then
                 VAGRANT_PROFILE=""
             else
-                VAGRANT_PROFILE="-p "$OPTARG
+                VAGRANT_PROFILE="$OPTARG"
             fi
         ;;
         t)
             echo -e $PREFIX"Setting the test manifests to ["$OPTARG"]"
-            if [ -z $OPTARG ];then
+            if [ -z "$OPTARG" ];then
                 TEST_MANIFESTS=""
             else
-                TEST_MANIFESTS="-t "$OPTARG
+                TEST_MANIFESTS="$OPTARG"
             fi
         ;;
+        -)
+            case "${OPTARG}" in
+            h)
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+            help)
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+            *)
+                echo -e $PREFIX"Unknown option --${OPTARG}"
+                echo -e $PREFIX"Supported parameters are:"
+                echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+                echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+                echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+                exit -1
+            ;;
+       esac;;
         \?)
-            echo "Unsupported option and/or parameter :"$OPTARG
-            echo "Supported parameters are:"
-            echo "[-m module_name] a list of module names, reflecting the directory naming of the module"
-            echo "[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
-            echo "[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
+            echo -e $PREFIX"Unsupported option and/or parameter :"$OPTARG
+            echo -e $PREFIX"Supported parameters are:"
+            echo -e $PREFIX"[-m module_name] a list of module names, reflecting the directory naming of the module"
+            echo -e $PREFIX"[-p os_profile] a list of os profiles, reflecting the name of the vagrant defined profile"
+            echo -e $PREFIX"[-t test_manifest] a list of test manifests, reflecting the file name of the test manifests"
             exit -1
         ;;
     esac
@@ -188,8 +224,8 @@ echo -e $PREFIX"Module list [${#MODULES[*]} modules]:"
 for ((k = 0; k < "${#MODULES[*]}"; k++));
 do
     if [ -d ${MODULES[k]} ];then
-        echo -e $PREFIX"run_module [-m ${MODULES[k]}] [$VAGRANT_PROFILE] [$TEST_MANIFESTS]"
-        run_module -m ${MODULES[k]} $VAGRANT_PROFILE $TEST_MANIFESTS
+        echo -e $PREFIX"run_module [-m ${MODULES[k]}] [-p $VAGRANT_PROFILE] [-t $TEST_MANIFESTS]"
+        run_module -m ${MODULES[k]} -p "$VAGRANT_PROFILE" -t "$TEST_MANIFESTS"
     fi
     echo -e $PREFIX"exiting ${MODULES[k]}"
 done

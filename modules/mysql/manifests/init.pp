@@ -198,5 +198,6 @@ define mysql::differential_restore(
     require => File["db-${dbname}-restore.sh"],
     command => "/usr/local/bin/db-${dbname}-restore.sh",
     cwd => "/home/vagrant",
+    onlyif => "/bin/ls ${backup_path}*-${dbname}backup.sql ",
   }
 }
