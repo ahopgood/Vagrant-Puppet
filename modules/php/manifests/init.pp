@@ -10,10 +10,7 @@
 #
 # Sample Usage:
 #
-class php (  
-  $major_version = '5',
-  $minor_version = '4',
-  $patch_version = '16'
+class php (
 ) {
   notify{"PHP Module running":}
   
@@ -30,13 +27,22 @@ class php (
   if (versioncmp("CentOS", "${operatingsystem}") == 0){
     $provider = "rpm"
     if (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $major_version = '5'
+      $minor_version = '4'
+      $patch_version = '16'
       $platform = "el7"
       $os_specific = ".${platform}_1.${architecture}"
       $build_number = "36"
       
       $freetype_file = "freetype-2.4.11-12.${platform}.${architecture}.rpm"
       $libxpm_file = "libXpm-3.5.11-3.${platform}.${architecture}.rpm"
+
+      $apache_restart_cmd = "/usr/bin/systemctl restart httpd" #centos7
     } else {
+      $major_version = '5'
+      $minor_version = '3'
+      $patch_version = '3'
+    
       $platform = "el6"
       $os_specific = ".${platform}_6.${architecture}"
       $build_number = "46"
@@ -44,20 +50,15 @@ class php (
       $freetype_file = "freetype-2.3.11-15.${platform}_6.1.${architecture}.rpm"
       $libxpm_file = "libXpm-3.5.10-2.${platform}.${architecture}.rpm"
 
-      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the php module")
+      $apache_restart_cmd = "/etc/init.d/httpd restart"
+#      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the php module")
     }
   } else {
     fail("${operatingsystem} is not currently supported by the php module")
   }
-  
-  #Centos versioning <packagename>-<major_ver>.<minor_ver>.<patch_ver>-<buildnumber>.el<majorLinuxVer>_<minorLinuxVer>.<arch>.rpm
-#  $os_specific = "-46.el6_6.x86_64"
-#  $os_specific = ".${platform}_1.${architecture}"
-#  $build_number = "36"
 
   if (versioncmp("CentOS7", "${operatingsystem}${operatingsystemmajrelease}") == 0){
 	  notify{"In libzip":}
-#	  $lib_zip = "libzip-0.10.1-8.el7.x86_64.rpm"
 	  $lib_zip = "libzip-0.10.1-8.${platform}.${architecture}"
 	  $lib_zip_file = "${lib_zip}.rpm"
 	  file{
@@ -69,10 +70,11 @@ class php (
 	    ensure => present,
 	    provider => 'rpm',
 	    source => "${local_install_dir}${$lib_zip_file}",
+      before => Package["php-common"],
 	    require => [File["${local_install_dir}${lib_zip_file}"]],
 	  }
     #Centos7
-    $libx11_file = "libX11-1.6.3-2.el7.${architecture}.rpm"
+    $libx11_file = "libX11-1.6.3-2.${platform}.${architecture}.rpm"
     file{
       "${local_install_dir}${libx11_file}":
         ensure => present,
@@ -89,7 +91,7 @@ class php (
     }
 
     #Centos7
-    $libx11_common_file = "libX11-common-1.6.3-2.el7.noarch.rpm"
+    $libx11_common_file = "libX11-common-1.6.3-2.${platform}.noarch.rpm"
     file{
       "${local_install_dir}${libx11_common_file}":
         ensure => present,
@@ -102,7 +104,7 @@ class php (
       require => File["${local_install_dir}${libx11_common_file}"],
     }
     #Centos7
-    $libxcb_file = "libxcb-1.11-4.el7.x86_64.rpm"
+    $libxcb_file = "libxcb-1.11-4.${platform}.${architecture}.rpm"
     file{
       "${local_install_dir}${libxcb_file}":
         ensure => present,
@@ -115,7 +117,7 @@ class php (
       require => File["${local_install_dir}${libxcb_file}"],
     }
     #Centos7
-    $libXau_file = "libXau-1.0.8-2.1.el7.x86_64.rpm"
+    $libXau_file = "libXau-1.0.8-2.1.${platform}.${architecture}.rpm"
     file{
       "${local_install_dir}${libXau_file}":
         ensure => present,
@@ -130,7 +132,7 @@ class php (
 
     #Centos7
     #PHP-GD dependencies
-    $libpng_file = "libpng-1.5.13-7.el7_2.x86_64.rpm"
+    $libpng_file = "libpng-1.5.13-7.${platform}_2.${architecture}.rpm"
     file{
       "${local_install_dir}${libpng_file}":
         ensure => present,
@@ -140,11 +142,12 @@ class php (
       ensure => present,
       provider => 'rpm',
       source => "${local_install_dir}${libpng_file}",
+      before => Package["php-gd"],
       require => File["${local_install_dir}${libpng_file}"],
     }
 
     #Centos7
-    $libt1_file = "t1lib-5.1.2-14.el7.x86_64.rpm"
+    $libt1_file = "t1lib-5.1.2-14.${platform}.${architecture}.rpm"
     file{
       "${local_install_dir}${libt1_file}":
         ensure => present,
@@ -154,12 +157,13 @@ class php (
       ensure => present,
       provider => 'rpm',
       source => "${local_install_dir}${libt1_file}",
+      before => Package["php-gd"],
       require => [File["${local_install_dir}${libt1_file}"],
         Package["libX11"]],
     }
 
     #Centos7
-    $libjpeg_file = "libjpeg-turbo-1.2.90-5.el7.x86_64.rpm"
+    $libjpeg_file = "libjpeg-turbo-1.2.90-5.${platform}.${architecture}.rpm"
     file{
       "${local_install_dir}${libjpeg_file}":
         ensure => present,
@@ -169,6 +173,7 @@ class php (
       ensure => present,
       provider => 'rpm',
       source => "${local_install_dir}${libjpeg_file}",
+      before => Package["php-gd"],
       require => [File["${local_install_dir}${libjpeg_file}"]],
     }
   }
@@ -213,7 +218,7 @@ class php (
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${php_common_file}",
-    require => [File["${local_install_dir}${php_common_file}"], Package["libzip"]],
+    require => [File["${local_install_dir}${php_common_file}"]],
   }
   file{
     "${local_install_dir}${php_file}":
@@ -231,9 +236,8 @@ class php (
     "restart_apache_for_php":
     require => Package["php"],
 #    path => "/etc/",
-#    command => "/etc/init.d/httpd restart", #centos6
-    path => "/usr/bin/",
-    command => "systemctl restart httpd", #centos7
+    path => "/",
+    command => "${apache_restart_cmd}",
     cwd => "/usr/bin/",
   } 
   
@@ -273,10 +277,7 @@ class php (
     provider => 'rpm',
     source => "${local_install_dir}${php_gd_file}",
     require => [File["${local_install_dir}${php_gd_file}"], Package["php-common"], Package["freetype"], 
-      Package["libXpm"],
-      Package["libpng"],
-      Package["t1lib"],
-      Package["libjpeg-turbo"]],
+      Package["libXpm"]],
   }
 
   file{
@@ -300,9 +301,7 @@ class php (
     ensure => present,
     provider => 'rpm',
     source => "${local_install_dir}${libxpm_file}",
-#    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
     require => [File["${local_install_dir}${libxpm_file}"]],
-#      Package["libX11"]],
   }
      
   $php_mysql = "php-mysql-${major_version}.${minor_version}.${patch_version}-${build_number}"
