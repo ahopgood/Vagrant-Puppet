@@ -69,7 +69,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
     #Just in case the port numbers have changed per server then the saved key signature will be wrong so purge
     ssh-keygen -f $HOME"/.ssh/known_hosts" -R [localhost]:$port
     #Take snapshot so we can work on a fresh OS per puppet manifest we apply
-    vagrant snapshot save $vm_name virgin
+    vagrant snapshot save $vm_name $snapshot_name
 
     # Get list of manifests from the tests/ directory
     if [ ! -z "$3" ]; then
@@ -92,7 +92,7 @@ RUN_VM_PREFIX=$PREFIX"\e[36mrun_vm: \e[39m"
 
         #Reset the snapshot
         echo -e $RUN_VM_PREFIX"Restoring snapshot ["$snapshot_name"] on VM ["$vm_name"] after test run result ["${RESULTS_ARRAY[$(($iterator + i))]}"]"
-        vagrant snapshot restore $vm_name virgin
+        vagrant snapshot restore $vm_name $snapshot_name
 #        vagrant destroy $vm_name -f
     done
 
