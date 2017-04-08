@@ -12,6 +12,6 @@ Package{
   } 
 
   class {"mysql":}
-  class {"iptables": port => "80"}
+#  class {"iptables": port => "80"}
   class {"httpd":}
   class {"php":}

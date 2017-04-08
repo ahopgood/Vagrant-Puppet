@@ -27,21 +27,32 @@ class php (
   $puppet_file_dir = "modules/${module_name}/"
   $local_install_dir = "${local_install_path}installers/"
 
+  if (versioncmp("CentOS", "${operatingsystem}") == 0){
+    $provider = "rpm"
+    if (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $platform = "el7"
+    } else {
+      $platform = "el6"
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the php module")
+    }
+  } else {
+    fail("${operatingsystem} is not currently supported by the php module")
+  }
+  
   #Centos versioning <packagename>-<major_ver>.<minor_ver>.<patch_ver>-<buildnumber>.el<majorLinuxVer>_<minorLinuxVer>.<arch>.rpm
 #  $os_specific = "-46.el6_6.x86_64"
   $os_specific = ".el7_1.x86_64"
   $build_number = "36"
 
-#  if "${minor_version}" > "3" {
-##  && "${major_version}" > 4 {
+  if (versioncmp("CentOS7", "${operatingsystem}${operatingsystemmajrelease}") == 0){
 	  notify{"In libzip":}
 #	  $lib_zip = "libzip-0.10.1-8.el7.x86_64.rpm"
-	  $lib_zip = "libzip-0.10.1-8.el7.x86_64"
+	  $lib_zip = "libzip-0.10.1-8.${platform}.${architecture}"
 	  $lib_zip_file = "${lib_zip}.rpm"
 	  file{
 	    "${local_install_dir}${lib_zip_file}":
 	    ensure => present,
-	    source => ["puppet:///${puppet_file_dir}${$lib_zip_file}",]
+	    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${$lib_zip_file}",]
 	  }
 	  package {"libzip":
 	    ensure => present,
@@ -49,7 +60,7 @@ class php (
 	    source => "${local_install_dir}${$lib_zip_file}",
 	    require => [File["${local_install_dir}${lib_zip_file}"]],
 	  }
-#  }
+  }
  
   $php_name = "php-${major_version}.${minor_version}.${patch_version}-${build_number}"
   $php_file = "${php_name}.rpm"  
@@ -74,7 +85,7 @@ class php (
   file{
     "${local_install_dir}${php_cli_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_cli_os}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_cli_os}",]
   }  
   package {"php-cli":
     ensure => present,
@@ -85,7 +96,7 @@ class php (
   file{
     "${local_install_dir}${php_common_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_common_os}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_common_os}",]
   }
   package {"php-common":
     ensure => present,
@@ -96,7 +107,7 @@ class php (
   file{
     "${local_install_dir}${php_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_file_os}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_file_os}",]
   }
   package {"php":
     ensure => present,
@@ -118,7 +129,7 @@ class php (
   file{
     "${local_install_dir}${php_mbstring_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${php_mbstring_os}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_mbstring_os}",]
   }
   package {"php-mbstring":
     ensure => present,
@@ -129,7 +140,7 @@ class php (
   file{
     "${local_install_dir}${php_pdo_file}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_pdo_os}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_pdo_os}",
   }
   package {"php-pdo":
     ensure => present,
@@ -144,7 +155,7 @@ class php (
   file{
     "${local_install_dir}${php_gd_file}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_gd_os}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_gd_os}",
   }
   package {"php-gd":
     ensure => present,
@@ -156,11 +167,12 @@ class php (
       Package["t1lib"],
       Package["libjpeg-turbo"]],
   }
-  $freetype_file = "freetype-2.3.11-15.el6_6.1.x86_64.rpm"
+#  $freetype_file = "freetype-2.3.11-15.el6_6.1.x86_64.rpm"
+  $freetype_file = "freetype-2.4.11-12.${platform}.${architecture}.rpm"
   file{
     "${local_install_dir}${$freetype_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${freetype_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${freetype_file}",]
   }  
   package {"freetype":
     ensure => present,
@@ -169,11 +181,12 @@ class php (
     require => File["${local_install_dir}${freetype_file}"],
   }
 
-  $libxpm_file = "libXpm-3.5.10-2.el6.x86_64.rpm"
+#  $libxpm_file = "libXpm-3.5.10-2.el6.x86_64.rpm"
+  $libxpm_file = "libXpm-3.5.11-3.${platform}.${architecture}.rpm"
   file{
     "${local_install_dir}${libxpm_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libxpm_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxpm_file}",]
   }
   package {"libXpm":
     ensure => present,
@@ -188,7 +201,7 @@ class php (
   file{
     "${local_install_dir}${libx11_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libx11_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libx11_file}",]
   }
   package {"libX11":
     ensure => present,
@@ -204,7 +217,7 @@ class php (
   file{
     "${local_install_dir}${libx11_common_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libx11_common_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libx11_common_file}",]
   }
   package {"libX11-common":
     ensure => present,
@@ -217,7 +230,7 @@ class php (
   file{
     "${local_install_dir}${libxcb_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libxcb_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxcb_file}",]
   }
   package {"libxcb":
     ensure => present,
@@ -230,7 +243,7 @@ class php (
   file{
     "${local_install_dir}${libXau_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libXau_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libXau_file}",]
   }
   package {"libXau":
     ensure => present,
@@ -245,7 +258,7 @@ class php (
   file{
     "${local_install_dir}${libpng_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libpng_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpng_file}",]
   }
   package {"libpng":
     ensure => present,
@@ -259,7 +272,7 @@ class php (
   file{
     "${local_install_dir}${libt1_file}":
     ensure => present,
-    source => ["puppet:///${puppet_file_dir}${libt1_file}",]
+    source => ["puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libt1_file}",]
   }
   package {"t1lib":
     ensure => present,
@@ -273,7 +286,7 @@ class php (
   file{
     "${local_install_dir}${libjpeg_file}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${libjpeg_file}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libjpeg_file}",
   }
   package {"libjpeg-turbo":
     ensure => present,
@@ -289,7 +302,7 @@ class php (
   file{
     "${local_install_dir}${php_mysql_os}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${php_mysql_os}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${php_mysql_os}",
   }
   package {"php-mysql":
     ensure => present,
