@@ -1,4 +1,4 @@
-class jekyll::gem (
+class jekyll (
   $blog_source_directory = "/blog/",
   $blog_output_directory = "/published_blog/",
   $blog_host_address = "192.168.33.25",
@@ -132,6 +132,7 @@ class jekyll::gem (
     source => "${local_install_dir}${jekyll_sass_converter_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
+    before => Package["listen"],
   }
 
   $jekyll_watch_gem_file = "jekyll-watch-1.5.0.gem"
@@ -288,6 +289,7 @@ class jekyll::gem (
     source => "${local_install_dir}${sass_listen_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
+    before => Package["listen"],
   }
 
   if ("${showDrafts}" == "true"){
