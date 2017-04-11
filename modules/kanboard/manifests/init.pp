@@ -124,13 +124,32 @@ class kanboard (
     group => "apache",
     require => Exec["chown"]
   }
-  
+
+  if (versioncmp("CentOS", "${operatingsystem}") == 0){
+    if (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/usr/bin/systemctl restart httpd"
+    } elsif (versioncmp("6", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/etc/init.d/httpd restart"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not supported")
+    }
+  } elsif (versioncmp("Ubuntu", "${operatingsystem}") == 0){
+    if (versioncmp("15.10", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/etc/init.d/apache2 restart"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not supported")
+    }
+  } else {
+    fail("${operatingsystem} is not supported")
+  }
+
   exec {
     "restart_apache_for_kanban":
-    require => File["config.php"],
-#    command => "/etc/init.d/httpd restart",#centos 6
-    cwd => "/usr/bin/",
-    command => "systemctl restart httpd"
+      cwd => "/usr/bin/",
+      command => "${restart_command}",
+      require => [
+        Php::Php_ini_file["php.ini"],
+        File["config.php"]],
   } 
   
   notify {

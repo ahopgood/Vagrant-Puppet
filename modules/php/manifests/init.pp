@@ -338,7 +338,7 @@ class php (
 #      [
 #        "set short_open_tag On",      
 #      ],
-        notify => Service["httpd"],
+#        notify => Service["httpd"],
       #require => Package["php"], 
       #supplanted by the Class["php"] declaration but useful to know if this augeas call is externalised.
       }

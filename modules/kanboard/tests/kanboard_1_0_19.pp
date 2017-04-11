@@ -14,8 +14,9 @@ Package{
 
 
 #class {"iptables": port => "80" }
+
 class {'httpd':}
-->
+
 class {'mysql':
   major_version => "5",
   minor_version => "6",
