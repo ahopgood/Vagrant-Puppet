@@ -68,6 +68,7 @@ define java (
       major_version => "${major_version}",
       update_version => "${update_version}",
     }
+
     if ($::operatingsystem == "Ubuntu"){
       file { "create default link":
         ensure => link,

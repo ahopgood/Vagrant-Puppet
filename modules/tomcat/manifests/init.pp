@@ -16,17 +16,27 @@ class tomcat (
   $tomcat_manager_password = '',
   $tomcat_script_manager_username = '',
   $tomcat_script_manager_password = '',
-  
-  $logging_directory = '/var/log/tomcat',
+  $logging_directory = undef,
   $major_version = "7",
   $minor_version = "54",
   $port = null,
   $java_opts = '',
   $catalina_opts = '' ) {
-    
+
+
+  #requires storeconfigs to be set in puppet master with a db adapter
+#  Java<<| name == 'java-8' |>> -> Class['tomcat']
   #Java required
-  Java <| |> -> Class['tomcat']
-     
+  if (versioncmp("${major_version}", 8) == 0){
+    Java["java-7"] -> Class['tomcat']
+    #manual check?
+  } elsif (versioncmp("${major_version}", 7) == 0) {
+    Java["java-6"] -> Class['tomcat']
+  }
+
+  #ls -l /var/log | grep tomcat
+  #lrwxrwxrwx 1 root   root       25 Apr 11 08:00 tomcat8 -> /var/hosting/tomcat8/logs
+
   notify {
     "${module_name} installation completed":
   }  
@@ -127,7 +137,8 @@ class tomcat (
     require   =>  Exec["Rename to ${tomcat_short_ver}"],
     notify	  =>  Service["${tomcat_service_file}"],
   }
-   
+
+  #Needs to be contextual to the OS
   file {  "Set JAVA_HOME":
     owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
@@ -146,9 +157,11 @@ class tomcat (
   
   #Link a specified folder to the tomcat/log folder
   #How to ensure the link can be created when the parent folder(s) doesn't exist.
-  file { "/var/log/${tomcat_short_ver}":
-    ensure  =>  link,
-    target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
+  if ($logging_directory != undef){
+    file { "${logging_directory}":
+      ensure  =>  link,
+      target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
+    }
   }
 
   file { "/usr/bin/${tomcat_short_ver}":
@@ -225,6 +238,7 @@ class tomcat (
   service { ["${tomcat_service_file}"]:
     ensure  =>  running,
     enable  =>  true,
+    provider => "init",
     require =>  [File["${tomcat_service_file}"],File["Set CATALINA_HOME"]]
   }  
 
