@@ -10,13 +10,12 @@ define java::centos(
     $local_install_path = "/etc/puppet/"
     $local_install_dir  = "${local_install_path}${name}/"
     $puppet_file_dir    = "modules/java/"
-    
-    file {
-      "${local_install_dir}":
+
+  file {
+    "${local_install_dir}":
       path       =>  "${local_install_dir}",
       ensure     =>  directory,
-    }
-  
+  }
     #Derive rpm file from verion number, update number and platform type
     if ($is64bit == true){
       if ("${major_version}" > 6){
@@ -81,11 +80,11 @@ define java::centos(
       install_options => $install_options,
     }
     ->
-    java::default::install{"install-jdk-${major_version}-in-alternatives":
-      major_version => $major_version,
-      update_version => $update_version,
-    }
-    ->  
+#    java::default::install{"install-jdk-${major_version}-in-alternatives":
+#      major_version => $major_version,
+#      update_version => $update_version,
+#    }
+#    ->
     exec {"remove-old-versions-of-java-${major_version}":
       path => "/bin/",
       command => $removeOldJavaPackages,

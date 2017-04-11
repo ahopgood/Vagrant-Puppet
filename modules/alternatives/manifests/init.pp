@@ -40,7 +40,8 @@ define alternatives::install(
   exec {
     "${name}-install-alternative":
     command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
-    unless      => "update-alternatives --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+#    unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    unless      => "/usr/sbin/${alternativesName} --display ${executableName}",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
@@ -49,6 +50,7 @@ define alternatives::install(
 define alternatives::set(
   $executableName = undef,
   $executableLocation = undef,
+  $targetExecutable = $executableName,
   $priority = undef,
 ){
   #Decide which alternatives program we have based on OS
@@ -62,7 +64,8 @@ define alternatives::set(
   exec {
     "set-alternative-${executableName}":
     command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
-    onlyif      =>  "${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName}",
+#    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }

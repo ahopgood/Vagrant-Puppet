@@ -43,18 +43,27 @@ define java (
       multiTenancy => $multiTenancy
     }
   } elsif $::operatingsystem == 'Ubuntu'{
-       include java::ubuntu::wily
-     java::ubuntu{"test-java-${major_version}":
-       major_version => $major_version,
-       update_version => $update_version,
-       is64bit => $is64bit,
-       multiTenancy => $multiTenancy
+    include java::ubuntu::wily
+
+    java::ubuntu{ "test-java-${major_version}":
+      major_version  => $major_version,
+      update_version => $update_version,
+      is64bit        => $is64bit,
+      multiTenancy   => $multiTenancy
     }
+
+    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
+    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
   } else {
     fail("Operating system not supported:$::operatingsystem$::operatingsystemmajrelease")
   }
   if ($isDefault == true){
     #IsDefault is false by default - probably should change this?
+    java::default::install{"install-default-to-java-${major_version}":
+      major_version => "${major_version}",
+      update_version => "${update_version}",
+    }
+    ->
     java::default::set{"set-default-to-java-${major_version}":
       major_version => "${major_version}",
       update_version => "${update_version}",
@@ -65,6 +74,7 @@ define java (
         ensure => link,
         path => "/usr/lib/jvm/default",
         target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",
+        require => Java::Ubuntu["test-java-${major_version}"],
       }
     }
   }

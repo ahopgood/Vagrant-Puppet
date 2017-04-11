@@ -67,12 +67,14 @@ define java::ubuntu(
 
       #Clear any previous update versions
       package {
-      "oracle-java${major_version}-jdk":
+      "remove oracle-java${major_version}-jdk":
+        name        => "oracle-java${major_version}-jdk",
         ensure      => "purged",
         provider    =>  'dpkg',
+        #onlyif      => "${major_version} ${update_version} aren't equal
       }
       
-      $package_name = "${jdk}"
+      $package_name = "orcale-java${major_version}-jdk"
       package {
       "${package_name}":
         provider    =>  'dpkg',
@@ -102,7 +104,7 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libasound_data}"]
       }
       package {
-      "${libasound_data}":
+      "libasound2-data":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libasound_data}",
@@ -117,11 +119,14 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libasound}"]
       }
       package {
-      "${libasound}":
+      "libasound2":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libasound}",
-        require     =>  [File["${libasound}"],Package["${libasound_data}"]]
+        require     =>  [File["${libasound}"],
+#          Package["${libasound_data}"],
+          Package["libasound2-data"],
+        ]
       }
 
       $libgtk_common = "libgtk2.0-common_2.24.28-1ubuntu1.1_all.deb"
@@ -132,7 +137,7 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libgtk_common}"]
       }
       package {
-      "${libgtk_common}":
+      "libgtk2.0-common":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libgtk_common}",
@@ -147,17 +152,20 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libgtk}"]
       }
       package {
-      "${libgtk}":
+      "libgtk2.0-0":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libgtk}",
-        require     =>  [File["${libgtk}"],Package["${libgtk_common}"]]
+        require     =>  [File["${libgtk}"],
+#          Package["${libgtk_common}"],
+          Package["libgtk2.0-common"]
+        ]
       } 
 }
 
 /**
  * Used to set a particular JDK as a default using debian alternatives.
- * Requires a Java JDK setation.
+ * Requires a Java JDK.
  */
 define java::ubuntu::default::set(
   $version = undef,
