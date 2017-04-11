@@ -11,12 +11,17 @@
 # Sample Usage:
 #
 
-java { 'java-7':
-  major_version => '7',
-  update_version => '80',
-  isDefault => true,
+#java { 'java-7':
+#  major_version => '7',
+#  update_version => '80',
+#  isDefault => true,
+#}
+java{ "java-7":
+    major_version => "6",
+    update_version => "34",
+    isDefault => true,
 }
-
+->
 class { 'tomcat':
 	tomcat_manager_username =>  'admin',
     tomcat_manager_password =>  'adminadmin',
