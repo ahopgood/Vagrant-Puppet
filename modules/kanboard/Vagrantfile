@@ -60,6 +60,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
     config.vm.define "Ubuntu_15_test" do |ubuntu|
       ubuntu.vm.box = "ubuntu/wily64"
+      ubuntu.vm.box_version = "20160315.0.0"
       ubuntu.vm.box_check_update = false
       ubuntu.vm.network "private_network", ip: "192.168.33.15"
     end   
