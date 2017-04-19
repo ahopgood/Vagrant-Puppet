@@ -652,7 +652,7 @@ define java::default::set(
   alternatives::set{
     "firefox-javaplugin.so-set-alternative":
     executableName      => "firefox-javaplugin.so", 
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -660,7 +660,7 @@ define java::default::set(
   alternatives::set{
     "iceape-javaplugin.so-set-alternative":
     executableName      => "iceape-javaplugin.so", 
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -668,7 +668,7 @@ define java::default::set(
   alternatives::set{
     "iceweasel-javaplugin.so-set-alternative":
     executableName      => "iceweasel-javaplugin.so",
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -881,7 +881,7 @@ define java::default::set(
   alternatives::set{
     "midbrowser-javaplugin.so-set-alternative":
     executableName      => "midbrowser-javaplugin.so",
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -889,7 +889,7 @@ define java::default::set(
   alternatives::set{
     "mozilla-javaplugin.so-set-alternative":
     executableName      => "mozilla-javaplugin.so",
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -1032,7 +1032,7 @@ define java::default::set(
   alternatives::set{
     "xulrunner-addons-javaplugin.so-set-alternative":
     executableName      => "xulrunner-addons-javaplugin.so",
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
@@ -1040,7 +1040,7 @@ define java::default::set(
   alternatives::set{
     "xulrunner-javaplugin.so-set-alternative":
     executableName      =>  "xulrunner-javaplugin.so", 
-#    execAlias           => "libnpjp2.so",
+    execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
  }

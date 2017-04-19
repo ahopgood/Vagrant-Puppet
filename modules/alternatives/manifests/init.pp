@@ -40,8 +40,8 @@ define alternatives::install(
   exec {
     "${name}-install-alternative":
     command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
-#    unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
-    unless      => "/usr/sbin/${alternativesName} --display ${executableName}",
+    unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
+#    unless      => "/usr/sbin/${alternativesName} --display ${executableName}",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
@@ -50,7 +50,7 @@ define alternatives::install(
 define alternatives::set(
   $executableName = undef,
   $executableLocation = undef,
-  $targetExecutable = $executableName,
+  $execAlias = undef,
   $priority = undef,
 ){
   #Decide which alternatives program we have based on OS
@@ -61,11 +61,19 @@ define alternatives::set(
   } else {
     notify {"${::operatingsystem} is not supported":}
   }
+
+  if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink
+    $targetExecutable = "${execAlias}"
+  } else {
+    $targetExecutable = "${executableName}"
+  }
+
   exec {
     "set-alternative-${executableName}":
-    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${executableName}",
-    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName}",
-#    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${executableName} > /dev/null",
+    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${targetExecutable}",
+#    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName}",
+    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"link currently points to ${executableLocation}${targetExecutable}\" > /dev/null",
+      #need to update unless to check which one it is set to not if it is available.
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
