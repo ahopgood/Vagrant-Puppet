@@ -42,6 +42,9 @@ define java (
       is64bit => $is64bit,
       multiTenancy => $multiTenancy
     }
+
+    Java::Centos["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
+    Java::Centos["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
   } elsif $::operatingsystem == 'Ubuntu'{
     include java::ubuntu::wily
 
@@ -52,8 +55,8 @@ define java (
       multiTenancy   => $multiTenancy
     }
 
-    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
     Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
+    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
   } else {
     fail("Operating system not supported:$::operatingsystem$::operatingsystemmajrelease")
   }
