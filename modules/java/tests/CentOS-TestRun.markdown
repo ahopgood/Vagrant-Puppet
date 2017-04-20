@@ -45,4 +45,109 @@ Alternatives fails to remove the old entries.
 	* Java 5
 	* Java 6
 	* Java 7
-	* Java 8 
+	* Java 8
+	
+* **check for the .1.gz files in the /binman/man1/rmiregistry.1.gz location**
+## Minor Upgrades
+<table>
+<tr><td>Ubuntu</td> <td>Minor Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>   <td>Default Updated?</td>    <td>Alternatives Updated?</td></hd>
+<tr><td>6.34</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.76</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.31</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 6</td>   <td>Minor Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>   <td>Default Updated?</td>    <td>Alternatives Updated?</td></hd>
+<tr><td>6.34</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.76</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.31</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 7</td> <td>Minor Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.34</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.76</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.31</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+## Minor Downgrades
+<table>
+<tr><td>Ubuntu</td> <td>Minor Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>6.34</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>7.76</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>8.31</td>           <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 6</td>   <td>Minor Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>6.34</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>7.76</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>8.31</td>           <td>true</td>               <td>false</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 7</td> <td>Minor Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>6.34</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>7.76</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>8.31</td>           <td>true</td>               <td>false</td></tr>
+</table>
+
+## Major Upgrades
+<table>
+<tr><td>Ubuntu</td> <td>Major Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+<tr><td>6.45</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 6</td>   <td>Major Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+<tr><td>6.45</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 7</td> <td>Major Upgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>6.45</td>           <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>7.80</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+<tr><td>6.45</td>           <td>8.112</td>          <td>true</td>               <td>true</td></tr>
+</table>
+
+## Major Downgrades
+<table>
+<tr><td>Ubuntu</td> <td>Major Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>7.80</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>7.80</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 6</td>   <td>Major Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>7.80</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>7.80</td>           <td>true</td>               <td>false</td></tr>
+<tr><td>8.112</td>          <td>6.45</td>           <td>true</td>               <td>false</td></tr>
+</table>
+
+<table>
+<tr><td>CentOS 7</td> <td>Major Downgrades</td></tr>
+<hd><td>Start Version</td>  <td>End Version</td>    <td>Default Updated?</td>   <td>Alternatives Updated?</td></hd>
+<tr><td>7.80</td>           <td>6.45</td>           <td>true</td>               <td>true</td></tr>
+<tr><td>8.112</td>          <td>7.80</td>           <td>true</td>               <td>false</td></tr>
+<tr><td>8.112</td>          <td>6.45</td>           <td>true</td>               <td>false</td></tr>
+</table>
+
+## Observations
+Downgrading from a version of Java 8 that isn't update version 112 seems to work without issue.
+Downgrading to a previous version from Java 8u112 causes alternatives to be left in an inconsistent state

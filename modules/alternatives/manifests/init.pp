@@ -41,7 +41,6 @@ define alternatives::install(
     "${name}-install-alternative":
     command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
     unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
-#    unless      => "/usr/sbin/${alternativesName} --display ${executableName}",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }
@@ -71,9 +70,7 @@ define alternatives::set(
   exec {
     "set-alternative-${executableName}":
     command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${targetExecutable}",
-#    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName}",
     unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"link currently points to ${executableLocation}${targetExecutable}\" > /dev/null",
-      #need to update unless to check which one it is set to not if it is available.
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }

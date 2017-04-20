@@ -41,10 +41,15 @@ define java::centos(
     #you'll end up with both versions installed so we need to ensure the previous version is absent
     if ("${major_version}" == 5 or "${major_version}" == 6 or "${major_version}" == 7){
 #      $package_name  = "jdk"
-      
+
+      # package name = jdk1.8.0_31
+      # package version = 1.8.0_31-fcs
       $package_name = "jdk-1.${major_version}.0_${update_version}-fcs.x86_64"
+      $package_version = "jdk-1.${major_version}.0_${update_version}-fcs.x86_64"
+      #rpm package version = jdk1.8.0_112-1.8.0_112-fcs.x86_64
     } elsif ("${major_version}" == 8){
-      $package_name  = "jdk1.${major_version}.0_${update_version}-1.${major_version}.0_${update_version}-fcs.x86_64"
+      $package_name  = "jdk1.${major_version}.0_${update_version}"
+      $package_version = "1.${major_version}.0_${update_version}-fcs"
     } 
     
     file {
@@ -69,10 +74,10 @@ define java::centos(
       $removeOldJavaPackages = "rpm -e $(rpm -qa | grep jdk* | grep -v '${package_name}')"
       $checkOldPackagesExist = "rpm -qa | grep jdk* | grep -v '${package_name}'"
     }
-    
+
     package {
       "${package_name}":
-      ensure      => "${package_name}",
+      ensure      => "${package_version}",
 #      ensure      => installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}${jdk}",
@@ -85,13 +90,13 @@ define java::centos(
 #      update_version => $update_version,
 #    }
 #    ->
-    exec {"remove-old-versions-of-java-${major_version}":
+    exec {"remove-other-versions-of-java-${major_version}":
       path => "/bin/",
       command => $removeOldJavaPackages,
       onlyif => $checkOldPackagesExist,
-#      command => "rpm -e $(rpm -qa | grep jdk-1.${major_version}.* | grep -v 'jdk-1.${major_version}.0_${update_version}')",
-#      onlyif => "rpm -qa | grep jdk-1.${major_version} | grep -v 'jdk-1.${major_version}.0_${update_version}'"
-    }       
+      #Removing the java package via rpm fails to clear up alternatives
+    }
+
 #    if ("${multiTenancy}" == "true"){
 #      #Because we used --force on rpm we need to remove the previous minor versions of the major version we're trying to install.
 #    }
