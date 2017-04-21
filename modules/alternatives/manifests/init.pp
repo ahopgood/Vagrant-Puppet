@@ -17,6 +17,7 @@ define alternatives::install(
   $manExecutable = undef,
   $manLocation = undef,
   $execAlias = undef,
+  $slaveHash = undef,
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
@@ -36,10 +37,15 @@ define alternatives::install(
   } else {
     $targetExecutable = "${executableName}"
   } 
-  
+
+  if ($slaveHash != undef){
+    $slaveArray = $slaveHash.map |$key, $value| { "--slave /usr/bin/$key $key $value$key" }
+    $slaves = $slaveArray.reduce |$memo, $value| { "$memo $value" }
+  }
+
   exec {
     "${name}-install-alternative":
-    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave}",
+    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave} ${slaves}",
     unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
