@@ -44,7 +44,7 @@ define java (
     }
 
     Java::Centos["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
-    Java::Centos["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
+#    Java::Centos["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
   } elsif $::operatingsystem == 'Ubuntu'{
     include java::ubuntu::wily
 
@@ -56,17 +56,20 @@ define java (
     }
 
     Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
-    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
+#    Java::Ubuntu["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
   } else {
     fail("Operating system not supported:$::operatingsystem$::operatingsystemmajrelease")
   }
+
+  java::default::install{"install-default-to-java-${major_version}":
+    major_version => "${major_version}",
+    update_version => "${update_version}",
+  }
+
   if ($isDefault == true){
     #IsDefault is false by default - probably should change this?
-    java::default::install{"install-default-to-java-${major_version}":
-      major_version => "${major_version}",
-      update_version => "${update_version}",
-    }
-    ->
+    Java::Default::Install["install-default-to-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
+#    ->
     java::default::set{"set-default-to-java-${major_version}":
       major_version => "${major_version}",
       update_version => "${update_version}",
@@ -150,13 +153,13 @@ define java::default::install(
     manLocation         => "${manLocation}",
     manExecutable       => "appletviewer.1.gz",
   }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-ControlPanel":
-    executableName      => "ControlPanel",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-ControlPanel":
+#    executableName      => "ControlPanel",
+#    executableLocation  => "${jreBinLocation}",
+#    priority            => $priority,
+#  }
   #/bin
   alternatives::install{
     "java-${major_version}-extcheck":
@@ -226,7 +229,17 @@ define java::default::install(
     priority            => $priority,
     manExecutable       => "java.1.gz",
     manLocation         => "${manLocation}",
+    slaveHash           => { "ControlPanel" => "${jreBinLocation}" }
   }
+
+  #  #/jre/bin
+  #  alternatives::install{
+  #    "java-${major_version}-ControlPanel":
+  #    executableName      => "ControlPanel",
+  #    executableLocation  => "${jreBinLocation}",
+  #    priority            => $priority,
+  #  }
+
   #/bin
   alternatives::install{
     "java-${major_version}-javac":
@@ -1110,11 +1123,11 @@ define java::jce(
     require => Exec["unzip ${jce_file}"]
   }
 
-  $US_export_policy = "US_export_policy.jar"
-  exec {"move Java ${major_version} default ${US_export_policy} files":
+  $us_export_policy = "US_export_policy.jar"
+  exec {"move Java ${major_version} default ${us_export_policy} files":
     path => "/bin/",
-    command => "mv ${securityLocation}${US_export_policy} ${securityBackupLocation}",
-    unless => "/bin/ls -1 ${securityBackupLocation} | /bin/grep ${US_export_policy}",
+    command => "mv ${securityLocation}${us_export_policy} ${securityBackupLocation}",
+    unless => "/bin/ls -1 ${securityBackupLocation} | /bin/grep ${us_export_policy}",
     require => File["${securityBackupLocation}"],
   }
 
@@ -1126,12 +1139,12 @@ define java::jce(
     require => File["${securityBackupLocation}"],
   }
 
-  file {"${securityLocation}${US_export_policy}":
+  file {"${securityLocation}${us_export_policy}":
     ensure => present,
-    path => "${securityLocation}${US_export_policy}",
-    source => ["${zipLocation}jce-${major_version}/${unpacked_jce_folder}/${US_export_policy}"],
+    path => "${securityLocation}${us_export_policy}",
+    source => ["${zipLocation}jce-${major_version}/${unpacked_jce_folder}/${us_export_policy}"],
     require => [
-      Exec["move Java ${major_version} default ${US_export_policy} files"],
+      Exec["move Java ${major_version} default ${us_export_policy} files"],
       Exec["move Java ${major_version} default ${local_policy} files"],
     ]
   }
@@ -1141,7 +1154,7 @@ define java::jce(
     path => "${securityLocation}${local_policy}",
     source => ["${zipLocation}jce-${major_version}/${unpacked_jce_folder}/${local_policy}"],
     require => [
-      Exec["move Java ${major_version} default ${US_export_policy} files"],
+      Exec["move Java ${major_version} default ${us_export_policy} files"],
       Exec["move Java ${major_version} default ${local_policy} files"],
     ]
   }
