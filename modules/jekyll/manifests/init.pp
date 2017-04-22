@@ -4,24 +4,6 @@ class jekyll (
   $blog_host_address = "192.168.33.25",
   $showDrafts = "false",
 ) {
-  #gem install -i tmp jekyll -v 3.3.1
-  #tmp/cache/*.gem
-  #gem install -f --local /vagrant/files/*.gem
-  
-  #ubuntu/wily (15.10)
-  #Ruby version 2.1.5p273
-  #Check the gem addressable (for example) is installed locally
-  #gem list addressable 
-  
-  #Perform ubuntu 15.10 check
-  #Perform ruby check
-  #Perform rubygems check
-  
-  #Start server
-  #jekyll serve --host 192.168.33.24 -s /blog/ -d /published_blog/ --watch --drafts --force_polling --detach
-  #Kill server
-  #Server detached with pid '1933'. Run `pkill -f jekyll' or `kill -9 1933' to stop the server.
-  
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/jekyll/"
@@ -132,7 +114,8 @@ class jekyll (
     source => "${local_install_dir}${jekyll_sass_converter_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
-    before => Package["listen"],
+    install_options => ["--force"],
+#    before => Package["listen"],
   }
 
   $jekyll_watch_gem_file = "jekyll-watch-1.5.0.gem"
@@ -289,7 +272,8 @@ class jekyll (
     source => "${local_install_dir}${sass_listen_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
-    before => Package["listen"],
+    install_options => ["--force"],
+#    before => Package["listen"],
   }
 
   if ("${showDrafts}" == "true"){
