@@ -40,10 +40,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	ubuntu.vm.synced_folder "published_blog", "/published_blog"
 	
 	ubuntu.vm.synced_folder "../", "/etc/puppet/modules"
-	ubuntu.vm.provision "puppet" do |puppet|
-		puppet.manifests_path = "manifests"
-		puppet.manifest_file  = "jekyll.pp"
-	end
+#	ubuntu.vm.provision "puppet" do |puppet|
+#		puppet.manifests_path = "manifests"
+#		puppet.manifest_file  = "jekyll.pp"
+#	end
   end
   
   config.vm.define "jekyll" do | jekyll |
