@@ -110,48 +110,21 @@ define java::default::install(
   $jreBinLocation = "${jdkLocation}jre/bin/"
   $pluginLocation = "${jdkLocation}jre/lib/amd64/"
   $manLocation     = "${jdkLocation}man/man1/"
-  $priority = 300 + "${major_version}"
+  $priority = 100000  + (1000 * "${major_version}") + "${update_version}"
+  #e.g. java 8u112 and 7u80 respectively:
+  #100000 + 8000 = 180000 + 112 = 180112
+  #100000 + 7000 = 170000 + 80 = 1700080
 
   $manExt = ".1"
 
-
-  if ($major_version == 7 or $major_version == 8){
-    #/bin
-    alternatives::install{
-      "java-${major_version}-jcmd":
-      executableName      => "jcmd",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-      manExecutable       => "jcmd${manExt}",
-      manLocation         => "${manLocation}",
-    }
-    #/bin
-    alternatives::install{
-      "java-${major_version}-jmc":
-      executableName      => "jmc",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-      manExecutable       => "jmc${manExt}",
-      manLocation         => "${manLocation}",
-    }
-  }
   if ($major_version == 8){
-    #/bin
-    alternatives::install{
-      "java-${major_version}-jdeps":
-      executableName      => "jdeps",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-      manExecutable       => "jdeps${manExt}",
-      manLocation         => "${manLocation}",
-    }
-    $slaveHash = {
+    $javaSlaveHash = { #Verified
       "ControlPanel" => "${jreBinLocation}",
       "javaws" => "${jreBinLocation}",
       "jcontrol" => "${jreBinLocation}",
       "jjs" => "${jreBinLocation}",
       "keytool" => "${jreBinLocation}",
-      "ordb" => "${jreBinLocation}",
+      "orbd" => "${jreBinLocation}",
       "pack200" => "${jreBinLocation}",
       "policytool" => "${jreBinLocation}",
       "rmid" => "${jreBinLocation}",
@@ -160,7 +133,6 @@ define java::default::install(
       "tnameserv" => "${jreBinLocation}",
       "unpack200" => "${jreBinLocation}",
       "javaws${manExt}" => "${manLocation}",
-      "jcontrol${manExt}" => "${manLocation}",
       "jjs${manExt}" => "${manLocation}",
       "keytool${manExt}" => "${manLocation}",
       "ordb${manExt}" => "${manLocation}",
@@ -172,54 +144,335 @@ define java::default::install(
       "tnameserv${manExt}" => "${manLocation}",
       "unpack200${manExt}" => "${manLocation}",
     }
-  } else { #java 6 & 7
-    $slaveHash = {
+
+    $javaCompilerslaveHash = {
       "ControlPanel" => "${jreBinLocation}",
+      "appletviewer" => "${jdkBinLocation}",
+      "extcheck" => "${jdkBinLocation}",
+      "idlj" => "${jdkBinLocation}",
+      "jar" => "${jdkBinLocation}",
+      "jarsigner" => "${jdkBinLocation}",
+      "java-rmi.cgi" => "${jdkBinLocation}",
+      "javadoc" => "${jdkBinLocation}",
+      "javafxpackager" => "${jdkBinLocation}",
+      "javah" => "${jdkBinLocation}",
+      "javap" => "${jdkBinLocation}",
+      "javapackager" => "${jdkBinLocation}",
       "javaws" => "${jreBinLocation}",
-      "java_vm" => "${jreBinLocation}",
+      "jcmd" => "${jdkBinLocation}", #java 7 & 8
+      "jconsole" => "${jdkBinLocation}",
       "jcontrol" => "${jreBinLocation}",
+      "jdb" => "${jdkBinLocation}",
+      "jdeps" => "${jdkBinLocation}",
+      "jhat" => "${jdkBinLocation}",
+      "jinfo" => "${jdkBinLocation}",
+      "jjs" => "${jreBinLocation}", #java 8 only
+      "jmap" => "${jdkBinLocation}",
+      "jmc" => "${jdkBinLocation}", #java 8 & 7 only
+      "jmc.ini" => "${jdkBinLocation}", #java 8 & 7 only
+      "jps" => "${jdkBinLocation}",
+      "jrunscript" => "${jdkBinLocation}",
+      "jsadebugd" => "${jdkBinLocation}",
+      "jstack" => "${jdkBinLocation}",
+      "jstatd" => "${jdkBinLocation}",
+      "jvisualvm" => "${jdkBinLocation}",
       "keytool" => "${jreBinLocation}",
-      "ordb" => "${jreBinLocation}",
+      "native2ascii" => "${jdkBinLocation}",
+      "orbd" => "${jreBinLocation}",
       "pack200" => "${jreBinLocation}",
       "policytool" => "${jreBinLocation}",
+      "rmic" => "${jdkBinLocation}",
       "rmid" => "${jreBinLocation}",
       "rmiregistry" => "${jreBinLocation}",
+      "schemagen" => "${jdkBinLocation}",
+      "serialver" => "${jdkBinLocation}",
       "servertool" => "${jreBinLocation}",
       "tnameserv" => "${jreBinLocation}",
       "unpack200" => "${jreBinLocation}",
+      "wsgen" => "${jdkBinLocation}",
+      "wsimport" => "${jdkBinLocation}",
+      "xjc" => "${jdkBinLocation}",
+      "appletviewer${manExt}" => "${manLocation}",
+      "extcheck${manExt}" => "${manLocation}",
+      "idlj${manExt}" => "${manLocation}",
+      "jar${manExt}" => "${manLocation}",
+      "jarsigner${manExt}" => "${manLocation}",
+      "java${manExt}" => "${manLocation}",
+      "javac${manExt}" => "${manLocation}",
+      "javadoc${manExt}" => "${manLocation}",
+      "javafxpackager${manExt}" => "${manLocation}",
+      "javah${manExt}" => "${manLocation}",
+      "javap${manExt}" => "${manLocation}",
+      "javapackager${manExt}" => "${manLocation}",
       "javaws${manExt}" => "${manLocation}",
-      "java_vm${manExt}" => "${manLocation}",
-      "jcontrol${manExt}" => "${manLocation}",
+      "jcmd${manExt}" => "${manLocation}", #java 8 & 7 only
+      "jconsole${manExt}" => "${manLocation}",
+      "jdb${manExt}" => "${manLocation}",
+      "jdeps${manExt}" => "${manLocation}",
+      "jhat${manExt}" => "${manLocation}",
+      "jinfo${manExt}" => "${manLocation}",
+      "jjs${manExt}" => "${manLocation}", #java 8 only
+      "jmap${manExt}" => "${manLocation}",
+      "jmc${manExt}" => "${manLocation}",
+      "jps${manExt}" => "${manLocation}",
+      "jrunscript${manExt}" => "${manLocation}",
+      "jsadebugd${manExt}" => "${manLocation}",
+      "jstack${manExt}" => "${manLocation}",
+      "jstat${manExt}" => "${manLocation}",
+      "jstatd${manExt}" => "${manLocation}",
+      "jvisualvm${manExt}" => "${manLocation}",
       "keytool${manExt}" => "${manLocation}",
-      "ordb${manExt}" => "${manLocation}",
+      "native2ascii${manExt}" => "${manLocation}",
+      "orbd${manExt}" => "${manLocation}",
       "pack200${manExt}" => "${manLocation}",
       "policytool${manExt}" => "${manLocation}",
+      "rmic${manExt}" => "${manLocation}",
       "rmid${manExt}" => "${manLocation}",
       "rmiregistry${manExt}" => "${manLocation}",
+      "schemagen${manExt}" => "${manLocation}",
+      "serialver${manExt}" => "${manLocation}",
       "servertool${manExt}" => "${manLocation}",
       "tnameserv${manExt}" => "${manLocation}",
       "unpack200${manExt}" => "${manLocation}",
+      "wsgen${manExt}" => "${manLocation}",
+      "wsimport${manExt}" => "${manLocation}",
+      "xjc${manExt}" => "${manLocation}",
+    }
+  } elsif (versioncmp("${major_version}", "7") == 0) {
+    $javaSlaveHash = { # checked
+      "ControlPanel"         => "${jreBinLocation}",
+      "java_vm"              => "${jreBinLocation}",
+      "javaws"               => "${jreBinLocation}",
+      "jcontrol"             => "${jreBinLocation}",
+      "keytool"              => "${jreBinLocation}",
+      "orbd"                 => "${jreBinLocation}",
+      "pack200"              => "${jreBinLocation}",
+      "policytool"           => "${jreBinLocation}",
+      "rmid"                 => "${jreBinLocation}",
+      "rmiregistry"          => "${jreBinLocation}",
+      "servertool"           => "${jreBinLocation}",
+      "tnameserv"            => "${jreBinLocation}",
+      "unpack200"            => "${jreBinLocation}",
+      "javaws${manExt}"      => "${manLocation}",
+      "keytool${manExt}"     => "${manLocation}",
+      "ordb${manExt}"        => "${manLocation}",
+      "pack200${manExt}"     => "${manLocation}",
+      "policytool${manExt}"  => "${manLocation}",
+      "rmid${manExt}"        => "${manLocation}",
+      "rmiregistry${manExt}" => "${manLocation}",
+      "servertool${manExt}"  => "${manLocation}",
+      "tnameserv${manExt}"   => "${manLocation}",
+      "unpack200${manExt}"   => "${manLocation}",
     }
 
-  }
-  
-  #bin
-  alternatives::install{
-    "java-${major_version}-appletviewer":
-    executableName      => "appletviewer",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manLocation         => "${manLocation}",
-    manExecutable       => "appletviewer${manExt}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-extcheck":
-    executableName      => "extcheck",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manLocation         => "${manLocation}",
-    manExecutable      => "extcheck${manExt}",
+    $javaCompilerslaveHash = {
+      "ControlPanel"            => "${jreBinLocation}",
+      "appletviewer"            => "${jdkBinLocation}",
+      "extcheck"                => "${jdkBinLocation}",
+      "idlj"                    => "${jdkBinLocation}",
+      "jar"                     => "${jdkBinLocation}",
+      "jarsigner"               => "${jdkBinLocation}",
+      "java-rmi.cgi"            => "${jdkBinLocation}",
+      "javadoc"                 => "${jdkBinLocation}",
+      "javafxpackager"          => "${jdkBinLocation}",
+      "javah"                   => "${jdkBinLocation}",
+      "javap"                   => "${jdkBinLocation}",
+      "javapackager"            => "${jdkBinLocation}",
+      "javaws"                  => "${jreBinLocation}",
+      "java_vm"                 => "${jreBinLocation}",
+      "jcmd"                    => "${jdkBinLocation}", #java 7 & 8
+      "jconsole"                => "${jdkBinLocation}",
+      "jcontrol"                => "${jreBinLocation}",
+      "jdb"                     => "${jdkBinLocation}",
+      "jdeps"                   => "${jdkBinLocation}",
+      "jhat"                    => "${jdkBinLocation}",
+      "jinfo"                   => "${jdkBinLocation}",
+      "jmap"                    => "${jdkBinLocation}",
+      "jmc"                     => "${jdkBinLocation}", #java 8 & 7 only
+      "jmc.ini"                 => "${jdkBinLocation}", #java 8 & 7 only
+      "jps"                     => "${jdkBinLocation}",
+      "jrunscript"              => "${jdkBinLocation}",
+      "jsadebugd"               => "${jdkBinLocation}",
+      "jstack"                  => "${jdkBinLocation}",
+      "jstatd"                  => "${jdkBinLocation}",
+      "jvisualvm"               => "${jdkBinLocation}",
+      "keytool"                 => "${jreBinLocation}",
+      "native2ascii"            => "${jdkBinLocation}",
+      "orbd"                    => "${jreBinLocation}",
+      "pack200"                 => "${jreBinLocation}",
+      "policytool"              => "${jreBinLocation}",
+      "rmic"                    => "${jdkBinLocation}",
+      "rmid"                    => "${jreBinLocation}",
+      "rmiregistry"             => "${jreBinLocation}",
+      "schemagen"               => "${jdkBinLocation}",
+      "serialver"               => "${jdkBinLocation}",
+      "servertool"              => "${jreBinLocation}",
+      "tnameserv"               => "${jreBinLocation}",
+      "unpack200"               => "${jreBinLocation}",
+      "wsgen"                   => "${jdkBinLocation}",
+      "wsimport"                => "${jdkBinLocation}",
+      "xjc"                     => "${jdkBinLocation}",
+      "appletviewer${manExt}"   => "${manLocation}",
+      "extcheck${manExt}"       => "${manLocation}",
+      "idlj${manExt}"           => "${manLocation}",
+      "jar${manExt}"            => "${manLocation}",
+      "jarsigner${manExt}"      => "${manLocation}",
+      "java${manExt}"           => "${manLocation}",
+      "javac${manExt}"          => "${manLocation}",
+      "javadoc${manExt}"        => "${manLocation}",
+      "javafxpackager${manExt}" => "${manLocation}",
+      "javah${manExt}"          => "${manLocation}",
+      "javap${manExt}"          => "${manLocation}",
+      "javapackager${manExt}"   => "${manLocation}",
+      "javaws${manExt}"         => "${manLocation}",
+      "jcmd${manExt}"           => "${manLocation}", #java 8 & 7 only
+      "jconsole${manExt}"       => "${manLocation}",
+      "jdb${manExt}"            => "${manLocation}",
+      "jdeps${manExt}"          => "${manLocation}",
+      "jhat${manExt}"           => "${manLocation}",
+      "jinfo${manExt}"          => "${manLocation}",
+      "jmap${manExt}"           => "${manLocation}",
+      "jmc${manExt}"            => "${manLocation}",
+      "jps${manExt}"            => "${manLocation}",
+      "jrunscript${manExt}"     => "${manLocation}",
+      "jsadebugd${manExt}"      => "${manLocation}",
+      "jstack${manExt}"         => "${manLocation}",
+      "jstat${manExt}"          => "${manLocation}",
+      "jstatd${manExt}"         => "${manLocation}",
+      "jvisualvm${manExt}"      => "${manLocation}",
+      "keytool${manExt}"        => "${manLocation}",
+      "native2ascii${manExt}"   => "${manLocation}",
+      "orbd${manExt}"           => "${manLocation}",
+      "pack200${manExt}"        => "${manLocation}",
+      "policytool${manExt}"     => "${manLocation}",
+      "rmic${manExt}"           => "${manLocation}",
+      "rmid${manExt}"           => "${manLocation}",
+      "rmiregistry${manExt}"    => "${manLocation}",
+      "schemagen${manExt}"      => "${manLocation}",
+      "serialver${manExt}"      => "${manLocation}",
+      "servertool${manExt}"     => "${manLocation}",
+      "tnameserv${manExt}"      => "${manLocation}",
+      "unpack200${manExt}"      => "${manLocation}",
+      "wsgen${manExt}"          => "${manLocation}",
+      "wsimport${manExt}"       => "${manLocation}",
+      "xjc${manExt}"            => "${manLocation}",
+    }
+  } elsif (versioncmp("${major_version}", "6") == 0) { # java 6
+    $javaSlaveHash = {
+      "ControlPanel"         => "${jreBinLocation}",
+      "java_vm"              => "${jreBinLocation}",
+      "javaws"               => "${jreBinLocation}",
+      "jcontrol"             => "${jreBinLocation}",
+      "keytool"              => "${jreBinLocation}",
+      "orbd"                 => "${jreBinLocation}",
+      "pack200"              => "${jreBinLocation}",
+      "policytool"           => "${jreBinLocation}",
+      "rmid"                 => "${jreBinLocation}",
+      "rmiregistry"          => "${jreBinLocation}",
+      "servertool"           => "${jreBinLocation}",
+      "tnameserv"            => "${jreBinLocation}",
+      "unpack200"            => "${jreBinLocation}",
+      "javaws${manExt}"      => "${manLocation}",
+      "keytool${manExt}"     => "${manLocation}",
+      "orbd${manExt}"        => "${manLocation}",
+      "pack200${manExt}"     => "${manLocation}",
+      "policytool${manExt}"  => "${manLocation}",
+      "rmid${manExt}"        => "${manLocation}",
+      "rmiregistry${manExt}" => "${manLocation}",
+      "servertool${manExt}"  => "${manLocation}",
+      "tnameserv${manExt}"   => "${manLocation}",
+      "unpack200${manExt}"   => "${manLocation}",
+    }
+
+    $javaCompilerslaveHash = {
+      "ControlPanel"            => "${jreBinLocation}",
+      "appletviewer"            => "${jdkBinLocation}",
+      "extcheck"                => "${jdkBinLocation}",
+      "idlj"                    => "${jdkBinLocation}",
+      "jar"                     => "${jdkBinLocation}",
+      "jarsigner"               => "${jdkBinLocation}",
+      "java-rmi.cgi"            => "${jdkBinLocation}",
+      "javadoc"                 => "${jdkBinLocation}",
+      "javafxpackager"          => "${jdkBinLocation}",
+      "javah"                   => "${jdkBinLocation}",
+      "javap"                   => "${jdkBinLocation}",
+      "javapackager"            => "${jdkBinLocation}",
+      "javaws"                  => "${jreBinLocation}",
+      "java_vm"                 => "${jreBinLocation}",
+      "jconsole"                => "${jdkBinLocation}",
+      "jcontrol"                => "${jreBinLocation}",
+      "jdb"                     => "${jdkBinLocation}",
+      "jdeps"                   => "${jdkBinLocation}",
+      "jhat"                    => "${jdkBinLocation}",
+      "jinfo"                   => "${jdkBinLocation}",
+      "jmap"                    => "${jdkBinLocation}",
+      "jps"                     => "${jdkBinLocation}",
+      "jrunscript"              => "${jdkBinLocation}",
+      "jsadebugd"               => "${jdkBinLocation}",
+      "jstack"                  => "${jdkBinLocation}",
+      "jstatd"                  => "${jdkBinLocation}",
+      "jvisualvm"               => "${jdkBinLocation}",
+      "keytool"                 => "${jreBinLocation}",
+      "native2ascii"            => "${jdkBinLocation}",
+      "orbd"                    => "${jreBinLocation}",
+      "pack200"                 => "${jreBinLocation}",
+      "policytool"              => "${jreBinLocation}",
+      "rmic"                    => "${jdkBinLocation}",
+      "rmid"                    => "${jreBinLocation}",
+      "rmiregistry"             => "${jreBinLocation}",
+      "schemagen"               => "${jdkBinLocation}",
+      "serialver"               => "${jdkBinLocation}",
+      "servertool"              => "${jreBinLocation}",
+      "tnameserv"               => "${jreBinLocation}",
+      "unpack200"               => "${jreBinLocation}",
+      "wsgen"                   => "${jdkBinLocation}",
+      "wsimport"                => "${jdkBinLocation}",
+      "xjc"                     => "${jdkBinLocation}",
+      "appletviewer${manExt}"   => "${manLocation}",
+      "extcheck${manExt}"       => "${manLocation}",
+      "idlj${manExt}"           => "${manLocation}",
+      "jar${manExt}"            => "${manLocation}",
+      "jarsigner${manExt}"      => "${manLocation}",
+      "java${manExt}"           => "${manLocation}",
+      "javac${manExt}"          => "${manLocation}",
+      "javadoc${manExt}"        => "${manLocation}",
+      "javafxpackager${manExt}" => "${manLocation}",
+      "javah${manExt}"          => "${manLocation}",
+      "javap${manExt}"          => "${manLocation}",
+      "javapackager${manExt}"   => "${manLocation}",
+      "javaws${manExt}"         => "${manLocation}",
+      "jconsole${manExt}"       => "${manLocation}",
+      "jdb${manExt}"            => "${manLocation}",
+      "jdeps${manExt}"          => "${manLocation}",
+      "jhat${manExt}"           => "${manLocation}",
+      "jinfo${manExt}"          => "${manLocation}",
+      "jmap${manExt}"           => "${manLocation}",
+      "jps${manExt}"            => "${manLocation}",
+      "jrunscript${manExt}"     => "${manLocation}",
+      "jsadebugd${manExt}"      => "${manLocation}",
+      "jstack${manExt}"         => "${manLocation}",
+      "jstat${manExt}"          => "${manLocation}",
+      "jstatd${manExt}"         => "${manLocation}",
+      "jvisualvm${manExt}"      => "${manLocation}",
+      "keytool${manExt}"        => "${manLocation}",
+      "native2ascii${manExt}"   => "${manLocation}",
+      "orbd${manExt}"           => "${manLocation}",
+      "pack200${manExt}"        => "${manLocation}",
+      "policytool${manExt}"     => "${manLocation}",
+      "rmic${manExt}"           => "${manLocation}",
+      "rmid${manExt}"           => "${manLocation}",
+      "rmiregistry${manExt}"    => "${manLocation}",
+      "schemagen${manExt}"      => "${manLocation}",
+      "serialver${manExt}"      => "${manLocation}",
+      "servertool${manExt}"     => "${manLocation}",
+      "tnameserv${manExt}"      => "${manLocation}",
+      "unpack200${manExt}"      => "${manLocation}",
+      "wsgen${manExt}"          => "${manLocation}",
+      "wsimport${manExt}"       => "${manLocation}",
+      "xjc${manExt}"            => "${manLocation}",
+    }
+  } else {
+    fail("Java ${major_version} alternatives not supported")
   }
 
   #/jre/lib/amd64
@@ -246,33 +499,7 @@ define java::default::install(
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-idlj":
-    executableName      => "idlj",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "idlj${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jar":
-    executableName      => "jar",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jar${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jarsigner":
-    executableName      => "jarsigner",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jarsigner${manExt}",
-    manLocation         => "${manLocation}",
-  }
+
   #/jre/bin
   alternatives::install{
     "java-${major_version}-java":
@@ -281,107 +508,8 @@ define java::default::install(
     priority            => $priority,
     manExecutable       => "java${manExt}",
     manLocation         => "${manLocation}",
-    slaveHash           => $slaveHash,
+    slaveHash           => $javaSlaveHash,
   }
-
-  #  #/jre/bin
-  #  alternatives::install{
-  #    "java-${major_version}-ControlPanel":
-  #    executableName      => "ControlPanel",
-  #    executableLocation  => "${jreBinLocation}",
-  #    priority            => $priority,
-  #  }
-  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-javaws":
-#      executableName      => "javaws",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "javaws${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-keytool":
-#      executableName      => "keytool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "keytool${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-orbd":
-#      executableName      => "orbd",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "orbd${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-pack200":
-#      executableName      => "pack200",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "pack200${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-policytool":
-#      executableName      => "policytool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "policytool${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-rmid":
-#      executableName      => "rmid",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "rmid${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-rmiregistry":
-#      executableName      => "rmiregistry",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "rmiregistry${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-servertool":
-#      executableName      => "servertool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "servertool${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-tnameserv":
-#      executableName      => "tnameserv",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "tnameserv${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-unpack200":
-#      executableName      => "unpack200",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#      manExecutable       => "unpack200${manExt}",
-#      manLocation         => "${manLocation}",
-#  }
-
   #/bin
   alternatives::install{
     "java-${major_version}-javac":
@@ -390,52 +518,9 @@ define java::default::install(
     priority            => $priority,      
     manExecutable       => "javac${manExt}",
     manLocation         => "${manLocation}",
+    slaveHash           => $javaCompilerslaveHash,
   }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-javadoc":
-    executableName      => "javadoc",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "javadoc${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-javah":
-    executableName      => "javah",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "javah${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-javap":
-    executableName      => "javap",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "javap${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jconsole":
-    executableName      => "jconsole",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jconsole${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jdb":
-    executableName      => "jdb",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jdb${manExt}",
-    manLocation         => "${manLocation}",
-  }
+
   #/jre/lib
   alternatives::install{
     "java-${major_version}-jexec":
@@ -443,96 +528,7 @@ define java::default::install(
     executableLocation  => "${jdkLocation}jre/lib/",
     priority            => $priority,
   }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jhat":
-    executableName      => "jhat",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jhat${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jinfo":
-    executableName      => "jinfo",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jinfo${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jmap":
-    executableName      => "jmap",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jmap${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jps":
-    executableName      => "jps",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jps${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jrunscript":
-    executableName      => "jrunscript",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jrunscript${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jsadebugd":
-    executableName      => "jsadebugd",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jsadebugd${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::install{
-    "java-${major_version}-jstack":
-    executableName      => "jstack",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jstack${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::install{
-    "java-${major_version}-jstat":
-    executableName      => "jstat",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jstat${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::install{
-    "java-${major_version}-jstatd":
-    executableName      => "jstatd",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jstatd${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-jvisualvm":
-    executableName      => "jvisualvm",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "jvisualvm${manExt}",
-    manLocation         => "${manLocation}",
-  }
+
   #/jre/lib/amd64
   alternatives::install{
     "java-${major_version}-midbrowser-javaplugin.so":
@@ -549,69 +545,7 @@ define java::default::install(
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-native2ascii":
-    executableName      => "native2ascii",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "native2ascii${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::install{
-    "java-${major_version}-rmic":
-    executableName      => "rmic",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "rmic${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-schemagen":
-    executableName      => "schemagen",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "schemagen${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-serialver":
-    executableName      => "serialver",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "serialver${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-wsgen":
-    executableName      => "wsgen",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "wsgen${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-wsimport":
-    executableName      => "wsimport",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "wsimport${manExt}",
-    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-xjc":
-    executableName      => "xjc",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-    manExecutable       => "xjc${manExt}",
-    manLocation         => "${manLocation}",
-  }
+
   #/jre/lib/amd64
   alternatives::install{
     "java-${major_version}-xulrunner-addons-javaplugin.so":
@@ -689,56 +623,38 @@ define java::default::set(
 #      manExecutable       => "jdeps${manExt}",
 #      manLocation         => "${manLocation}",
     }
-    $javaSlaveHash = {
-      "ControlPanel" => "${jreBinLocation}",
-      "javaws" => "${jreBinLocation}",
-      "jcontrol" => "${jreBinLocation}",
-      "jjs" => "${jreBinLocation}",
-      "keytool" => "${jreBinLocation}",
-      "orbd" => "${jreBinLocation}",
-      "pack200" => "${jreBinLocation}",
-      "policytool" => "${jreBinLocation}",
-      "rmid" => "${jreBinLocation}",
-      "rmiregistry" => "${jreBinLocation}",
-      "servertool" => "${jreBinLocation}",
-      "tnameserv" => "${jreBinLocation}",
-      "unpack200" => "${jreBinLocation}",
-    }
+#    $javaSlaveHash = {
+#      "ControlPanel" => "${jreBinLocation}",
+#      "javaws" => "${jreBinLocation}",
+#      "jcontrol" => "${jreBinLocation}",
+#      "jjs" => "${jreBinLocation}",
+#      "keytool" => "${jreBinLocation}",
+#      "orbd" => "${jreBinLocation}",
+#      "pack200" => "${jreBinLocation}",
+#      "policytool" => "${jreBinLocation}",
+#      "rmid" => "${jreBinLocation}",
+#      "rmiregistry" => "${jreBinLocation}",
+#      "servertool" => "${jreBinLocation}",
+#      "tnameserv" => "${jreBinLocation}",
+#      "unpack200" => "${jreBinLocation}",
+#    }
 
   } else { #java 6 & 7
-  $javaSlaveHash = {
-  "ControlPanel" => "${jreBinLocation}",
-  "javaws" => "${jreBinLocation}",
-  "java_vm" => "${jreBinLocation}",
-  "jcontrol" => "${jreBinLocation}",
-  "keytool" => "${jreBinLocation}",
-  "orbd" => "${jreBinLocation}",
-  "pack200" => "${jreBinLocation}",
-  "policytool" => "${jreBinLocation}",
-  "rmid" => "${jreBinLocation}",
-  "rmiregistry" => "${jreBinLocation}",
-  "servertool" => "${jreBinLocation}",
-  "tnameserv" => "${jreBinLocation}",
-  "unpack200" => "${jreBinLocation}",
-  }
-  }
-  #bin
-  alternatives::set{
-    "appletviewer-set-alternative":
-    executableName      => "appletviewer",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manLocation         => "${manLocation}",
-#    manExecutable       => "appletviewer${manExt}",
-  }
-  #/bin
-  alternatives::set{
-    "extcheck-set-alternative":
-    executableName      => "extcheck",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manLocation         => "${manLocation}",
-#    manExecutable      => "extcheck${manExt}",
+#    $javaSlaveHash = {
+#      "ControlPanel" => "${jreBinLocation}",
+#      "javaws" => "${jreBinLocation}",
+#      "java_vm" => "${jreBinLocation}",
+#      "jcontrol" => "${jreBinLocation}",
+#      "keytool" => "${jreBinLocation}",
+#      "orbd" => "${jreBinLocation}",
+#      "pack200" => "${jreBinLocation}",
+#      "policytool" => "${jreBinLocation}",
+#      "rmid" => "${jreBinLocation}",
+#      "rmiregistry" => "${jreBinLocation}",
+#      "servertool" => "${jreBinLocation}",
+#      "tnameserv" => "${jreBinLocation}",
+#      "unpack200" => "${jreBinLocation}",
+#    }
   }
 
   #/jre/lib/amd64
@@ -765,294 +681,19 @@ define java::default::set(
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
   }
-  #/bin
-  alternatives::set{
-    "idlj-set-alternative":
-    executableName      => "idlj",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "idlj${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jar-set-alternative":
-    executableName      => "jar",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jar${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jarsigner-set-alternative":
-    executableName      => "jarsigner",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jarsigner${manExt}",
-#    manLocation         => "${manLocation}",
-  }
   #/jre/bin
   alternatives::set{
     "java-set-alternative":
     executableName      => "java",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
-#    manExecutable       => "java${manExt}",
-#    manLocation         => "${manLocation}",
-    slaveAlias          => $javaSlaveHash,
   }
-#  #/jre/bin
-#  alternatives::set{
-#    "ControlPanel-set-alternative":
-#      executableName      => "ControlPanel",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "javaws-set-alternative":
-#      executableName      => "javaws",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "javaws${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "keytool-set-alternative":
-#      executableName      => "keytool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "keytool${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "orbd-set-alternative":
-#      executableName      => "orbd",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "orbd${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "pack200-set-alternative":
-#      executableName      => "pack200",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "pack200${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "policytool-set-alternative":
-#      executableName      => "policytool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "policytool${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "rmid-set-alternative":
-#      executableName      => "rmid",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "rmid${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "rmiregistry-set-alternative":
-#      executableName      => "rmiregistry",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "rmiregistry${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "servertool-set-alternative":
-#      executableName      => "servertool",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "servertool${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "tnameserv-set-alternative":
-#      executableName      => "tnameserv",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "tnameserv${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-#  #/jre/bin
-#  alternatives::set{
-#    "unpack200-set-alternative":
-#      executableName      => "unpack200",
-#      executableLocation  => "${jreBinLocation}",
-#      priority            => $priority,
-#    #    manExecutable       => "unpack200${manExt}",
-#    #    manLocation         => "${manLocation}",
-#  }
-
-
-
   #/bin
   alternatives::set{
     "javac-set-alternative":
     executableName      => "javac",
     executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,      
-#    manExecutable       => "javac${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "javadoc-set-alternative":
-    executableName      => "javadoc",
-    executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "javadoc${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "javah-set-alternative":
-    executableName      => "javah",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "javah${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "javap-set-alternative":
-    executableName      => "javap",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "javap${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/lib
-  alternatives::set{
-    "jexec-set-alternative":
-      executableName      => "jexec",
-      executableLocation  => "${jdkLocation}jre/lib/",
-      priority            => $priority,
-  }
-
-  #/bin
-  alternatives::set{
-    "jconsole-set-alternative":
-    executableName      => "jconsole",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jconsole${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jdb-set-alternative":
-    executableName      => "jdb",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jdb${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jhat-set-alternative":
-    executableName      => "jhat",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jhat${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jinfo-set-alternative":
-    executableName      => "jinfo",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jinfo${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jmap-set-alternative":
-    executableName      => "jmap",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jmap${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jps-set-alternative":
-    executableName      => "jps",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jps${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jrunscript-set-alternative":
-    executableName      => "jrunscript",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jrunscript${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jsadebugd-set-alternative":
-    executableName      => "jsadebugd",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jsadebugd${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::set{
-    "jstack-set-alternative":
-    executableName      => "jstack",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jstack${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::set{
-    "jstat-set-alternative":
-    executableName      => "jstat",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jstat${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::set{
-    "jstatd-set-alternative":
-    executableName      => "jstatd",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jstatd",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "jvisualvm-set-alternative":
-    executableName      => "jvisualvm",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "jvisualvm${manExt}",
-#    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
   alternatives::set{
@@ -1069,69 +710,6 @@ define java::default::set(
     execAlias           => "libnpjp2.so",
     executableLocation  => "${pluginLocation}",
     priority            => $priority,
-  }
-  #/bin
-  alternatives::set{
-    "native2ascii-set-alternative":
-    executableName      => "native2ascii",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "native2ascii${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #bin
-  alternatives::set{
-    "rmic-set-alternative":
-    executableName      => "rmic",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "rmic${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "schemagen-set-alternative":
-    executableName      => "schemagen",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "schemagen${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "serialver-set-alternative":
-    executableName      => "serialver",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "serialver${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "wsgen-set-alternative":
-    executableName      => "wsgen",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "wsgen${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "wsimport-set-alternative":
-    executableName      => "wsimport",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "wsimport${manExt}",
-#    manLocation         => "${manLocation}",
-  }
-  #/bin
-  alternatives::set{
-    "xjc-set-alternative":
-    executableName      => "xjc",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "xjc${manExt}",
-#    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
   alternatives::set{
