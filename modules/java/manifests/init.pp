@@ -112,6 +112,9 @@ define java::default::install(
   $manLocation     = "${jdkLocation}man/man1/"
   $priority = 300 + "${major_version}"
 
+  $manExt = ".1"
+
+
   if ($major_version == 7 or $major_version == 8){
     #/bin
     alternatives::install{
@@ -119,7 +122,7 @@ define java::default::install(
       executableName      => "jcmd",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-      manExecutable       => "jcmd.1.gz",
+      manExecutable       => "jcmd${manExt}",
       manLocation         => "${manLocation}",
     }
     #/bin
@@ -128,7 +131,7 @@ define java::default::install(
       executableName      => "jmc",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-      manExecutable       => "jmc.1.gz",
+      manExecutable       => "jmc${manExt}",
       manLocation         => "${manLocation}",
     }
   }
@@ -139,9 +142,65 @@ define java::default::install(
       executableName      => "jdeps",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-      manExecutable       => "jdeps.1.gz",
+      manExecutable       => "jdeps${manExt}",
       manLocation         => "${manLocation}",
-    }    
+    }
+    $slaveHash = {
+      "ControlPanel" => "${jreBinLocation}",
+      "javaws" => "${jreBinLocation}",
+      "jcontrol" => "${jreBinLocation}",
+      "jjs" => "${jreBinLocation}",
+      "keytool" => "${jreBinLocation}",
+      "ordb" => "${jreBinLocation}",
+      "pack200" => "${jreBinLocation}",
+      "policytool" => "${jreBinLocation}",
+      "rmid" => "${jreBinLocation}",
+      "rmiregistry" => "${jreBinLocation}",
+      "servertool" => "${jreBinLocation}",
+      "tnameserv" => "${jreBinLocation}",
+      "unpack200" => "${jreBinLocation}",
+      "javaws${manExt}" => "${manLocation}",
+      "jcontrol${manExt}" => "${manLocation}",
+      "jjs${manExt}" => "${manLocation}",
+      "keytool${manExt}" => "${manLocation}",
+      "ordb${manExt}" => "${manLocation}",
+      "pack200${manExt}" => "${manLocation}",
+      "policytool${manExt}" => "${manLocation}",
+      "rmid${manExt}" => "${manLocation}",
+      "rmiregistry${manExt}" => "${manLocation}",
+      "servertool${manExt}" => "${manLocation}",
+      "tnameserv${manExt}" => "${manLocation}",
+      "unpack200${manExt}" => "${manLocation}",
+    }
+  } else { #java 6 & 7
+    $slaveHash = {
+      "ControlPanel" => "${jreBinLocation}",
+      "javaws" => "${jreBinLocation}",
+      "java_vm" => "${jreBinLocation}",
+      "jcontrol" => "${jreBinLocation}",
+      "keytool" => "${jreBinLocation}",
+      "ordb" => "${jreBinLocation}",
+      "pack200" => "${jreBinLocation}",
+      "policytool" => "${jreBinLocation}",
+      "rmid" => "${jreBinLocation}",
+      "rmiregistry" => "${jreBinLocation}",
+      "servertool" => "${jreBinLocation}",
+      "tnameserv" => "${jreBinLocation}",
+      "unpack200" => "${jreBinLocation}",
+      "javaws${manExt}" => "${manLocation}",
+      "java_vm${manExt}" => "${manLocation}",
+      "jcontrol${manExt}" => "${manLocation}",
+      "keytool${manExt}" => "${manLocation}",
+      "ordb${manExt}" => "${manLocation}",
+      "pack200${manExt}" => "${manLocation}",
+      "policytool${manExt}" => "${manLocation}",
+      "rmid${manExt}" => "${manLocation}",
+      "rmiregistry${manExt}" => "${manLocation}",
+      "servertool${manExt}" => "${manLocation}",
+      "tnameserv${manExt}" => "${manLocation}",
+      "unpack200${manExt}" => "${manLocation}",
+    }
+
   }
   
   #bin
@@ -151,15 +210,8 @@ define java::default::install(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manLocation         => "${manLocation}",
-    manExecutable       => "appletviewer.1.gz",
+    manExecutable       => "appletviewer${manExt}",
   }
-#  #/jre/bin
-#  alternatives::install{
-#    "java-${major_version}-ControlPanel":
-#    executableName      => "ControlPanel",
-#    executableLocation  => "${jreBinLocation}",
-#    priority            => $priority,
-#  }
   #/bin
   alternatives::install{
     "java-${major_version}-extcheck":
@@ -167,7 +219,7 @@ define java::default::install(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
     manLocation         => "${manLocation}",
-    manExecutable      => "extcheck.1.gz",
+    manExecutable      => "extcheck${manExt}",
   }
 
   #/jre/lib/amd64
@@ -200,7 +252,7 @@ define java::default::install(
     executableName      => "idlj",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "idlj.1.gz",
+    manExecutable       => "idlj${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -209,7 +261,7 @@ define java::default::install(
     executableName      => "jar",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jar.1.gz",
+    manExecutable       => "jar${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -218,7 +270,7 @@ define java::default::install(
     executableName      => "jarsigner",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jarsigner.1.gz",
+    manExecutable       => "jarsigner${manExt}",
     manLocation         => "${manLocation}",
   }
   #/jre/bin
@@ -227,9 +279,9 @@ define java::default::install(
     executableName      => "java",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
-    manExecutable       => "java.1.gz",
+    manExecutable       => "java${manExt}",
     manLocation         => "${manLocation}",
-    slaveHash           => { "ControlPanel" => "${jreBinLocation}" }
+    slaveHash           => $slaveHash,
   }
 
   #  #/jre/bin
@@ -239,6 +291,96 @@ define java::default::install(
   #    executableLocation  => "${jreBinLocation}",
   #    priority            => $priority,
   #  }
+  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-javaws":
+#      executableName      => "javaws",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "javaws${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-keytool":
+#      executableName      => "keytool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "keytool${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-orbd":
+#      executableName      => "orbd",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "orbd${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-pack200":
+#      executableName      => "pack200",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "pack200${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-policytool":
+#      executableName      => "policytool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "policytool${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-rmid":
+#      executableName      => "rmid",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "rmid${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-rmiregistry":
+#      executableName      => "rmiregistry",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "rmiregistry${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-servertool":
+#      executableName      => "servertool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "servertool${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-tnameserv":
+#      executableName      => "tnameserv",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "tnameserv${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::install{
+#    "java-${major_version}-unpack200":
+#      executableName      => "unpack200",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#      manExecutable       => "unpack200${manExt}",
+#      manLocation         => "${manLocation}",
+#  }
 
   #/bin
   alternatives::install{
@@ -246,7 +388,7 @@ define java::default::install(
     executableName      => "javac",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,      
-    manExecutable       => "javac.1.gz",
+    manExecutable       => "javac${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -255,7 +397,7 @@ define java::default::install(
     executableName      => "javadoc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "javadoc.1.gz",
+    manExecutable       => "javadoc${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -264,7 +406,7 @@ define java::default::install(
     executableName      => "javah",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "javah.1.gz",
+    manExecutable       => "javah${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -273,16 +415,7 @@ define java::default::install(
     executableName      => "javap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "javap.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-javaws":
-    executableName      => "javaws",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "javaws.1.gz",
+    manExecutable       => "javap${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -291,7 +424,7 @@ define java::default::install(
     executableName      => "jconsole",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jconsole.1.gz",
+    manExecutable       => "jconsole${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -300,7 +433,7 @@ define java::default::install(
     executableName      => "jdb",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jdb.1.gz",
+    manExecutable       => "jdb${manExt}",
     manLocation         => "${manLocation}",
   }
   #/jre/lib
@@ -316,7 +449,7 @@ define java::default::install(
     executableName      => "jhat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jhat.1.gz",
+    manExecutable       => "jhat${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -325,7 +458,7 @@ define java::default::install(
     executableName      => "jinfo",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jinfo.1.gz",
+    manExecutable       => "jinfo${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -334,7 +467,7 @@ define java::default::install(
     executableName      => "jmap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jmap.1.gz",
+    manExecutable       => "jmap${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -343,7 +476,7 @@ define java::default::install(
     executableName      => "jps",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jps.1.gz",
+    manExecutable       => "jps${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -352,7 +485,7 @@ define java::default::install(
     executableName      => "jrunscript",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jrunscript.1.gz",
+    manExecutable       => "jrunscript${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -361,7 +494,7 @@ define java::default::install(
     executableName      => "jsadebugd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jsadebugd.1.gz",
+    manExecutable       => "jsadebugd${manExt}",
     manLocation         => "${manLocation}",
   }
   #bin
@@ -370,7 +503,7 @@ define java::default::install(
     executableName      => "jstack",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jstack.1.gz",
+    manExecutable       => "jstack${manExt}",
     manLocation         => "${manLocation}",
   }
   #bin
@@ -379,7 +512,7 @@ define java::default::install(
     executableName      => "jstat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jstat.1.gz",
+    manExecutable       => "jstat${manExt}",
     manLocation         => "${manLocation}",
   }
   #bin
@@ -388,7 +521,7 @@ define java::default::install(
     executableName      => "jstatd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jstatd.1.gz",
+    manExecutable       => "jstatd${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -397,16 +530,7 @@ define java::default::install(
     executableName      => "jvisualvm",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "jvisualvm.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-keytool":
-    executableName      => "keytool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "keytool.1.gz",
+    manExecutable       => "jvisualvm${manExt}",
     manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
@@ -431,34 +555,7 @@ define java::default::install(
     executableName      => "native2ascii",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "native2ascii.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-orbd":
-    executableName      => "orbd",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "orbd.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-pack200":
-    executableName      => "pack200",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "pack200.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-policytool":
-    executableName      => "policytool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "policytool.1.gz",
+    manExecutable       => "native2ascii${manExt}",
     manLocation         => "${manLocation}",
   }
   #bin
@@ -467,25 +564,7 @@ define java::default::install(
     executableName      => "rmic",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "rmic.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-rmid":
-    executableName      => "rmid",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "rmid.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-rmiregistry":
-    executableName      => "rmiregistry",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "rmiregistry.1.gz",
+    manExecutable       => "rmic${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -494,7 +573,7 @@ define java::default::install(
     executableName      => "schemagen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "schemagen.1.gz",
+    manExecutable       => "schemagen${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -503,34 +582,7 @@ define java::default::install(
     executableName      => "serialver",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "serialver.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-servertool":
-    executableName      => "servertool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "servertool.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-tnameserv":
-    executableName      => "tnameserv",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "tnameserv.1.gz",
-    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-unpack200":
-    executableName      => "unpack200",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "unpack200.1.gz",
+    manExecutable       => "serialver${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -539,7 +591,7 @@ define java::default::install(
     executableName      => "wsgen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "wsgen.1.gz",
+    manExecutable       => "wsgen${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -548,7 +600,7 @@ define java::default::install(
     executableName      => "wsimport",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "wsimport.1.gz",
+    manExecutable       => "wsimport${manExt}",
     manLocation         => "${manLocation}",
   }
   #/bin
@@ -557,7 +609,7 @@ define java::default::install(
     executableName      => "xjc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-    manExecutable       => "xjc.1.gz",
+    manExecutable       => "xjc${manExt}",
     manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
@@ -612,7 +664,7 @@ define java::default::set(
       executableName      => "jmc",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-#     manExecutable       => "jmc.1.gz",
+#     manExecutable       => "jmc${manExt}",
 #     manLocation         => "${jdkBinLocation}",
     }
     #7 & 8
@@ -622,7 +674,7 @@ define java::default::set(
       executableName      => "jcmd",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-#     manExecutable       => "jcmd.1.gz",
+#     manExecutable       => "jcmd${manExt}",
 #     manLocation         => "${manLocation}",
     }
   }
@@ -634,9 +686,41 @@ define java::default::set(
       executableName      => "jdeps",
       executableLocation  => "${jdkBinLocation}",
       priority            => $priority,
-#      manExecutable       => "jdeps.1.gz",
+#      manExecutable       => "jdeps${manExt}",
 #      manLocation         => "${manLocation}",
     }
+    $javaSlaveHash = {
+      "ControlPanel" => "${jreBinLocation}",
+      "javaws" => "${jreBinLocation}",
+      "jcontrol" => "${jreBinLocation}",
+      "jjs" => "${jreBinLocation}",
+      "keytool" => "${jreBinLocation}",
+      "orbd" => "${jreBinLocation}",
+      "pack200" => "${jreBinLocation}",
+      "policytool" => "${jreBinLocation}",
+      "rmid" => "${jreBinLocation}",
+      "rmiregistry" => "${jreBinLocation}",
+      "servertool" => "${jreBinLocation}",
+      "tnameserv" => "${jreBinLocation}",
+      "unpack200" => "${jreBinLocation}",
+    }
+
+  } else { #java 6 & 7
+  $javaSlaveHash = {
+  "ControlPanel" => "${jreBinLocation}",
+  "javaws" => "${jreBinLocation}",
+  "java_vm" => "${jreBinLocation}",
+  "jcontrol" => "${jreBinLocation}",
+  "keytool" => "${jreBinLocation}",
+  "orbd" => "${jreBinLocation}",
+  "pack200" => "${jreBinLocation}",
+  "policytool" => "${jreBinLocation}",
+  "rmid" => "${jreBinLocation}",
+  "rmiregistry" => "${jreBinLocation}",
+  "servertool" => "${jreBinLocation}",
+  "tnameserv" => "${jreBinLocation}",
+  "unpack200" => "${jreBinLocation}",
+  }
   }
   #bin
   alternatives::set{
@@ -645,14 +729,7 @@ define java::default::set(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
 #    manLocation         => "${manLocation}",
-#    manExecutable       => "appletviewer.1.gz",
-  }
-  #/jre/bin
-  alternatives::set{
-    "ControlPanel-set-alternative":
-    executableName      => "ControlPanel",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
+#    manExecutable       => "appletviewer${manExt}",
   }
   #/bin
   alternatives::set{
@@ -661,7 +738,7 @@ define java::default::set(
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
 #    manLocation         => "${manLocation}",
-#    manExecutable      => "extcheck.1.gz",
+#    manExecutable      => "extcheck${manExt}",
   }
 
   #/jre/lib/amd64
@@ -694,7 +771,7 @@ define java::default::set(
     executableName      => "idlj",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "idlj.1.gz",
+#    manExecutable       => "idlj${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -703,7 +780,7 @@ define java::default::set(
     executableName      => "jar",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jar.1.gz",
+#    manExecutable       => "jar${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -712,7 +789,7 @@ define java::default::set(
     executableName      => "jarsigner",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jarsigner.1.gz",
+#    manExecutable       => "jarsigner${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/jre/bin
@@ -721,16 +798,117 @@ define java::default::set(
     executableName      => "java",
     executableLocation  => "${jreBinLocation}",
     priority            => $priority,
-#    manExecutable       => "java.1.gz",
+#    manExecutable       => "java${manExt}",
 #    manLocation         => "${manLocation}",
+    slaveAlias          => $javaSlaveHash,
   }
+#  #/jre/bin
+#  alternatives::set{
+#    "ControlPanel-set-alternative":
+#      executableName      => "ControlPanel",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "javaws-set-alternative":
+#      executableName      => "javaws",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "javaws${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "keytool-set-alternative":
+#      executableName      => "keytool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "keytool${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "orbd-set-alternative":
+#      executableName      => "orbd",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "orbd${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "pack200-set-alternative":
+#      executableName      => "pack200",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "pack200${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "policytool-set-alternative":
+#      executableName      => "policytool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "policytool${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "rmid-set-alternative":
+#      executableName      => "rmid",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "rmid${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "rmiregistry-set-alternative":
+#      executableName      => "rmiregistry",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "rmiregistry${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "servertool-set-alternative":
+#      executableName      => "servertool",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "servertool${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "tnameserv-set-alternative":
+#      executableName      => "tnameserv",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "tnameserv${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+#  #/jre/bin
+#  alternatives::set{
+#    "unpack200-set-alternative":
+#      executableName      => "unpack200",
+#      executableLocation  => "${jreBinLocation}",
+#      priority            => $priority,
+#    #    manExecutable       => "unpack200${manExt}",
+#    #    manLocation         => "${manLocation}",
+#  }
+
+
+
   #/bin
   alternatives::set{
     "javac-set-alternative":
     executableName      => "javac",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,      
-#    manExecutable       => "javac.1.gz",
+#    manExecutable       => "javac${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -739,7 +917,7 @@ define java::default::set(
     executableName      => "javadoc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "javadoc.1.gz",
+#    manExecutable       => "javadoc${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -748,7 +926,7 @@ define java::default::set(
     executableName      => "javah",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "javah.1.gz",
+#    manExecutable       => "javah${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -757,25 +935,24 @@ define java::default::set(
     executableName      => "javap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "javap.1.gz",
+#    manExecutable       => "javap${manExt}",
 #    manLocation         => "${manLocation}",
   }
-  #/jre/bin
+  #/jre/lib
   alternatives::set{
-    "javaws-set-alternative":
-    executableName      => "javaws",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "javaws.1.gz",
-#    manLocation         => "${manLocation}",
+    "jexec-set-alternative":
+      executableName      => "jexec",
+      executableLocation  => "${jdkLocation}jre/lib/",
+      priority            => $priority,
   }
+
   #/bin
   alternatives::set{
     "jconsole-set-alternative":
     executableName      => "jconsole",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jconsole.1.gz",
+#    manExecutable       => "jconsole${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -784,15 +961,8 @@ define java::default::set(
     executableName      => "jdb",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jdb.1.gz",
+#    manExecutable       => "jdb${manExt}",
 #    manLocation         => "${manLocation}",
-  }
-  #/jre/lib
-  alternatives::set{
-    "jexec-set-alternative":
-    executableName      => "jexec",
-    executableLocation  => "${jdkLocation}jre/lib/",
-    priority            => $priority,
   }
   #/bin
   alternatives::set{
@@ -800,7 +970,7 @@ define java::default::set(
     executableName      => "jhat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jhat.1.gz",
+#    manExecutable       => "jhat${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -809,7 +979,7 @@ define java::default::set(
     executableName      => "jinfo",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jinfo.1.gz",
+#    manExecutable       => "jinfo${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -818,7 +988,7 @@ define java::default::set(
     executableName      => "jmap",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jmap.1.gz",
+#    manExecutable       => "jmap${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -827,7 +997,7 @@ define java::default::set(
     executableName      => "jps",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jps.1.gz",
+#    manExecutable       => "jps${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -836,7 +1006,7 @@ define java::default::set(
     executableName      => "jrunscript",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jrunscript.1.gz",
+#    manExecutable       => "jrunscript${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -845,7 +1015,7 @@ define java::default::set(
     executableName      => "jsadebugd",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jsadebugd.1.gz",
+#    manExecutable       => "jsadebugd${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #bin
@@ -854,7 +1024,7 @@ define java::default::set(
     executableName      => "jstack",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jstack.1.gz",
+#    manExecutable       => "jstack${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #bin
@@ -863,7 +1033,7 @@ define java::default::set(
     executableName      => "jstat",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jstat.1.gz",
+#    manExecutable       => "jstat${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #bin
@@ -881,16 +1051,7 @@ define java::default::set(
     executableName      => "jvisualvm",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "jvisualvm.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "keytool-set-alternative":
-    executableName      => "keytool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "keytool.1.gz",
+#    manExecutable       => "jvisualvm${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64
@@ -915,34 +1076,7 @@ define java::default::set(
     executableName      => "native2ascii",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "native2ascii.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "orbd-set-alternative":
-    executableName      => "orbd",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "orbd.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "pack200-set-alternative":
-    executableName      => "pack200",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "pack200.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "policytool-set-alternative":
-    executableName      => "policytool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "policytool.1.gz",
+#    manExecutable       => "native2ascii${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #bin
@@ -951,25 +1085,7 @@ define java::default::set(
     executableName      => "rmic",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "rmic.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "rmid-set-alternative":
-    executableName      => "rmid",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "rmid.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "rmiregistry-set-alternative":
-    executableName      => "rmiregistry",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "rmiregistry.1.gz",
+#    manExecutable       => "rmic${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -978,7 +1094,7 @@ define java::default::set(
     executableName      => "schemagen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "schemagen.1.gz",
+#    manExecutable       => "schemagen${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -987,34 +1103,7 @@ define java::default::set(
     executableName      => "serialver",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "serialver.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "servertool-set-alternative":
-    executableName      => "servertool",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "servertool.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "tnameserv-set-alternative":
-    executableName      => "tnameserv",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "tnameserv.1.gz",
-#    manLocation         => "${manLocation}",
-  }
-  #/jre/bin
-  alternatives::set{
-    "unpack200-set-alternative":
-    executableName      => "unpack200",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-#    manExecutable       => "unpack200.1.gz",
+#    manExecutable       => "serialver${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -1023,7 +1112,7 @@ define java::default::set(
     executableName      => "wsgen",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "wsgen.1.gz",
+#    manExecutable       => "wsgen${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -1032,7 +1121,7 @@ define java::default::set(
     executableName      => "wsimport",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "wsimport.1.gz",
+#    manExecutable       => "wsimport${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/bin
@@ -1041,7 +1130,7 @@ define java::default::set(
     executableName      => "xjc",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
-#    manExecutable       => "xjc.1.gz",
+#    manExecutable       => "xjc${manExt}",
 #    manLocation         => "${manLocation}",
   }
   #/jre/lib/amd64

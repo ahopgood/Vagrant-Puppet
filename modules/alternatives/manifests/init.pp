@@ -57,6 +57,7 @@ define alternatives::set(
   $executableLocation = undef,
   $execAlias = undef,
   $priority = undef,
+  $slaveAlias = undef,
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
@@ -73,9 +74,14 @@ define alternatives::set(
     $targetExecutable = "${executableName}"
   }
 
+  if ($slaveHash != undef){
+    $slaveArray = $slaveHash.map |$key, $value| { "--slave /usr/bin/$key $key $value$key" }
+    $slaves = $slaveArray.reduce |$memo, $value| { "$memo $value" }
+  }
+
   exec {
     "set-alternative-${executableName}":
-    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${targetExecutable}",
+    command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${targetExecutable} ${slaves}",
     unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"link currently points to ${executableLocation}${targetExecutable}\" > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
