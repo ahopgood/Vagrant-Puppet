@@ -117,7 +117,7 @@ define java::default::install(
 
   $manExt = ".1"
 
-  if ($major_version == 8){
+  if (versioncmp("${major_version}", "8") == 0){
     $javaSlaveHash = { #Verified
       "ControlPanel" => "${jreBinLocation}",
       "javaws" => "${jreBinLocation}",
@@ -135,7 +135,7 @@ define java::default::install(
       "javaws${manExt}" => "${manLocation}",
       "jjs${manExt}" => "${manLocation}",
       "keytool${manExt}" => "${manLocation}",
-      "ordb${manExt}" => "${manLocation}",
+      "orbd${manExt}" => "${manLocation}",
       "pack200${manExt}" => "${manLocation}",
       "policytool${manExt}" => "${manLocation}",
       "rmid${manExt}" => "${manLocation}",
@@ -146,8 +146,8 @@ define java::default::install(
     }
 
     $javaCompilerslaveHash = {
-      "ControlPanel" => "${jreBinLocation}",
       "appletviewer" => "${jdkBinLocation}",
+      "ControlPanel" => "${jreBinLocation}",
       "extcheck" => "${jdkBinLocation}",
       "idlj" => "${jdkBinLocation}",
       "jar" => "${jdkBinLocation}",
@@ -174,6 +174,7 @@ define java::default::install(
       "jrunscript" => "${jdkBinLocation}",
       "jsadebugd" => "${jdkBinLocation}",
       "jstack" => "${jdkBinLocation}",
+      "jstat" => "${jdkBinLocation}",
       "jstatd" => "${jdkBinLocation}",
       "jvisualvm" => "${jdkBinLocation}",
       "keytool" => "${jreBinLocation}",
@@ -241,8 +242,8 @@ define java::default::install(
   } elsif (versioncmp("${major_version}", "7") == 0) {
     $javaSlaveHash = { # checked
       "ControlPanel"         => "${jreBinLocation}",
-      "java_vm"              => "${jreBinLocation}",
       "javaws"               => "${jreBinLocation}",
+      "java_vm"              => "${jreBinLocation}",
       "jcontrol"             => "${jreBinLocation}",
       "keytool"              => "${jreBinLocation}",
       "orbd"                 => "${jreBinLocation}",
@@ -255,7 +256,7 @@ define java::default::install(
       "unpack200"            => "${jreBinLocation}",
       "javaws${manExt}"      => "${manLocation}",
       "keytool${manExt}"     => "${manLocation}",
-      "ordb${manExt}"        => "${manLocation}",
+      "orbd${manExt}"        => "${manLocation}",
       "pack200${manExt}"     => "${manLocation}",
       "policytool${manExt}"  => "${manLocation}",
       "rmid${manExt}"        => "${manLocation}",
@@ -266,8 +267,8 @@ define java::default::install(
     }
 
     $javaCompilerslaveHash = {
-      "ControlPanel"            => "${jreBinLocation}",
       "appletviewer"            => "${jdkBinLocation}",
+      "ControlPanel"            => "${jreBinLocation}",
       "extcheck"                => "${jdkBinLocation}",
       "idlj"                    => "${jdkBinLocation}",
       "jar"                     => "${jdkBinLocation}",
@@ -294,6 +295,7 @@ define java::default::install(
       "jrunscript"              => "${jdkBinLocation}",
       "jsadebugd"               => "${jdkBinLocation}",
       "jstack"                  => "${jdkBinLocation}",
+      "jstat"                   => "${jdkBinLocation}",
       "jstatd"                  => "${jdkBinLocation}",
       "jvisualvm"               => "${jdkBinLocation}",
       "keytool"                 => "${jreBinLocation}",
@@ -358,10 +360,10 @@ define java::default::install(
       "xjc${manExt}"            => "${manLocation}",
     }
   } elsif (versioncmp("${major_version}", "6") == 0) { # java 6
-    $javaSlaveHash = {
+    $javaSlaveHash = { #checked
       "ControlPanel"         => "${jreBinLocation}",
-      "java_vm"              => "${jreBinLocation}",
       "javaws"               => "${jreBinLocation}",
+      "java_vm"              => "${jreBinLocation}",
       "jcontrol"             => "${jreBinLocation}",
       "keytool"              => "${jreBinLocation}",
       "orbd"                 => "${jreBinLocation}",
@@ -385,24 +387,22 @@ define java::default::install(
     }
 
     $javaCompilerslaveHash = {
-      "ControlPanel"            => "${jreBinLocation}",
       "appletviewer"            => "${jdkBinLocation}",
+      "ControlPanel"            => "${jreBinLocation}",
       "extcheck"                => "${jdkBinLocation}",
+      "HtmlConverter"           => "${jdkBinLocation}",
       "idlj"                    => "${jdkBinLocation}",
       "jar"                     => "${jdkBinLocation}",
       "jarsigner"               => "${jdkBinLocation}",
-      "java-rmi.cgi"            => "${jdkBinLocation}",
       "javadoc"                 => "${jdkBinLocation}",
-      "javafxpackager"          => "${jdkBinLocation}",
       "javah"                   => "${jdkBinLocation}",
       "javap"                   => "${jdkBinLocation}",
-      "javapackager"            => "${jdkBinLocation}",
       "javaws"                  => "${jreBinLocation}",
       "java_vm"                 => "${jreBinLocation}",
       "jconsole"                => "${jdkBinLocation}",
       "jcontrol"                => "${jreBinLocation}",
       "jdb"                     => "${jdkBinLocation}",
-      "jdeps"                   => "${jdkBinLocation}",
+#      "jdeps"                   => "${jdkBinLocation}",
       "jhat"                    => "${jdkBinLocation}",
       "jinfo"                   => "${jdkBinLocation}",
       "jmap"                    => "${jdkBinLocation}",
@@ -410,6 +410,7 @@ define java::default::install(
       "jrunscript"              => "${jdkBinLocation}",
       "jsadebugd"               => "${jdkBinLocation}",
       "jstack"                  => "${jdkBinLocation}",
+      "jstat"                   => "${jdkBinLocation}",
       "jstatd"                  => "${jdkBinLocation}",
       "jvisualvm"               => "${jdkBinLocation}",
       "keytool"                 => "${jreBinLocation}",
@@ -427,7 +428,7 @@ define java::default::install(
       "unpack200"               => "${jreBinLocation}",
       "wsgen"                   => "${jdkBinLocation}",
       "wsimport"                => "${jdkBinLocation}",
-      "xjc"                     => "${jdkBinLocation}",
+      "xjc"                     => "${jdkBinLocation}", #Checked to here
       "appletviewer${manExt}"   => "${manLocation}",
       "extcheck${manExt}"       => "${manLocation}",
       "idlj${manExt}"           => "${manLocation}",
@@ -436,10 +437,10 @@ define java::default::install(
       "java${manExt}"           => "${manLocation}",
       "javac${manExt}"          => "${manLocation}",
       "javadoc${manExt}"        => "${manLocation}",
-      "javafxpackager${manExt}" => "${manLocation}",
+#      "javafxpackager${manExt}" => "${manLocation}",
       "javah${manExt}"          => "${manLocation}",
       "javap${manExt}"          => "${manLocation}",
-      "javapackager${manExt}"   => "${manLocation}",
+#      "javapackager${manExt}"   => "${manLocation}",
       "javaws${manExt}"         => "${manLocation}",
       "jconsole${manExt}"       => "${manLocation}",
       "jdb${manExt}"            => "${manLocation}",
