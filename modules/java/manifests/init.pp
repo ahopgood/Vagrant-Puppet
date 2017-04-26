@@ -268,6 +268,7 @@ define java::default::install(
 
     $javaCompilerslaveHash = {
       "appletviewer"            => "${jdkBinLocation}",
+      "apt"                     => "${jdkBinLocation}",
       "ControlPanel"            => "${jreBinLocation}",
       "extcheck"                => "${jdkBinLocation}",
       "idlj"                    => "${jdkBinLocation}",
@@ -315,6 +316,7 @@ define java::default::install(
       "wsimport"                => "${jdkBinLocation}",
       "xjc"                     => "${jdkBinLocation}",
       "appletviewer${manExt}"   => "${manLocation}",
+      "apt${manExt}"            => "${manLocation}",
       "extcheck${manExt}"       => "${manLocation}",
       "idlj${manExt}"           => "${manLocation}",
       "jar${manExt}"            => "${manLocation}",
@@ -327,7 +329,7 @@ define java::default::install(
       "javap${manExt}"          => "${manLocation}",
       "javapackager${manExt}"   => "${manLocation}",
       "javaws${manExt}"         => "${manLocation}",
-      "jcmd${manExt}"           => "${manLocation}", #java 8 & 7 only
+      "jcmd${manExt}"           => "${manLocation}",
       "jconsole${manExt}"       => "${manLocation}",
       "jdb${manExt}"            => "${manLocation}",
       "jdeps${manExt}"          => "${manLocation}",
@@ -388,6 +390,7 @@ define java::default::install(
 
     $javaCompilerslaveHash = {
       "appletviewer"            => "${jdkBinLocation}",
+      "apt"                     => "${jdkBinLocation}",
       "ControlPanel"            => "${jreBinLocation}",
       "extcheck"                => "${jdkBinLocation}",
       "HtmlConverter"           => "${jdkBinLocation}",
@@ -402,7 +405,6 @@ define java::default::install(
       "jconsole"                => "${jdkBinLocation}",
       "jcontrol"                => "${jreBinLocation}",
       "jdb"                     => "${jdkBinLocation}",
-#      "jdeps"                   => "${jdkBinLocation}",
       "jhat"                    => "${jdkBinLocation}",
       "jinfo"                   => "${jdkBinLocation}",
       "jmap"                    => "${jdkBinLocation}",
@@ -428,8 +430,9 @@ define java::default::install(
       "unpack200"               => "${jreBinLocation}",
       "wsgen"                   => "${jdkBinLocation}",
       "wsimport"                => "${jdkBinLocation}",
-      "xjc"                     => "${jdkBinLocation}", #Checked to here
+      "xjc"                     => "${jdkBinLocation}",
       "appletviewer${manExt}"   => "${manLocation}",
+      "apt${manExt}"            => "${manLocation}",
       "extcheck${manExt}"       => "${manLocation}",
       "idlj${manExt}"           => "${manLocation}",
       "jar${manExt}"            => "${manLocation}",
@@ -437,10 +440,8 @@ define java::default::install(
       "java${manExt}"           => "${manLocation}",
       "javac${manExt}"          => "${manLocation}",
       "javadoc${manExt}"        => "${manLocation}",
-#      "javafxpackager${manExt}" => "${manLocation}",
       "javah${manExt}"          => "${manLocation}",
       "javap${manExt}"          => "${manLocation}",
-#      "javapackager${manExt}"   => "${manLocation}",
       "javaws${manExt}"         => "${manLocation}",
       "jconsole${manExt}"       => "${manLocation}",
       "jdb${manExt}"            => "${manLocation}",
