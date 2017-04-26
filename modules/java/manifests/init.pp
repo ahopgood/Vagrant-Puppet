@@ -229,8 +229,6 @@ define java::default::install(
       "jjs"                     => "${jreBinLocation}", #java 8 only
       "jjs${manExt}"            => "${manLocation}", #java 8 only
     }
-    $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
-
     $javaCompilerslaveVersionSpecificHash = {
       "java-rmi.cgi"            => "${jdkBinLocation}",
       "javafxpackager"          => "${jdkBinLocation}",
@@ -247,14 +245,10 @@ define java::default::install(
       "jjs${manExt}"            => "${manLocation}", #java 8 only
       "jmc${manExt}"            => "${manLocation}",
     }
-    #Merge common hash of javac slaves with version specific ones
-    $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
   } elsif (versioncmp("${major_version}", "7") == 0) {
     $javaSlaveVersionSpecificHash = { # checked
       "java_vm"              => "${jreBinLocation}",
     }
-    $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
-
     $javaCompilerslaveVersionSpecificHash = {
       "apt"                     => "${jdkBinLocation}",
       "java-rmi.cgi"            => "${jdkBinLocation}",
@@ -267,25 +261,22 @@ define java::default::install(
       "jcmd${manExt}"           => "${manLocation}",
       "jmc${manExt}"            => "${manLocation}",
     }
-    #Merge common hash of javac slaves with version specific ones
-    $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
-
   } elsif (versioncmp("${major_version}", "6") == 0) { # java 6
     $javaSlaveVersionSpecificHash = { # checked
       "java_vm"              => "${jreBinLocation}",
     }
-    $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
-
     $javaCompilerslaveVersionSpecificHash = {
       "HtmlConverter"           => "${jdkBinLocation}",
       "apt${manExt}"            => "${manLocation}",
       "apt"                     => "${jdkBinLocation}",
     }
-    #Merge common hash of javac slaves with version specific ones
-    $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
   } else {
     fail("Java ${major_version} alternatives not supported")
   }
+  #Merge common hash of java slaves with version specific ones
+  $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
+  #Merge common hash of javac slaves with version specific ones
+  $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
 
   #/jre/lib/amd64
   alternatives::install{
