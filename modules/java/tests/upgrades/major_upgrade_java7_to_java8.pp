@@ -11,7 +11,7 @@ Package{
 
 java{"java-8-31":
   major_version => "8",
-  update_version => "111",
+  update_version => "31",
   isDefault => true,
   multiTenancy => true,
 }

@@ -17,7 +17,8 @@ define alternatives::install(
   $manExecutable = undef,
   $manLocation = undef,
   $execAlias = undef,
-  $slaveHash = undef,
+  $slaveBinariesHash = undef,
+  $slaveManPagesHash = undef,
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
@@ -29,7 +30,7 @@ define alternatives::install(
   }
   
   if (($manLocation != undef) and ($manExecutable != undef)){
-    $slave = "--slave /usr/bin/${manExecutable} ${manExecutable} ${manLocation}${manExecutable}"
+    $slave = "--slave /usr/local/share/man/man1/${manExecutable} ${manExecutable} ${manLocation}${manExecutable}"
   }
 
   if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink 
@@ -38,14 +39,19 @@ define alternatives::install(
     $targetExecutable = "${executableName}"
   } 
 
-  if ($slaveHash != undef){
-    $slaveArray = $slaveHash.map |$key, $value| { "--slave /usr/bin/$key $key $value$key" }
-    $slaves = $slaveArray.reduce |$memo, $value| { "$memo $value" }
+  if ($slaveBinariesHash != undef){
+    $slaveBinariesArray = $slaveBinariesHash.map |$key, $value| { "--slave /usr/bin/$key $key $value$key" }
+    $binariesSlaves = $slaveBinariesArray.reduce |$memo, $value| { "$memo $value" }
+  }
+
+  if ($slaveManPagesHash != undef){
+    $slaveManPagesArray = $slaveManPagesHash.map |$key, $value| { "--slave /usr/local/share/man/man1/$key $key $value$key" }
+    $manPagesSlaves = $slaveManPagesArray.reduce |$memo, $value| { "$memo $value" }
   }
 
   exec {
     "${name}-install-alternative":
-    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave} ${slaves}",
+    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave} ${binariesSlaves} ${manPagesSlaves}",
     unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',

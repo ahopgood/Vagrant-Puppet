@@ -119,27 +119,30 @@ define java::default::install(
   # Common binaries that are slaved to the java command
   $javaSlaveCommonHash = {
     "ControlPanel" => "${jreBinLocation}",
-    "javaws" => "${jreBinLocation}",
-    "jcontrol" => "${jreBinLocation}",
-    "keytool" => "${jreBinLocation}",
-    "orbd" => "${jreBinLocation}",
-    "pack200" => "${jreBinLocation}",
-    "policytool" => "${jreBinLocation}",
-    "rmid" => "${jreBinLocation}",
-    "rmiregistry" => "${jreBinLocation}",
-    "servertool" => "${jreBinLocation}",
-    "tnameserv" => "${jreBinLocation}",
-    "unpack200" => "${jreBinLocation}",
-    "javaws${manExt}" => "${manLocation}",
-    "keytool${manExt}" => "${manLocation}",
-    "orbd${manExt}" => "${manLocation}",
-    "pack200${manExt}" => "${manLocation}",
-    "policytool${manExt}" => "${manLocation}",
-    "rmid${manExt}" => "${manLocation}",
+    "javaws"       => "${jreBinLocation}",
+    "jcontrol"     => "${jreBinLocation}",
+    "keytool"      => "${jreBinLocation}",
+    "orbd"         => "${jreBinLocation}",
+    "pack200"      => "${jreBinLocation}",
+    "policytool"   => "${jreBinLocation}",
+    "rmid"         => "${jreBinLocation}",
+    "rmiregistry"  => "${jreBinLocation}",
+    "servertool"   => "${jreBinLocation}",
+    "tnameserv"    => "${jreBinLocation}",
+    "unpack200"    => "${jreBinLocation}",
+  }
+
+  $javaManSlaveCommonHash = {
+    "javaws${manExt}"      => "${manLocation}",
+    "keytool${manExt}"     => "${manLocation}",
+    "orbd${manExt}"        => "${manLocation}",
+    "pack200${manExt}"     => "${manLocation}",
+    "policytool${manExt}"  => "${manLocation}",
+    "rmid${manExt}"        => "${manLocation}",
     "rmiregistry${manExt}" => "${manLocation}",
-    "servertool${manExt}" => "${manLocation}",
-    "tnameserv${manExt}" => "${manLocation}",
-    "unpack200${manExt}" => "${manLocation}",
+    "servertool${manExt}"  => "${manLocation}",
+    "tnameserv${manExt}"   => "${manLocation}",
+    "unpack200${manExt}"   => "${manLocation}",
   }
 
   # Common binaries and man files that are slaved to the javac command
@@ -183,6 +186,8 @@ define java::default::install(
     "wsgen"                   => "${jdkBinLocation}",
     "wsimport"                => "${jdkBinLocation}",
     "xjc"                     => "${jdkBinLocation}",
+  }
+  $javaCompilersManSlaveCommonHash = {
     "appletviewer${manExt}"   => "${manLocation}",
     "extcheck${manExt}"       => "${manLocation}",
     "idlj${manExt}"           => "${manLocation}",
@@ -227,6 +232,8 @@ define java::default::install(
   if (versioncmp("${major_version}", "8") == 0){
     $javaSlaveVersionSpecificHash = {
       "jjs"                     => "${jreBinLocation}", #java 8 only
+    }
+    $javaManSlaveVersionSpecificHash = {
       "jjs${manExt}"            => "${manLocation}", #java 8 only
     }
     $javaCompilerslaveVersionSpecificHash = {
@@ -238,6 +245,8 @@ define java::default::install(
       "jjs"                     => "${jreBinLocation}", #java 8 only
       "jmc"                     => "${jdkBinLocation}",
       "jmc.ini"                 => "${jdkBinLocation}",
+    }
+    $javaCompilersManSlaveVersionSpecificHash = {
       "javafxpackager${manExt}" => "${manLocation}",
       "javapackager${manExt}"   => "${manLocation}", #java 8 only
       "jcmd${manExt}"           => "${manLocation}",
@@ -256,6 +265,8 @@ define java::default::install(
       "jcmd"                    => "${jdkBinLocation}",
       "jmc"                     => "${jdkBinLocation}",
       "jmc.ini"                 => "${jdkBinLocation}",
+    }
+    $javaCompilersManSlaveVersionSpecificHash = {
       "apt${manExt}"            => "${manLocation}",
       "javafxpackager${manExt}" => "${manLocation}",
       "jcmd${manExt}"           => "${manLocation}",
@@ -267,16 +278,21 @@ define java::default::install(
     }
     $javaCompilerslaveVersionSpecificHash = {
       "HtmlConverter"           => "${jdkBinLocation}",
-      "apt${manExt}"            => "${manLocation}",
       "apt"                     => "${jdkBinLocation}",
+    }
+    $javaCompilersManSlaveVersionSpecificHash = {
+      "apt${manExt}"            => "${manLocation}",
     }
   } else {
     fail("Java ${major_version} alternatives not supported")
   }
   #Merge common hash of java slaves with version specific ones
   $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
+  $javaManSlaveHash = $javaManSlaveCommonHash+$javaManSlaveVersionSpecificHash
   #Merge common hash of javac slaves with version specific ones
   $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
+  $javaCompilersManSlaveHash = $javaCompilersManSlaveCommonHash+$javaCompilersManSlaveVersionSpecificHash
+
 
   #/jre/lib/amd64
   alternatives::install{
@@ -311,7 +327,8 @@ define java::default::install(
     priority            => $priority,
     manExecutable       => "java${manExt}",
     manLocation         => "${manLocation}",
-    slaveHash           => $javaSlaveHash,
+    slaveBinariesHash   => $javaSlaveHash,
+    slaveManPagesHash   => $javaManSlaveHash,
   }
   #/bin
   alternatives::install{
@@ -321,7 +338,8 @@ define java::default::install(
     priority            => $priority,      
     manExecutable       => "javac${manExt}",
     manLocation         => "${manLocation}",
-    slaveHash           => $javaCompilerslaveHash,
+    slaveBinariesHash   => $javaCompilerslaveHash,
+    slaveManPagesHash   => $javaCompilerManSlaveHash,
   }
 
   #/jre/lib
@@ -426,38 +444,8 @@ define java::default::set(
 #      manExecutable       => "jdeps${manExt}",
 #      manLocation         => "${manLocation}",
     }
-#    $javaSlaveHash = {
-#      "ControlPanel" => "${jreBinLocation}",
-#      "javaws" => "${jreBinLocation}",
-#      "jcontrol" => "${jreBinLocation}",
-#      "jjs" => "${jreBinLocation}",
-#      "keytool" => "${jreBinLocation}",
-#      "orbd" => "${jreBinLocation}",
-#      "pack200" => "${jreBinLocation}",
-#      "policytool" => "${jreBinLocation}",
-#      "rmid" => "${jreBinLocation}",
-#      "rmiregistry" => "${jreBinLocation}",
-#      "servertool" => "${jreBinLocation}",
-#      "tnameserv" => "${jreBinLocation}",
-#      "unpack200" => "${jreBinLocation}",
-#    }
-
   } else { #java 6 & 7
-#    $javaSlaveHash = {
-#      "ControlPanel" => "${jreBinLocation}",
-#      "javaws" => "${jreBinLocation}",
-#      "java_vm" => "${jreBinLocation}",
-#      "jcontrol" => "${jreBinLocation}",
-#      "keytool" => "${jreBinLocation}",
-#      "orbd" => "${jreBinLocation}",
-#      "pack200" => "${jreBinLocation}",
-#      "policytool" => "${jreBinLocation}",
-#      "rmid" => "${jreBinLocation}",
-#      "rmiregistry" => "${jreBinLocation}",
-#      "servertool" => "${jreBinLocation}",
-#      "tnameserv" => "${jreBinLocation}",
-#      "unpack200" => "${jreBinLocation}",
-#    }
+
   }
 
   #/jre/lib/amd64
