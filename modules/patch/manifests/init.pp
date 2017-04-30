@@ -15,16 +15,47 @@ class patch {
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/${module_name}/"
-  
-  $patch_file = "patch-2.6-6.el6.x86_64.rpm"
+
+
+  if (versioncmp("CentOS", "${operatingsystem}") == 0){
+    $platform = ".${architecture}.rpm"  #architecture = x86_64
+    $provider = "rpm"
+
+    if (versioncmp("6", "${operatingsystemmajrelease}") == 0){
+      $release = "-6.el${operatingsystemmajrelease}"
+      $patch_file = "patch-2.6${release}${platform}"
+
+    } elsif (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $release = "-8.el${operatingsystemmajrelease}"
+      $patch_file = "patch-2.7.1${release}${platform}"
+
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
+    }
+  } elsif (versioncmp("Ubuntu", "${operatingsystem}") == 0) {
+    $platform = "${architecture}.deb" #architecture = amd64
+    $provider = "dpkg"
+
+    if (versioncmp ("15.10", "${operatingsystemmajrelease}") == 0){
+      $release = "-1_"
+      $patch_file = "patch_2.7.5${release}${platform}"
+
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
+    }
+  } else {
+    fail("${operatingsystem} is not currently supported by the patch module")
+  }
+
+
   file{
     "${local_install_dir}${patch_file}":
     ensure => present,
-    source => "puppet:///${puppet_file_dir}${patch_file}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${patch_file}",
   }
   package {"patch":
     ensure => present,
-    provider => 'rpm',
+    provider => "${provider}",
     source => "${local_install_dir}${patch_file}",
     require => File["${local_install_dir}${patch_file}"],
     #1.12
