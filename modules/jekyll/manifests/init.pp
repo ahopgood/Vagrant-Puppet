@@ -116,6 +116,7 @@ class jekyll (
     provider => 'gem',
     install_options => ["--force"],
 #    before => Package["listen"],
+    require => Package["sass"],
   }
 
   $jekyll_watch_gem_file = "jekyll-watch-1.5.0.gem"
@@ -128,6 +129,7 @@ class jekyll (
     source => "${local_install_dir}${jekyll_watch_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
+    require => Package["listen"],
   }
 
   $kramdown_gem_file = "kramdown-1.13.2.gem"
@@ -164,6 +166,7 @@ class jekyll (
     source => "${local_install_dir}${listen_gem_file}",
     ensure   => 'installed',
     provider => 'gem',
+    require => Package["rb-inotify"],
   }
 
   $mercenary_gem_file = "mercenary-0.3.6.gem"
@@ -273,7 +276,6 @@ class jekyll (
     ensure   => 'installed',
     provider => 'gem',
     install_options => ["--force"],
-#    before => Package["listen"],
   }
 
   if ("${showDrafts}" == "true"){
@@ -297,8 +299,9 @@ class jekyll (
   
   }
   exec {"start-jekyll-server":
-    path => "/usr/local/bin/",   
+    path => "/usr/local/bin/",
     command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} --force_polling &",
+#    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} &",
     require => Package["jekyll"],
   }
 #exec
