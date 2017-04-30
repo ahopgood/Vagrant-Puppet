@@ -44,6 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #		puppet.manifests_path = "manifests"
 #		puppet.manifest_file  = "jekyll.pp"
 #	end
+
   end 
   
       config.vm.define "CentOS_7_test" do |centos7|
