@@ -109,13 +109,7 @@ define httpd::xclacks {
         "set IfModule[last()]/Directory/directive[1]/arg[1] set",
         "set IfModule[last()]/Directory/directive[1]/arg[2] X-Clacks-Overhead",
         "set IfModule[last()]/Directory/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
-        
-        #"ins Directory after /files/etc/httpd/conf/httpd.conf/Directory[last()]",
-        #"set Directory[last()]/arg '\"/var/www/html/\"'",
-        #"set Directory[last()]/directive[1] header",
-        #"set Directory[last()]/directive[1]/arg[1] set",
-        #"set Directory[last()]/directive[1]/arg[2] X-Clacks-Overhead",
-        #"set Directory[last()]/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+
       ]  
       augeas {"add header to directory":
         incl => "/etc/httpd/conf/httpd.conf",
