@@ -16,7 +16,41 @@ define httpd::content_security_policy(
 
     if (versioncmp("${virtual_host}", "global") == 0){
       notify{"in global CSP":}
-      $self = "\"default-src 'self';\""
+
+      $file_to_change = "/etc/apache2/apache2.conf"
+      $context = "/files${file_to_change}/"
+      $lens = "Httpd.lns"
+      $csp_rule = "\"default-src \'self\'\""
+      $contents = [
+        "ins Directory after ${context}Directory[last()]",
+        "set ${context}Directory[last()]/arg \"/var/www/html/\"",
+        "set ${context}Directory[last()]/IfModule/arg headers_module",
+        "set ${context}Directory[last()]/IfModule/directive[1] header",
+        "set ${context}Directory[last()]/IfModule/directive[1]/arg[1] set",
+        "set ${context}Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Context",
+        "set ${context}Directory[last()]/IfModule/directive[1]/arg[3] ${csp_rule}",
+        "save",
+        "print /augeas//error",
+      ]
+      $flattenedContents = $contents.reduce|$memo, $value| { "$memo \n$value" }
+      file {"/home/vagrant/testfile.txt":
+        content => $flattenedContents,
+      }
+
+      exec{"format quotes and single quotes for augtool":
+        path => "/bin",
+        command => "sed -f /vagrant/files/sed-script.txt -i /home/vagrant/testfile.txt",
+        #sed 's/"\(.*\)"/"\\"\1\\""/g'
+      }
+
+    exec{"apply header to main config file":
+      path => "/usr/bin",
+      command => "augtool -At \"${lens} incl ${file_to_change}\" -f /home/vagrant/testfile.txt",
+      require => Exec["format quotes and single quotes for augtool"],
+      #can we add an onlyif style clause here?
+    }
+
+
       $header_contents = [
       #global Directory level header
         "ins Directory after /files/etc/apache2/apache2.conf/Directory[last()]",
@@ -25,16 +59,9 @@ define httpd::content_security_policy(
         "set Directory[last()]/IfModule/directive[1] header",
         "set Directory[last()]/IfModule/directive[1]/arg[1] set",
         "set Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy",
-        "set Directory[last()]/IfModule/directive[1]/arg[3] ${self}",
-#        "set Directory[last()]/IfModule/directive[1]/arg[3] '\"default-src\s\'self\';\"'",
-        
-        #Succeds with header set Content-Security-Policy "default-src \'self\';"
-#        "set Directory[last()]/IfModule/directive[1]/arg[3] '\"default-src \\'self\\';\"'",
-        #This works:
-#        "set Directory[last()]/IfModule/directive[1]/arg[3] '\"default-src self;\"'",
       ]
       $conf_file_location = "/etc/apache2/apache2.conf"
-      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size > 0"
+      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
       #augtool -At "Httpd.lns incl /etc/apache2/apache2.conf"
       #print /files/etc/apache2/apache2.conf/Directory[arg = "/var/www/"]
       #The following works:
@@ -56,20 +83,20 @@ define httpd::content_security_policy(
       $onlyif = "match /files${conf_file_location}/VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
     }
 
-    augeas {"add header to directory":
-      incl => "${conf_file_location}",
-      lens => "Httpd.lns",
-      context => "/files${conf_file_location}/",
-      changes => $header_contents,
-      require => Exec["restart-apache2-to-install-headers"],
-      onlyif   => "${onlyif}" 
-#Need to change this to allow for updating of the CSP value but not adding duplicates
-    }
-    ->
-    exec {"restart-apache2-to-add-csp":
-      path => "/usr/sbin/:/bin/",
-      command => "service apache2 reload",
-    }
+#    augeas {"add header to directory":
+#      incl => "${conf_file_location}",
+#      lens => "Httpd.lns",
+#      context => "/files${conf_file_location}/",
+#      changes => $header_contents,
+#      require => Exec["restart-apache2-to-install-headers"],
+#      onlyif   => "${onlyif}"
+##Need to change this to allow for updating of the CSP value but not adding duplicates
+#    }
+#    ->
+#    exec {"restart-apache2-to-add-csp":
+#      path => "/usr/sbin/:/bin/",
+#      command => "service apache2 reload",
+#    }
   } elsif ("${operatingsystem}" == "CentOS"){
     if ("${operatingsystemmajrelease}" == "6" or "${operatingsystemmajrelease}" == "7") {
       notify{"Beginning support for CentOS${operatingsystemmajrelease}":}

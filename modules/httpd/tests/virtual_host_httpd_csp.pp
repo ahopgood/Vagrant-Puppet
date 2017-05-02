@@ -29,5 +29,5 @@ Package{
   }
   ->
   httpd::content_security_policy{"CSP":
-    
+
   }
