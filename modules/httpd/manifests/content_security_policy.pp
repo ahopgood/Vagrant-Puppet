@@ -43,13 +43,19 @@ define httpd::content_security_policy(
         require => Class['augeas'],
       }
 
+    #Use echo instead of intermediatory file
+    #echo "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']" > augtool -At "Httpd.lns incl /etc/apache2/apache2.conf" -f  | grep -c -v "(no matches)"
+
+    $onlyif = "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']"
+
+    $augtool_location = "/usr/bin/"
     exec{"apply header to main config file":
-      path => "/usr/bin",
+      path => "${augtool_location}",
       command => "augtool -At \"${lens} incl ${file_to_change}\" -f /home/vagrant/testfile.txt",
       require => Exec["format quotes and single quotes for augtool"],
       #can we add an onlyif style clause here?
       #Only if the number of matching lines equals 0, i.e. only if we haven't put this header in before
-      onlyif => "augtool -At \"Httpd.lns incl /etc/apache2/apache2.conf\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'"
+      onlyif => "${augtool_location}augtool -At \"${lens} incl ${file_to_change}\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'"
 #      Equivalent to
 #      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
     }
