@@ -50,9 +50,8 @@ define httpd::content_security_policy(
       #can we add an onlyif style clause here?
       #Only if the number of matching lines equals 0, i.e. only if we haven't put this header in before
       onlyif => "augtool -At \"Httpd.lns incl /etc/apache2/apache2.conf\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'"
-      #Only if the value already exists
-#      onlyif => "augtool -At \"Httpd.lns incl /etc/apache2/apache2.conf\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v  \"(no matches)\""
-
+#      Equivalent to
+#      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
     }
 
 
@@ -66,11 +65,7 @@ define httpd::content_security_policy(
         "set Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy",
       ]
       $conf_file_location = "/etc/apache2/apache2.conf"
-      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
-      #augtool -At "Httpd.lns incl /etc/apache2/apache2.conf"
-      #print /files/etc/apache2/apache2.conf/Directory[arg = "/var/www/"]
-      #The following works:
-      #set /files/etc/apache2/apache2.conf/Directory[arg = "/var/www/"]/IfModule/directive[1]/arg[3] "default-src 'self';"
+
     } else {
       notify{"in ${server_name} CSP":}
       $header_contents = [

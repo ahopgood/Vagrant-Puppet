@@ -190,8 +190,16 @@ I had to roll my own augeas header solution due to conflicts with string escapin
 * Use sed-script.txt as a puppet file provider file puppet://module/sed-script.txt into a concrete file
 * Use concrete file for sed-script.txt
 * Add an onlyif clause to the augeas executable
+  * Externalise the onlyif.txt content to be created as a file from a parameter
+  * Utilise the lens variable
+  * Utilise the conf file variable
+  * Make augtool call match the OS we're on.
+  * Externalise the equality condition as a variable 
+  * Externalise the size condition as a variable matched to grep -c and awk
+  * Find out how to modify an existing entry
 * Note the use of `--parser=future` required for flattening the arguments into a single file.
 * Extract header into a separate module
+* Add dependency on `Class["augeas"]`
 * Make xclacks use header module
 * Try xclacks **and** csp header
 * Extract augeas bits into a separate define section?
