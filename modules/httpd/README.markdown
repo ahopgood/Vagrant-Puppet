@@ -182,6 +182,21 @@ header set X-Clacks-Overhead "GNU Terry Pratchett"
 #### Depdendencies
 This will only work if the headers module is installed.
 
+## Content Security Policy
+I had to roll my own augeas header solution due to conflicts with string escaping on puppet and augeas conspiring to prevent me using strings such as "default-src 'self';".
+### ToDo
+* Move testfile.txt into a variable
+* Delete testfile.txt as part of the module
+* Use sed-script.txt as a puppet file provider file puppet://module/sed-script.txt into a concrete file
+* Use concrete file for sed-script.txt
+* Add an onlyif clause to the augeas executable
+* Note the use of `--parser=future` required for flattening the arguments into a single file.
+* Extract header into a separate module
+* Make xclacks use header module
+* Try xclacks **and** csp header
+* Extract augeas bits into a separate define section?
+* CentOS support
+ * 
 
 ## Virtual Hosts
 Required parameters:  

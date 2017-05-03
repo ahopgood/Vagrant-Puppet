@@ -27,7 +27,7 @@ define httpd::content_security_policy(
         "set ${context}Directory[last()]/IfModule/arg headers_module",
         "set ${context}Directory[last()]/IfModule/directive[1] header",
         "set ${context}Directory[last()]/IfModule/directive[1]/arg[1] set",
-        "set ${context}Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Context",
+        "set ${context}Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy",
         "set ${context}Directory[last()]/IfModule/directive[1]/arg[3] ${csp_rule}",
         "save",
         "print /augeas//error",
@@ -40,7 +40,7 @@ define httpd::content_security_policy(
       exec{"format quotes and single quotes for augtool":
         path => "/bin",
         command => "sed -f /vagrant/files/sed-script.txt -i /home/vagrant/testfile.txt",
-        #sed 's/"\(.*\)"/"\\"\1\\""/g'
+        require => Class['augeas'],
       }
 
     exec{"apply header to main config file":
@@ -48,6 +48,11 @@ define httpd::content_security_policy(
       command => "augtool -At \"${lens} incl ${file_to_change}\" -f /home/vagrant/testfile.txt",
       require => Exec["format quotes and single quotes for augtool"],
       #can we add an onlyif style clause here?
+      #Only if the number of matching lines equals 0, i.e. only if we haven't put this header in before
+      onlyif => "augtool -At \"Httpd.lns incl /etc/apache2/apache2.conf\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'"
+      #Only if the value already exists
+#      onlyif => "augtool -At \"Httpd.lns incl /etc/apache2/apache2.conf\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v  \"(no matches)\""
+
     }
 
 

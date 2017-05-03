@@ -28,6 +28,8 @@ Package{
     content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
   }
   ->
+  class{"augeas":}
+  ->
   httpd::content_security_policy{"CSP":
 
   }
