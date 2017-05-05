@@ -6,7 +6,7 @@ define httpd::content_security_policy(
       path => "/usr/sbin/:/usr/bin/",
       command => "/usr/sbin/a2enmod headers",
       unless => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
-      require => Package["apache2"],
+      require => [Package["apache2"],Class["httpd"]]
     }
     ->
     exec {"restart-apache2-to-install-headers":
@@ -17,13 +17,22 @@ define httpd::content_security_policy(
     if (versioncmp("${virtual_host}", "global") == 0){
       notify{"in global CSP":}
 
-      $file_to_change = "/etc/apache2/apache2.conf"
-      $context = "/files${file_to_change}/"
+      $conf_file_location = "/etc/apache2/apache2.conf"
+      $context = "/files${conf_file_location}/"
       $lens = "Httpd.lns"
-      $csp_rule = "\"default-src \'self\'\""
-      $contents = [
+      $csp_rule = "\"\\\"default-src \'self\'\\\"\""
+
+      #insert first onlyif match not present
+      #insert everything else if 
+      $header_contents = [
+#        "set ${context}Directory[arg = '\"/var/www/html/\"]/arg \\\"/var/www/html/\\\"",
+#        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/arg headers_module",
+#        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[arg = 'Content-Security-Policy'] header",
+#        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[1] set",
+#        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[2] Content-Security-Policy",
+#        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[3] ${csp_rule}",
         "ins Directory after ${context}Directory[last()]",
-        "set ${context}Directory[last()]/arg \"/var/www/html/\"",
+        "set ${context}Directory[last()]/arg \\\"/var/www/html/\\\"",
         "set ${context}Directory[last()]/IfModule/arg headers_module",
         "set ${context}Directory[last()]/IfModule/directive[1] header",
         "set ${context}Directory[last()]/IfModule/directive[1]/arg[1] set",
@@ -32,45 +41,52 @@ define httpd::content_security_policy(
         "save",
         "print /augeas//error",
       ]
-      $flattenedContents = $contents.reduce|$memo, $value| { "$memo \n$value" }
-      file {"/home/vagrant/testfile.txt":
-        content => $flattenedContents,
+      $flattenedHeaderContents = $header_contents.reduce|$memo, $value| { "$memo \n$value" }
+    
+#      $header_contents_file = "/home/vagrant/testfile.txt"
+#      file {"${header_contents_file}":
+#        content => $flattenedHeaderContents,
+#      }
+#      ->
+#      exec {"reformat quotes and single quotes for augtool":
+#        path => "/bin",
+#        command => "sed -f /vagrant/files/sed-script.txt -i ${header_contents_file}",
+#        require => Class['augeas'],
+#      }
+#    
+      $onlyif = "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']"
+      httpd::header{ "CSP":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $header_contents,
       }
-
-      exec{"format quotes and single quotes for augtool":
-        path => "/bin",
-        command => "sed -f /vagrant/files/sed-script.txt -i /home/vagrant/testfile.txt",
-        require => Class['augeas'],
-      }
-
-    #Use echo instead of intermediatory file
-    #echo "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']" > augtool -At "Httpd.lns incl /etc/apache2/apache2.conf" -f  | grep -c -v "(no matches)"
-
-    $onlyif = "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']"
-
-    $augtool_location = "/usr/bin/"
-    exec{"apply header to main config file":
-      path => "${augtool_location}",
-      command => "augtool -At \"${lens} incl ${file_to_change}\" -f /home/vagrant/testfile.txt",
-      require => Exec["format quotes and single quotes for augtool"],
+#      $onlyif_file = "/home/vagrant/onlyif.txt"
+#      file {"${onlyif_file}":
+#        content => "${onlyif}"
+#      }
+#    
+##    #Need to set if we find the correct node, and ins if we don't
+#      $augtool_location = "/usr/bin"
+#      exec{"apply header to main config file":
+#        path => "${augtool_location}",
+#        command => "augtool -At \"${lens} incl ${conf_file_location}\" -f ${header_contents_file}",
+#        require => [
+##          Exec["reformat quotes and single quotes for augtool"],
+#          File["${onlyif_file}"],
+#          File["${header_contents_file}"],
+#        ],
+##        onlyif => "${augtool_location}/augtool -At \"${lens} incl ${conf_file_location}\" -f ${onlyif_file} | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'",
+#      }
+#      ->
+#      exec {"restart-apache2-to-add-csp":
+#        path => "/usr/sbin/:/bin/",
+#        command => "service apache2 reload",
+#      }
       #can we add an onlyif style clause here?
       #Only if the number of matching lines equals 0, i.e. only if we haven't put this header in before
-      onlyif => "${augtool_location}augtool -At \"${lens} incl ${file_to_change}\" -f /vagrant/files/onlyif.txt | /bin/grep -c -v \"(no matches)\" | /usr/bin/awk '{ if (\$0 == 0) exit 0; else  exit 1; }'"
-#      Equivalent to
-#      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
-    }
-
-
-      $header_contents = [
-      #global Directory level header
-        "ins Directory after /files/etc/apache2/apache2.conf/Directory[last()]",
-        "set Directory[last()]/arg '\"/var/www/html/\"'",
-        "set Directory[last()]/IfModule/arg headers_module",
-        "set Directory[last()]/IfModule/directive[1] header",
-        "set Directory[last()]/IfModule/directive[1]/arg[1] set",
-        "set Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy",
-      ]
-      $conf_file_location = "/etc/apache2/apache2.conf"
+      #      Equivalent to augeas puppet provider
+      #      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
 
     } else {
       notify{"in ${server_name} CSP":}
