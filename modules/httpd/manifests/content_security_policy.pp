@@ -24,50 +24,97 @@ define httpd::content_security_policy(
 
       #insert first onlyif match not present
       #insert everything else if 
-      $header_contents = [
+      $directory_header_contents = [
 #        "set ${context}Directory[arg = '\"/var/www/html/\"]/arg \\\"/var/www/html/\\\"",
 #        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/arg headers_module",
 #        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[arg = 'Content-Security-Policy'] header",
 #        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[1] set",
 #        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[2] Content-Security-Policy",
 #        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/directive[1]/arg[3] ${csp_rule}",
-        "ins Directory after ${context}Directory[last()]",
-        "set ${context}Directory[last()]/arg \\\"/var/www/html/\\\"",
-        "set ${context}Directory[last()]/IfModule/arg headers_module",
-        "set ${context}Directory[last()]/IfModule/directive[1] header",
-        "set ${context}Directory[last()]/IfModule/directive[1]/arg[1] set",
-        "set ${context}Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy",
-        "set ${context}Directory[last()]/IfModule/directive[1]/arg[3] ${csp_rule}",
+#        "ins Directory after ${context}Directory[last()]",
+        "set ${context}Directory[last()+1]/arg \\\"/var/www/html/\\\"",
         "save",
-        "print /augeas//error",
+        "print /augeas//error"
       ]
-      $flattenedHeaderContents = $header_contents.reduce|$memo, $value| { "$memo \n$value" }
-    
-#      $header_contents_file = "/home/vagrant/testfile.txt"
-#      file {"${header_contents_file}":
-#        content => $flattenedHeaderContents,
-#      }
-#      ->
-#      exec {"reformat quotes and single quotes for augtool":
-#        path => "/bin",
-#        command => "sed -f /vagrant/files/sed-script.txt -i ${header_contents_file}",
-#        require => Class['augeas'],
-#      }
-#    
-      $onlyif = "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']"
-      httpd::header{ "CSP":
+      #if there's no match - this isn't working
+      $directory_onlyif = "match /files/etc/apache2/apache2.conf/Directory[arg = '\"/var/www/html/\"']"
+      httpd::header{ "CSP - directory":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $directory_header_contents,
+        onlyif => $directory_onlyif,
+        before => [
+          Httpd::Header["CSP - header"],
+          Httpd::Header["CSP - IfModule"],
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
+      }
+      $header_contents = [
+        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule/arg headers_module",
+        "save",
+        "print /augeas//error"
+      ]
+      $header_onlyif = "match /files/etc/apache2/apache2.conf/Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']"
+
+      httpd::header{ "CSP - IfModule":
         conf_file_location => $conf_file_location,
         context => $context,
         lens => $lens,
         header_contents => $header_contents,
+        onlyif => $header_onlyif,
+        before => [
+          Httpd::Header["CSP - header"],
+          Httpd::Header["CSP - contents"],
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
       }
-#      $onlyif_file = "/home/vagrant/onlyif.txt"
-#      file {"${onlyif_file}":
-#        content => "${onlyif}"
-#      }
-#    
-##    #Need to set if we find the correct node, and ins if we don't
-#      $augtool_location = "/usr/bin"
+      
+      $csp_header = [  
+        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[last()+1] header",
+        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[last()]/arg[1] set",
+        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[last()]/arg[2] Content-Security-Policy",
+        "save",
+        "print /augeas//error",
+      ]
+      $onlyif = "match /files/etc/apache2/apache2.conf/Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']"
+      httpd::header{ "CSP - header":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $csp_header,
+        onlyif => $onlyif,
+        before => [
+          Httpd::Header["CSP - contents"],
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
+      }
+
+      $csp_header_contents = [
+        "set ${context}Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
+        "save",
+        "print /augeas//error",
+      ]
+#      $onlyif = "match /files/etc/apache2/apache2.conf/Directory[arg = '\"/var/www/html/\"']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy' and arg = 'dummy']"
+      httpd::header{ "CSP - contents":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $csp_header_contents,
+#        onlyif => $onlyif,
+        before => [
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+#          Httpd::Header["CSP - header"],
+        ]
+      }
+#
+      ->
+      exec {"restart-apache2-to-add-csp for header ${name}":
+        path => "/usr/sbin/:/bin/",
+        command => "service apache2 reload",
+      }
+      ##    #Need to set if we find the correct node, and ins if we don't
+#      
 #      exec{"apply header to main config file":
 #        path => "${augtool_location}",
 #        command => "augtool -At \"${lens} incl ${conf_file_location}\" -f ${header_contents_file}",
