@@ -137,11 +137,11 @@ define httpd::content_security_policy(
 #    }
   } elsif ("${operatingsystem}" == "CentOS"){
     if ("${operatingsystemmajrelease}" == "6" or "${operatingsystemmajrelease}" == "7") {
-      notify{"Beginning support for CentOS${operatingsystemmajrelease}":}
+#      notify{"Beginning support for CentOS${operatingsystemmajrelease}":}
       #Find if the module is installed
       #apachectl -t -D DUMP_MODULES | grep headers
 
-      exec {"module_source_exists":
+      exec {"module_source_exists [${name}]":
         path => "/bin/",
         command => "ls -l /etc/httpd/modules/ | grep headers",
       }
@@ -160,19 +160,19 @@ define httpd::content_security_policy(
         context => "/files/etc/httpd/conf/httpd.conf/",
         changes => $module_load_contents,
         onlyif   => "match /files/etc/httpd/conf/httpd.conf/directive[. = 'LoadModule']/arg[. = 'headers_module'] size == 0",
-        require => Exec["module_source_exists"],
+        require => Exec["module_source_exists [${name}]"],
       }
       ->
       exec {"restart-httpd-to-add-headers-module":
         path => "/sbin/:/bin/",
         command => "service httpd reload",
         unless => "/usr/sbin/apachectl -t -D DUMP_MODULES | /bin/grep headers",
-        before => Augeas["add header to directory"],
+#        before => Augeas["add header to directory"],
       }
 
       #module check
       #<IfModule mod_headers.c>
-      if (versioncmp("${virtual_host}", "global"), 0){
+      if (versioncmp("${virtual_host}", "global") == 0){
         $conf_file_location = "/etc/httpd/conf/httpd.conf"
         $context = "/files${conf_file_location}/"
         $lens = "Httpd.lns"
@@ -185,7 +185,8 @@ define httpd::content_security_policy(
           "save",
           "print /augeas//error"
         ]
-        $header_ifModule_onlyif = "match ${context}IfModule[arg = 'arg mod_headers.c']"
+        #Onlyif is failing
+        $header_ifModule_onlyif = "match ${context}IfModule[arg = 'mod_headers.c']"
 
         httpd::header{ "CSP - IfModule":
           conf_file_location => $conf_file_location,
@@ -195,12 +196,12 @@ define httpd::content_security_policy(
           onlyif => $header_ifModule_onlyif,
           before => [
             Httpd::Header["CSP - directory"],
-            Exec["restart-apache2-to-add-csp for header ${name}"],
+            Exec["restart-httpd-to-add-header for ${name}"],
           ]
         }
 
 
-        #        "set IfModule[last()]/Directory/arg '\"/var/www/html/\"'",
+#        #        "set IfModule[last()]/Directory/arg '\"/var/www/html/\"'",
         $directory_header_contents = [
           "set ${context}IfModule[arg = 'mod_headers.c']/Directory/arg \\\"/var/www/html/\\\"",
           "save",
@@ -216,14 +217,14 @@ define httpd::content_security_policy(
           onlyif => $directory_onlyif,
           before => [
             Httpd::Header["CSP - header"],
-            Exec["restart-apache2-to-add-csp for header ${name}"],
+            Exec["restart-httpd-to-add-header for ${name}"],
           ]
         }
-
-#      "set IfModule[last()]/Directory/directive[1] header",
-#      "set IfModule[last()]/Directory/directive[1]/arg[1] set",
-#      "set IfModule[last()]/Directory/directive[1]/arg[2] X-Clacks-Overhead",
-#      "set IfModule[last()]/Directory/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
+#
+##      "set IfModule[last()]/Directory/directive[1] header",
+##      "set IfModule[last()]/Directory/directive[1]/arg[1] set",
+##      "set IfModule[last()]/Directory/directive[1]/arg[2] X-Clacks-Overhead",
+##      "set IfModule[last()]/Directory/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
         $csp_header = [
           "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '\"/var/www/html/\"']/directive[last()+1] header",
           "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '\"/var/www/html/\"']/directive[last()]/arg[1] set",
@@ -240,7 +241,7 @@ define httpd::content_security_policy(
           onlyif => $onlyif,
           before => [
             Httpd::Header["CSP - contents"],
-            Exec["restart-apache2-to-add-csp for header ${name}"],
+            Exec["restart-httpd-to-add-header for ${name}"],
           ]
         }
 
@@ -255,30 +256,16 @@ define httpd::content_security_policy(
           lens => $lens,
           header_contents => $csp_header_contents,
           before => [
-            Exec["restart-apache2-to-add-csp for header ${name}"],
+            Exec["restart-httpd-to-add-header for ${name}"],
           ]
         }
       }
-#      $header_contents = [
-#        "ins IfModule after /files/etc/httpd/conf/httpd.conf/IfModule[last()]",
-#        "set IfModule[last()]/arg mod_headers.c",
-#        "set IfModule[last()]/Directory/arg '\"/var/www/html/\"'",
-#        "set IfModule[last()]/Directory/directive[1] header",
-#        "set IfModule[last()]/Directory/directive[1]/arg[1] set",
-#        "set IfModule[last()]/Directory/directive[1]/arg[2] X-Clacks-Overhead",
-#        "set IfModule[last()]/Directory/directive[1]/arg[3] '\"GNU Terry Pratchett\"'",
-#      ]
-#      augeas {"add header to directory":
-#        incl => "/etc/httpd/conf/httpd.conf",
-#        lens => "Httpd.lns",
-#        context => "/files/etc/httpd/conf/httpd.conf/",
-#        changes => $header_contents,
-#        onlyif   => "match /files/etc/httpd/conf/httpd.conf/Directory[.]/directive[. = 'header']/arg[. = 'X-Clacks-Overhead'] size == 0",
-#      }
-#      ->
-      exec {"restart-httpd-to-add-csp for header ${name}":
+      exec {"restart-httpd-to-add-header for ${name}":
         path => "/sbin/:/bin/",
         command => "service httpd reload",
+        require => [
+          Exec["restart-httpd-to-add-headers-module"],
+        ]
       }
       #close centos 6 & 7 check
     }
