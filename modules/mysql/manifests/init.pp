@@ -14,15 +14,15 @@
 class mysql (
   $password = "rootR00?s",
   $root_home = "/home/vagrant",
+  $major_version        = "5",
+  $minor_version        = "7",
+  $patch_version        = "13",
 ){  
   #Modify this into a class that we can pass args into, e.g. mysql version number, os speciic installer classes etc.
   #NOTE: This script will reset the root password if it cannot login to the mysql service
   $local_install_dir    = "${local_install_path}installers"
   $puppet_file_dir      = "modules/mysql/"
 
-  $major_version        = "5"
-  $minor_version        = "7"
-  $patch_version        = "13"
   $os = "$operatingsystem$operatingsystemmajrelease"
   notify{"Found ${os}":}
 
@@ -32,27 +32,27 @@ class mysql (
 
   if "${os}" == "CentOS7"{
     class{"mysql::centos":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
     contain mysql::centos
   } elsif "${os}" == "CentOS6" {
     class{"mysql::centos":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
     contain mysql::centos
   } elsif ("${os}" == "Ubuntu15.10"){
     class{"mysql::ubuntu":
-      major_version => $major_version,
-      minor_version => $minor_version,
-      patch_version => $patch_version,
+      major_version => "${major_version}",
+      minor_version => "${minor_version}",
+      patch_version => "${patch_version}",
       password => $password,
       root_home => $root_home,
     }
@@ -86,7 +86,7 @@ define mysql::create_user(
     command => "/bin/echo \"CREATE USER '${dbusername}'@'localhost' IDENTIFIED BY '${dbpassword}';\" | mysql -u${rootusername} -p${rootpassword}",
     unless => "mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/",
-    require => [Package["mysql-community-server"], Exec["reset password"]]
+    require => [Service["mysql"], Exec["confirm root password"]]
   }
   ->
   exec{"Grant_privileges_for_user ${dbusername}":
@@ -115,7 +115,7 @@ define mysql::create_database(
     command => "/bin/echo \"create database ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     unless => "/bin/echo \"use ${dbname}\" | mysql -u${dbusername} -p${dbpassword}",
     path => "/usr/bin/",
-    require => [Package["mysql-community-server"], Exec["reset password"]]
+    require => [Service["mysql"], Exec["confirm root password"]]
   }
 }
 

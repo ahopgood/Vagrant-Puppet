@@ -11,9 +11,9 @@
 # Sample Usage:
 #
 
-class { 'java':
+java { 'java-7':
   version => '7',
-  updateVersion => '71'
+  update_version => '71'
 }
 
 class { 'tomcat':

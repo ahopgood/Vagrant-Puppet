@@ -25,7 +25,7 @@ class tomcat (
   $catalina_opts = '' ) {
     
   #Java required
-  Java['java'] -> Class['tomcat']
+  Java <| |> -> Class['tomcat']
      
   notify {
     "${module_name} installation completed":
@@ -54,7 +54,6 @@ class tomcat (
     notify {    "Using operating system:$::operatingsystem": }
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
-    
   }
 
   group { "${tomcat_group}":
@@ -156,11 +155,21 @@ class tomcat (
   }
 
   if ("${port}" != null){ 
-  	#Create an iptables (firewall) exception, persist and restart iptables 
-    class { 'iptables':
-      port => "${port}",
-      require => File["Set CATALINA_HOME"]
+    if ("${operatingsystem}"=="CentOS") {
+      #Create an iptables (firewall) exception, persist and restart iptables 
+      class { 'iptables':
+        port => "${port}",
+        require => File["Set CATALINA_HOME"]
+      }
+    } elsif ("${operatingsystem}"=="Ubuntu"){
+      ufw {"test":
+        port => '8080',
+        isTCP => true
+      }
+    } else {
+      fail("Operating system not supported:$::operatingsystem")  
     }
+
   }
 
   file {  "${tomcat_users}":
@@ -170,7 +179,7 @@ class tomcat (
   }
   
   file { "${tomcat_server_config}":
-    content => template("${module_name}/server.xml.erb"),
+    content => template("${module_name}/server.xml.${tomcat_short_ver}.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"] 
   }

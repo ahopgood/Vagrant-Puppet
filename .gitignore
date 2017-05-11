@@ -3,3 +3,10 @@
 /modules/*/files/Ubuntu/*/*.deb
 /modules/*/files/CentOS/*/*.rpm
 /modules/*/files/CentOS/*/*.rpm.bin
+/modules/*/files/*/*/*.tar.gz
+
+/modules/*/files/*.deb
+/modules/*/files/*.rpm
+/modules/*/files/*.rpm.bin
+/modules/*/files/*.tar.gz
+/modules/*/files/*.zip
