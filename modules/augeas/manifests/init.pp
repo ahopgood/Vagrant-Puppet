@@ -6,7 +6,6 @@ class augeas {
     $provider = "rpm"
     $augeas = "augeas"
     $augeas_libs = "augeas-libs"
-    $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
     if (versioncmp("${operatingsystemmajrelease}", "7") == 0){
       $major_version = "1"
       $minor_version = "4"
@@ -31,6 +30,7 @@ class augeas {
     } else {
       fail ("${operatingsystem} ${operatingsystemmajrelease} is currently not supported for the augeas module")
     }
+    $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
   } elsif (versioncmp("${operatingsystem}", "Ubuntu") == 0){
     $major_version = "1"
     $minor_version = "3"
