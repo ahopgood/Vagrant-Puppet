@@ -13,24 +13,24 @@ define httpd::content_security_policy(
       path => "/usr/sbin/:/bin/",
       command => "service apache2 restart",
     }
-
+    
+    $lens = "Httpd.lns"
+    $csp_rule = "\"\\\"default-src \'self\'\\\"\""
+    
     if (versioncmp("${virtual_host}", "global") == 0){
       notify{"in global CSP":}
-
       $conf_file_location = "/etc/apache2/apache2.conf"
       $context = "/files${conf_file_location}/"
-      $lens = "Httpd.lns"
-      $csp_rule = "\"\\\"default-src \'self\'\\\"\""
-      $global_directory = "/var/www/"
-      $global_directory_search = "\"${global_directory}\""
+      $virtual_host_name = "/var/www/"
+      $virtual_host_name_search_term = "\"${virtual_host_name}\""
       
       $directory_header_contents = [
-        "set ${context}Directory[last()+1]/arg \\\"${global_directory}\\\"",
+        "set ${context}Directory[last()+1]/arg \\\"${virtual_host_name}\\\"",
         "save",
         "print /augeas//error"
       ]
       #if there's no match - this isn't working
-      $directory_onlyif = "match ${context}Directory[arg = '$global_directory_search']"
+      $directory_onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']"
       httpd::header{ "CSP - directory":
         conf_file_location => $conf_file_location,
         context => $context,
@@ -44,11 +44,11 @@ define httpd::content_security_policy(
         ]
       }
       $header_contents = [
-        "set ${context}Directory[arg = '$global_directory_search']/IfModule/arg headers_module",
+        "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule/arg headers_module",
         "save",
         "print /augeas//error"
       ]
-      $header_onlyif = "match ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']"
+      $header_onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']"
 
       httpd::header{ "CSP - IfModule":
         conf_file_location => $conf_file_location,
@@ -64,13 +64,13 @@ define httpd::content_security_policy(
       }
       
       $csp_header = [  
-        "set ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']/directive[last()+1] header",
-        "set ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']/directive[last()]/arg[1] set",
-        "set ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']/directive[last()]/arg[2] Content-Security-Policy",
+        "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()+1] header",
+        "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()]/arg[1] set",
+        "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()]/arg[2] Content-Security-Policy",
         "save",
         "print /augeas//error",
       ]
-      $onlyif = "match ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']"
+      $onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']"
       httpd::header{ "CSP - header":
         conf_file_location => $conf_file_location,
         context => $context,
@@ -84,7 +84,7 @@ define httpd::content_security_policy(
       }
 
       $csp_header_contents = [
-        "set ${context}Directory[arg = '$global_directory_search']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
+        "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
         "save",
         "print /augeas//error",
       ]
@@ -108,19 +108,85 @@ define httpd::content_security_policy(
 
     } else {
       notify{"in ${server_name} CSP":}
-      $header_contents = [
-        #Want to match the VirtualHost entry where the <ServerName "www.alexander.com"> 
-        #/files/etc/apache2/sites-available/www.alexander.com.conf/VirtualHost[*]/directive[. = 'ServerName' and arg = 'www.alexander.com']
-        #/files/etc/apache2/sites-available/www.alexander.com.conf/VirtualHost[directive = 'ServerName' and directive/arg = 'www.alexander.com']/IfModule/arg headers_module
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/arg headers_module",
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/arg headers_module",
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/directive[1] header",
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/directive[1]/arg[1] set",
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/directive[1]/arg[2] Content-Security-Policy",
-        "set VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule/directive[1]/arg[3]'\"default-src 'self';\"'"
+      $conf_file_location = "/etc/apache2/sites-available/${virtual_host}.conf"
+      $context = "/files${conf_file_location}/"
+      $virtual_host_name = "${virtual_host}"
+      $virtual_host_name_search_term = "\"${virtual_host_name}\""
+#      $header_contents = [
+#        #Want to match the VirtualHost entry where the <ServerName "www.alexander.com"> 
+#        #/files/etc/apache2/sites-available/www.alexander.com.conf/VirtualHost[*]/directive[. = 'ServerName' and arg = 'www.alexander.com']
+#        #/files/etc/apache2/sites-available/www.alexander.com.conf/VirtualHost[directive = 'ServerName' and directive/arg = 'www.alexander.com']/IfModule/arg headers_module
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/arg headers_module",
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/arg headers_module",
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/directive[1] header",
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/directive[1]/arg[1] set",
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/directive[1]/arg[2] Content-Security-Policy",
+#        "set VirtualHost[directive = 'ServerName' and directive/arg = '${virtual_host}']/IfModule/directive[1]/arg[3]'\"default-src 'self';\"'"
+#      ]
+#      /VirtualHost/IfModule
+#      /VirtualHost/IfModule/arg = "headers_module"
+#      $conf_file_location = "/etc/apache2/sites-available/${server_name}.conf"
+#      $onlyif = "match /files${conf_file_location}/VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
+      $directory_header_contents = [
+        "set ${context}VirtualHost/IfModule/arg headers_module",
+        "save",
+        "print /augeas//error"
       ]
-      $conf_file_location = "/etc/apache2/sites-available/${server_name}.conf"
-      $onlyif = "match /files${conf_file_location}/VirtualHost[directive = 'ServerName' and directive/arg = '${server_name}']/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
+      #if there's no match - this isn't working
+      $directory_onlyif = "match ${context}VirtualHost/IfModule[arg = 'headers_module']"
+      httpd::header{ "CSP - IfModule":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $directory_header_contents,
+        onlyif => $directory_onlyif,
+        before => [
+          Httpd::Header["CSP - header"],
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
+      }
+      $header_contents = [
+        "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive header",
+        "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[1] set",
+        "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[2] Content-Security-Policy",
+        "save",
+        "print /augeas//error"
+      ]
+      $header_onlyif = "match ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']"
+
+      httpd::header{ "CSP - header":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $header_contents,
+        onlyif => $header_onlyif,
+        before => [
+#          Httpd::Header["CSP - header"],
+          Httpd::Header["CSP - contents"],
+#          Httpd::Header["CSP - IfModule"],
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
+      }
+
+      $csp_header_contents = [
+        "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
+        "save",
+        "print /augeas//error",
+      ]
+      httpd::header{ "CSP - contents":
+        conf_file_location => $conf_file_location,
+        context => $context,
+        lens => $lens,
+        header_contents => $csp_header_contents,
+        before => [
+          Exec["restart-apache2-to-add-csp for header ${name}"],
+        ]
+      }
+      
+      exec {"restart-apache2-to-add-csp for header ${name}":
+        path => "/usr/sbin/:/bin/",
+        command => "service apache2 reload",
+      }
     }
 
   } elsif ("${operatingsystem}" == "CentOS"){
@@ -166,8 +232,8 @@ define httpd::content_security_policy(
         $lens = "Httpd.lns"
         $csp_rule = "\"\\\"default-src \'self\'\\\"\""
         
-        $global_directory = "/var/www/"
-        $global_directory_search = "\"${global_directory}\""
+        $virtual_host_name = "/var/www/"
+        $virtual_host_name_search_term = "\"${virtual_host_name}\""
 
         $header_ifModule = [
           "set ${context}IfModule[last()+1]/arg mod_headers.c",
@@ -190,11 +256,11 @@ define httpd::content_security_policy(
         }
         
         $directory_header_contents = [
-          "set ${context}IfModule[arg = 'mod_headers.c']/Directory/arg \\\"${global_directory}\\\"",
+          "set ${context}IfModule[arg = 'mod_headers.c']/Directory/arg \\\"${virtual_host_name}\\\"",
           "save",
           "print /augeas//error"
         ]
-        $directory_onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']"
+        $directory_onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']"
         httpd::header{ "CSP - directory":
           conf_file_location => $conf_file_location,
           context => $context,
@@ -207,13 +273,13 @@ define httpd::content_security_policy(
           ]
         }
         $csp_header = [
-          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']/directive[last()+1] header",
-          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']/directive[last()]/arg[1] set",
-          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']/directive[last()]/arg[2] Content-Security-Policy",
+          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()+1] header",
+          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()]/arg[1] set",
+          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()]/arg[2] Content-Security-Policy",
           "save",
           "print /augeas//error",
         ]
-        $onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']/directive[. = 'header' and arg = 'Content-Security-Policy']"
+        $onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[. = 'header' and arg = 'Content-Security-Policy']"
         httpd::header{ "CSP - header":
           conf_file_location => $conf_file_location,
           context => $context,
@@ -227,7 +293,7 @@ define httpd::content_security_policy(
         }
 
         $csp_header_contents = [
-          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$global_directory_search']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
+          "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[. = 'header' and arg = 'Content-Security-Policy']/arg[3] ${csp_rule}",
           "save",
           "print /augeas//error",
         ]

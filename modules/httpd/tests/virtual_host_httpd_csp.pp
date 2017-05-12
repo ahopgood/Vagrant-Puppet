@@ -56,5 +56,5 @@ Package{
 #  httpd::xclacks{"x-clacks":}
   ->
   httpd::content_security_policy{"CSP":
-
+    virtual_host => "www.alexander.com"
   }
