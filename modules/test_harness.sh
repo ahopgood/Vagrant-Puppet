@@ -21,7 +21,7 @@ function run_manifest {
     RUN_MANIFEST_PREFIX=$PREFIX"\e[32mrun_manifest: \e[39m"
 
     echo -e $RUN_MANIFEST_PREFIX"Working on VM ["$vm_name"] with snapshot ["$snapshot_name"] and testing with manifest "$manifest_name
-    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply /vagrant/tests/'$manifest_name' --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
+    /usr/bin/ssh -p$port vagrant@localhost -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no 'sudo puppet apply --parser=future /vagrant/tests/'$manifest_name' --detailed-exitcodes' 2> $manifest_name"_"$vm_name"-errors.txt"
     RESULT=$?
     # Save result to global array
     OUTPUT_FILE=$manifest_name"_"$vm_name"-errors-"$RESULT".txt"
@@ -38,6 +38,10 @@ function run_manifest {
     remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/package.rb:430:in \`default')"
     remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
+    remove_warning "Warning: Non-string values for the file mode property are deprecated. It must be a string, either a symbolic mode like 'o+w,a+r' or an octal representation like '0644' or '755'."
+    remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/file/mode.rb:69:in \`.*')"
+    remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
+    remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
     FILE_SIZE=$(ls -l $OUTPUT_FILE | awk '{ print $5 }')
 
     if [ $FILE_SIZE == 0 ];then

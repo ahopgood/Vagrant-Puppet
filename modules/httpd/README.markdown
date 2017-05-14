@@ -182,10 +182,9 @@ header set X-Clacks-Overhead "GNU Terry Pratchett"
 This will only work if the headers module is installed.
 
 ## Content Security Policy
+An apache/httpd implementation of a [Content Security Policy](https://content-security-policy.com/) header.
 I had to roll my own augeas header solution due to conflicts with string escaping on puppet and augeas conspiring to prevent me using strings such as "default-src 'self';".
 
-
-An explanation can be found [here](http://www.gnuterrypratchett.com/).
 ### Usage
 When using the CSP module the `--parser=future` parameter is required on puppet 3.7.x up to 4.0.0 to make use of some of the more advanced parser features to manipulate parameters.
 #### Global
