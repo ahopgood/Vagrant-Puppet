@@ -177,34 +177,95 @@ And this on CentOS:
 header set X-Clacks-Overhead "GNU Terry Pratchett"
 </Directory>
 </IfModule>
-</IfModule>
 ```
-#### Depdendencies
+### Depdendencies
 This will only work if the headers module is installed.
 
 ## Content Security Policy
 I had to roll my own augeas header solution due to conflicts with string escaping on puppet and augeas conspiring to prevent me using strings such as "default-src 'self';".
+
+
+An explanation can be found [here](http://www.gnuterrypratchett.com/).
+### Usage
+When using the CSP module the `--parser=future` parameter is required on puppet 3.7.x up to 4.0.0 to make use of some of the more advanced parser features to manipulate parameters.
+#### Global
+To set a global content security policy:
+```
+  class { "httpd": }
+  ->
+  httpd::content_security_policy{"CSP":}
+```
+This will add a directive on the `/var/www/` directory .
+The directive looks like this on Ubuntu:
+```
+<Directory "/var/www/">
+<IfModule headers_module>
+header set Security-Content-Policy "default-src 'self';"
+</IfModule>
+</Directory>
+```
+And this on CentOS:
+```
+<IfModule mod_headers.c>
+<Directory "/var/www/">
+header set Security-Content-Policy "default-src 'self';"
+</Directory>
+</IfModule>
+```
+#### Virtual Host
+To set a content security policy on a virtual host:
+```
+  class { "httpd": }
+  ->
+  httpd::content_security_policy{"CSP":
+    virtual_host => "www.alexander.com"
+  }
+```
+This will add a directive on:
+* CentOS at `/etc/httpd/sites-available/www.virtualhost.com.conf` file.
+* Ubuntu at `/etc/apache2/sites-available/www.virtualhost.com.conf`
+The directive looks like this:
+```
+<VirtualHost *:80>
+DocumentRoot /var/www/virtualhost/
+ServerAlias virtualhost.com
+ServerAlias virtualhost.net
+ServerName www.virtualhost.com
+<IfModule headers_module>
+header set Content-Security-Policy "default-src 'self'"
+</IfModule>
+</VirtualHost>
+
+```
+### Depdendencies
+This will only work if the headers module is installed.
+The Augeas class is required.  
+**Note** Use of the x-clacks-overhead *after* this module call will overwrite your **global** CSP header currently, virtual host policies will not be impacted.
+It is advisable to run the x-clacks first and then CSP as the CSP module has finer grained onlyif statements for detecting duplication, existing and/or modified values.
+```
+  httpd::xclacks{"x-clacks":}
+  httpd::content_security_policy{"CSP": }
+```
 ### ToDo
 * Move testfile.txt into a variable
-* Delete testfile.txt as part of the module
-* Use sed-script.txt as a puppet file provider file puppet://module/sed-script.txt into a concrete file
-* Use concrete file for sed-script.txt
+* Delete testfile.txt as part of the module tidyup
 * Add an onlyif clause to the augeas executable
-  * Externalise the onlyif.txt content to be created as a file from a parameter
-  * Utilise the lens variable
-  * Utilise the conf file variable
-  * Make augtool call match the OS we're on.
   * Externalise the equality condition as a variable 
   * Externalise the size condition as a variable matched to grep -c and awk
-  * Find out how to modify an existing entry
-* Note the use of `--parser=future` required for flattening the arguments into a single file.
-* Extract header into a separate module
-* Add dependency on `Class["augeas"]`
 * Make xclacks use header module
 * Try xclacks **and** csp header
 * Extract augeas bits into a separate define section?
-* CentOS support
- * 
+* Move the restarting of apache sections into their own definition
+* Have x-clacks use the httpd::restart definition
+* Replace CSP restarts with httpd::restart
+* Combine the virtualhost CSP section into one place
+* Update readme section with actual config file entries for apache2 and httpd for virtualhost
+* See if we can add the:
+```
+        "save",
+        "print /augeas//error"
+```
+call to the header module header_contents array.
 
 ## Virtual Hosts
 Required parameters:  
