@@ -32,8 +32,6 @@ define httpd::header(
     path => "${augtool_location}",
     command => "augtool -At \"${lens} incl ${conf_file_location}\" -f \"${header_contents_file}\"",
     require => [
-      #          Exec["reformat quotes and single quotes for augtool"],
-#      File["${onlyif_file}"],
       File["${header_contents_file}"],
       Class["augeas"],
     ],
