@@ -14,7 +14,12 @@ java{"java-7":
   multiTenancy => true,
 }
 
-java::jce {"jce8":
+java{"java-8":
   major_version => "8",
   update_version => "31",
+  multiTenancy => true,
 }
+#java::jce {"jce8":
+#  major_version => "8",
+#  update_version => "31",
+#}

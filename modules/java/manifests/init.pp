@@ -31,8 +31,6 @@ define java (
   #rpm -qa jdk
   #Will help to identify the names as far as rpm sees them
   notify{"Java version from hiera ${major_version}":}
-
-
   
   #Perform actions appropriate to the OS
   if $::operatingsystem == 'CentOS' {
@@ -75,7 +73,7 @@ define java (
       update_version => "${update_version}",
     }
 
-    if ($::operatingsystem == "Ubuntu"){
+    if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
       file { "create default link":
         ensure => link,
         path => "/usr/lib/jvm/default",
@@ -258,6 +256,7 @@ define java::default::install(
     $javaSlaveVersionSpecificHash = { # checked
       "java_vm"              => "${jreBinLocation}",
     }
+    $javaManSlaveVersionSpecificHash = {}
     $javaCompilerslaveVersionSpecificHash = {
       "apt"                     => "${jdkBinLocation}",
       "java-rmi.cgi"            => "${jdkBinLocation}",
@@ -276,6 +275,7 @@ define java::default::install(
     $javaSlaveVersionSpecificHash = { # checked
       "java_vm"              => "${jreBinLocation}",
     }
+    $javaManSlaveVersionSpecificHash = {}
     $javaCompilerslaveVersionSpecificHash = {
       "HtmlConverter"           => "${jdkBinLocation}",
       "apt"                     => "${jdkBinLocation}",
