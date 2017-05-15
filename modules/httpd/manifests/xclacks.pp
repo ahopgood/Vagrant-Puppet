@@ -56,7 +56,8 @@ define httpd::xclacks {
       lens => "Httpd.lns",
       context => "/files/etc/apache2/apache2.conf/",
       changes => $header_contents,
-      require => Exec["restart-apache2-to-install-headers"],
+#      require => Exec["restart-apache2-to-install-headers"],
+      require => Httpd::Header::Install["x-clacks"],
       onlyif   => "match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'X-Clacks-Overhead'] size == 0", 
     }
     ->

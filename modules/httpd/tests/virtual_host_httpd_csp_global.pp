@@ -38,9 +38,7 @@ Package{
   }
   ->
   class{"augeas":}
-#  ->
-#  httpd::xclacks{"x-clacks":}
   ->
-  httpd::content_security_policy{"CSP":
-#    virtual_host => "www.alexander.com"
-  }
+  httpd::xclacks{"x-clacks":}
+  ->
+  httpd::content_security_policy{"CSP":}

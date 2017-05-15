@@ -125,7 +125,7 @@ define httpd::content_security_policy(
       }
 
       $directory_header_contents = [
-        "set ${context}IfModule[arg = 'mod_headers.c']/Directory/arg \\\"${virtual_host_name}\\\"",
+        "set ${context}IfModule[arg = 'mod_headers.c']/Directory[last()+1]/arg \\\"${virtual_host_name}\\\"",
         "save",
         "print /augeas//error"
       ]
@@ -210,7 +210,7 @@ define httpd::content_security_policy(
       onlyif             => $directory_onlyif,
       before             => [
         Httpd::Header["CSP - header"],
-        Exec["restart-apache2-to-add-csp for header ${name}"],
+        Exec["restart-apache2-to-add-csp for ${name}"],
       ]
     }
     $header_contents = [
@@ -232,7 +232,7 @@ define httpd::content_security_policy(
         #          Httpd::Header["CSP - header"],
         Httpd::Header["CSP - contents"],
         #          Httpd::Header["CSP - IfModule"],
-        Exec["restart-apache2-to-add-csp for header ${name}"],
+        Exec["restart-apache2-to-add-csp for ${name}"],
       ]
     }
 
@@ -247,22 +247,26 @@ define httpd::content_security_policy(
       lens               => $lens,
       header_contents    => $csp_header_contents,
       before             => [
-        Exec["restart-apache2-to-add-csp for header ${name}"],
+        Exec["restart-apache2-to-add-csp for ${name}"],
       ]
     }
 
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
-      exec { "restart-apache2-to-add-csp for header ${name}":
+      exec { "restart-apache2-to-add-csp for ${name}":
         path    => "/usr/sbin/:/bin/",
         command => "service apache2 reload",
+        require =>[
+          Httpd::Header::Install["CSP"],
+        ]
       }
     } elsif (versioncmp("${operatingsystem}", "CentOS") == 0){
       #        exec {"restart-httpd-to-add-header for ${name}":
-      exec { "restart-apache2-to-add-header for ${name}":
+      exec { "restart-apache2-to-add-csp for ${name}":
         path    => "/sbin/:/bin/",
         command => "service httpd reload",
         require => [
-          Exec["restart-httpd-to-add-headers-module"],
+          Httpd::Header::Install["CSP"],
+#          Exec["restart-httpd-to-add-headers-module"],
         ]
       }
     } else {
