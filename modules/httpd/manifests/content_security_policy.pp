@@ -1,58 +1,13 @@
 define httpd::content_security_policy(
   $virtual_host = "global",
-){
   $csp_rule = "\"\\\"default-src \'self\'\\\"\""
+){
   $lens = "Httpd.lns"
-  if ("${operatingsystem}" == "Ubuntu"){
-    exec { "enable headers plugin":
-      path    => "/usr/sbin/:/usr/bin/",
-      command => "/usr/sbin/a2enmod headers",
-      unless  => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
-      require => [Package["apache2"],Class["httpd"]]
-    }
-    ->
-    exec { "restart-apache2-to-install-headers":
-      path    => "/usr/sbin/:/bin/",
-      command => "service apache2 restart",
-    }
-  } elsif (versioncmp("${operatingsystem}", "CentOS") == 0){
-    if ("${operatingsystemmajrelease}" == "6" or "${operatingsystemmajrelease}" == "7") {
-      #      notify{"Beginning support for CentOS${operatingsystemmajrelease}":}
-      #Find if the module is installed
-      #apachectl -t -D DUMP_MODULES | grep headers
 
-      exec { "module_source_exists [${name}]":
-        path    => "/bin/",
-        command => "ls -l /etc/httpd/modules/ | grep headers",
-      }
-      #For the following line:
-      #LoadModule headers_module modules/mod_headers.so
-      $module_load_contents = [
-        "ins directive after /files/etc/httpd/conf/httpd.conf/directive[last()]",
-        "set directive[last()] LoadModule",
-        "set directive[last()]/arg[1] headers_module",
-        "set directive[last()]/arg[2] modules/mod_headers.so",
-      ]
-
-      augeas { "add header module to httpd config":
-        incl     => "/etc/httpd/conf/httpd.conf",
-        lens     => "Httpd.lns",
-        context  => "/files/etc/httpd/conf/httpd.conf/",
-        changes  => $module_load_contents,
-        onlyif   => "match /files/etc/httpd/conf/httpd.conf/directive[. = 'LoadModule']/arg[. = 'headers_module'] size == 0",
-        require  => Exec["module_source_exists [${name}]"],
-      }
-      ->
-      exec { "restart-httpd-to-add-headers-module":
-        path    => "/sbin/:/bin/",
-        command => "service httpd reload",
-        unless  => "/usr/sbin/apachectl -t -D DUMP_MODULES | /bin/grep headers",
-        #        before => Augeas["add header to directory"],
-      }
-    }
-  } else {
-    fail("${operatingsystem} is not currently supported")
+  httpd::header::install{"CSP":
+    before => Httpd::Header["CSP - IfModule"]
   }
+  
   if (versioncmp("${virtual_host}", "global") == 0){
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
       notify{"in global CSP":}
@@ -225,7 +180,7 @@ define httpd::content_security_policy(
         path => "/sbin/:/bin/",
         command => "service httpd reload",
         require => [
-          Exec["restart-httpd-to-add-headers-module"],
+          Httpd::Header::Install["CSP"],
         ]
       }
     }# end version check
