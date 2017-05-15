@@ -229,9 +229,7 @@ define httpd::content_security_policy(
       header_contents    => $header_contents,
       onlyif             => $header_onlyif,
       before             => [
-        #          Httpd::Header["CSP - header"],
         Httpd::Header["CSP - contents"],
-        #          Httpd::Header["CSP - IfModule"],
         Exec["restart-apache2-to-add-csp for ${name}"],
       ]
     }
@@ -266,7 +264,6 @@ define httpd::content_security_policy(
         command => "service httpd reload",
         require => [
           Httpd::Header::Install["CSP"],
-#          Exec["restart-httpd-to-add-headers-module"],
         ]
       }
     } else {
