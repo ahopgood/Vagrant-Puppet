@@ -139,9 +139,9 @@ define httpd::header::set(
     ]
   }
   $header_contents = [
-    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive header",
-    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[1] set",
-    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[2] ${header_name}",
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[last()+1] header",
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[last()][. = 'header']/arg[1] set",
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[last()][. = 'header']/arg[2] ${header_name}",
     "save",
     "print /augeas//error"
   ]
