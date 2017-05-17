@@ -95,3 +95,103 @@ define httpd::header::install{
     fail("${operatingsystem} is not currently supported")
   }
 }
+
+define httpd::header::set(
+  $virtual_host = undef,
+  $header_name = undef,
+  $header_value = undef,
+) {
+  $lens = "Httpd.lns"
+  if ($header_name == undef){
+    fail("A header type is required to set a header")
+  }
+  if ($header_value == undef){
+    fail("Header contents are required when setting a header")
+  }
+  if ($virtual_host == undef){
+    fail("A virtual host is required when setting a header")
+  }
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+    $conf_file_location = "/etc/apache2/sites-available/${virtual_host}.conf"
+  } elsif (versioncmp ("${operatingsystem}", "CentOS") == 0){
+    $conf_file_location = "/etc/httpd/sites-available/${virtual_host}.conf"
+  }
+  $context = "/files${conf_file_location}/"
+  $virtual_host_name = "${virtual_host}"
+  $virtual_host_name_search_term = "\"${virtual_host_name}\""
+
+  $directory_header_contents = [
+    "set ${context}VirtualHost/IfModule/arg headers_module",
+    "save",
+    "print /augeas//error"
+  ]
+  #if there's no match - this isn't working
+  $directory_onlyif = "match ${context}VirtualHost/IfModule[arg = 'headers_module']"
+  httpd::header{ "${name} - IfModule":
+    conf_file_location => $conf_file_location,
+    context            => $context,
+    lens               => $lens,
+    header_contents    => $directory_header_contents,
+    onlyif             => $directory_onlyif,
+    before             => [
+      Httpd::Header["${name} - header"],
+      Exec["restart-apache2-to-add ${name} header"],
+    ]
+  }
+  $header_contents = [
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive header",
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[1] set",
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header']/arg[2] ${header_name}",
+    "save",
+    "print /augeas//error"
+  ]
+  $header_onlyif = "match ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = '${header_name}']"
+
+  httpd::header{ "${name} - header":
+    conf_file_location => $conf_file_location,
+    context            => $context,
+    lens               => $lens,
+    header_contents    => $header_contents,
+    onlyif             => $header_onlyif,
+    before             => [
+      Httpd::Header["${name} - contents"],
+      Exec["restart-apache2-to-add ${name} header"],
+    ]
+  }
+
+  $csp_header_contents = [
+    "set ${context}VirtualHost/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = '${header_name}']/arg[3] ${header_value}",
+    "save",
+    "print /augeas//error",
+  ]
+  httpd::header{ "${name} - contents":
+    conf_file_location => $conf_file_location,
+    context            => $context,
+    lens               => $lens,
+    header_contents    => $csp_header_contents,
+    before             => [
+      Exec["restart-apache2-to-add ${name} header"],
+    ]
+  }
+
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+    exec { "restart-apache2-to-add ${name} header":
+      path    => "/usr/sbin/:/bin/",
+      command => "service apache2 reload",
+      require =>[
+        Httpd::Header::Install["${name}"],
+      ]
+    }
+  } elsif (versioncmp("${operatingsystem}", "CentOS") == 0){
+    #        exec {"restart-httpd-to-add-header for ${name}":
+    exec { "restart-apache2-to-add ${name} header":
+      path    => "/sbin/:/bin/",
+      command => "service httpd reload",
+      require => [
+        Httpd::Header::Install["${name}"],
+      ]
+    }
+  } else {
+    fail("Operating System: [${operatingsystem}] not supported")
+  }
+}
