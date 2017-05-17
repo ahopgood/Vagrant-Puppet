@@ -195,3 +195,184 @@ define httpd::header::set(
     fail("Operating System: [${operatingsystem}] not supported")
   }
 }
+
+define httpd::header::set_global(
+  $header_name = undef,
+  $header_value = undef,
+) {
+  $lens = "Httpd.lns"
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+    $conf_file_location = "/etc/apache2/apache2.conf"
+    $context = "/files${conf_file_location}/"
+    $virtual_host_name = "/var/www/"
+    $virtual_host_name_search_term = "\"${virtual_host_name}\""
+
+    $directory_header_contents = [
+      "set ${context}Directory[last()+1]/arg \\\"${virtual_host_name}\\\"",
+      "save",
+      "print /augeas//error"
+    ]
+    #if there's no match - this isn't working
+    $directory_onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']"
+    httpd::header{ "${name} - directory":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $directory_header_contents,
+      onlyif => $directory_onlyif,
+      before => [
+        Httpd::Header["${name} - header"],
+        Httpd::Header["${name} - IfModule"],
+        Exec["restart-apache2-to-add-csp for header ${name}"],
+      ]
+    }
+    $header_contents = [
+      "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule/arg headers_module",
+      "save",
+      "print /augeas//error"
+    ]
+    $header_onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']"
+
+    httpd::header{ "${name} - IfModule":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $header_contents,
+      onlyif => $header_onlyif,
+      before => [
+        Httpd::Header["${name} - header"],
+        Httpd::Header["${name} - contents"],
+        Exec["restart-apache2-to-add-csp for header ${name}"],
+      ]
+    }
+
+    $csp_header = [
+      "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()+1] header",
+      "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()]/arg[1] set",
+      "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[last()]/arg[2] ${header_name}",
+      "save",
+      "print /augeas//error",
+    ]
+    $onlyif = "match ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = '${header_name}']"
+    httpd::header{ "${name} - header":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $csp_header,
+      onlyif => $onlyif,
+      before => [
+        Httpd::Header["${name} - contents"],
+        Exec["restart-apache2-to-add-csp for header ${name}"],
+      ]
+    }
+
+    $csp_header_contents = [
+      "set ${context}Directory[arg = '$virtual_host_name_search_term']/IfModule[arg = 'headers_module']/directive[. = 'header' and arg = '${header_name}']/arg[3] ${header_value}",
+      "save",
+      "print /augeas//error",
+    ]
+    httpd::header{ "${name} - contents":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $csp_header_contents,
+      before => [
+        Exec["restart-apache2-to-add-csp for header ${name}"],
+      ]
+    }
+    ->
+    exec {"restart-apache2-to-add-csp for header ${name}":
+      path => "/usr/sbin/:/bin/",
+      command => "service apache2 reload",
+    }
+    #Only if the number of matching lines equals 0, i.e. only if we haven't put this header in before
+    #      Equivalent to augeas puppet provider
+    #      $onlyif = "match /files${conf_file_location}/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy'] size == 0"
+  } elsif ("${operatingsystem}" == "CentOS"){
+    $conf_file_location = "/etc/httpd/conf/httpd.conf"
+    $context = "/files${conf_file_location}/"
+
+    $virtual_host_name = "/var/www/"
+    $virtual_host_name_search_term = "\"${virtual_host_name}\""
+
+    $header_ifModule = [
+      "set ${context}IfModule[last()+1]/arg mod_headers.c",
+      "save",
+      "print /augeas//error"
+    ]
+    #Onlyif is failing
+    $header_ifModule_onlyif = "match ${context}IfModule[arg = 'mod_headers.c']"
+
+    httpd::header{ "${name} - IfModule":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $header_ifModule,
+      onlyif => $header_ifModule_onlyif,
+      before => [
+        Httpd::Header["${name} - directory"],
+        Exec["restart-httpd-to-add-header for ${name}"],
+      ]
+    }
+
+    $directory_header_contents = [
+      "set ${context}IfModule[arg = 'mod_headers.c']/Directory[last()+1]/arg \\\"${virtual_host_name}\\\"",
+      "save",
+      "print /augeas//error"
+    ]
+    $directory_onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']"
+    httpd::header{ "${name} - directory":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $directory_header_contents,
+      onlyif => $directory_onlyif,
+      before => [
+        Httpd::Header["${name} - header"],
+        Exec["restart-httpd-to-add-header for ${name}"],
+      ]
+    }
+    $csp_header = [
+      "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()+1] header",
+      "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()]/arg[1] set",
+      "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[last()]/arg[2] ${header_name}",
+      "save",
+      "print /augeas//error",
+    ]
+    $onlyif = "match ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[. = 'header' and arg = '${header_name}']"
+    httpd::header{ "${name} - header":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $csp_header,
+      onlyif => $onlyif,
+      before => [
+        Httpd::Header["${name} - contents"],
+        Exec["restart-httpd-to-add-header for ${name}"],
+      ]
+    }
+
+    $csp_header_contents = [
+      "set ${context}IfModule[arg = 'mod_headers.c']/Directory[arg = '$virtual_host_name_search_term']/directive[. = 'header' and arg = '${header_name}']/arg[3] ${header_value}",
+      "save",
+      "print /augeas//error",
+    ]
+    httpd::header{ "${name} - contents":
+      conf_file_location => $conf_file_location,
+      context => $context,
+      lens => $lens,
+      header_contents => $csp_header_contents,
+      before => [
+        Exec["restart-httpd-to-add-header for ${name}"],
+      ]
+    }
+
+    exec {"restart-httpd-to-add-header for ${name}":
+      path => "/sbin/:/bin/",
+      command => "service httpd reload",
+      require => [
+        Httpd::Header::Install["${name}"],
+      ]
+    }
+  }# end version check
+}
