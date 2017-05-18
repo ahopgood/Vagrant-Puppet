@@ -96,7 +96,7 @@ define httpd::header::install{
   }
 }
 
-define httpd::header::set(
+define httpd::header::set_virtual(
   $virtual_host = undef,
   $header_name = undef,
   $header_value = undef,

@@ -5,23 +5,21 @@ define httpd::content_security_policy(
   $lens = "Httpd.lns"
   $header_name = "Content-Security-Policy"
   
-  httpd::header::install{"CSP":
-    before => Httpd::Header["CSP - IfModule"]
+  httpd::header::install{"CSP ${name}":
+    before => Httpd::Header["CSP ${name} - IfModule"]
   }
   
   if (versioncmp("${virtual_host}", "global") == 0){
-    notify{ "in ${virtual_host} CSP": }
     httpd::header::set_global{
-      "CSP":
-        header_name => "Content-Security-Policy",
+      "CSP ${name}":
+        header_name => $header_name,
         header_value => $csp_rule,
     }
   } else { #virtual host check
-    notify{ "in ${virtual_host} CSP": }
-    httpd::header::set{
-      "CSP": 
+    httpd::header::set_virtual{
+      "CSP ${name}": 
       virtual_host => $virtual_host,
-      header_name => "Content-Security-Policy",
+      header_name => $header_name,
       header_value => $csp_rule,
     }
   }# end global vs virtual host check

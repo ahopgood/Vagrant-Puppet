@@ -53,10 +53,10 @@ Package{
   ->
   class{"augeas":}
   ->
-  httpd::xclacks{"x-clacks":
+  httpd::xclacks{"www.alexander.com":
     virtual_host => "www.alexander.com"
   }
   ->
-  httpd::content_security_policy{"CSP":
+  httpd::content_security_policy{"www.alexander.com":
     virtual_host => "www.alexander.com"
   }
