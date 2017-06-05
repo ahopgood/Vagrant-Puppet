@@ -16,17 +16,27 @@ class tomcat (
   $tomcat_manager_password = '',
   $tomcat_script_manager_username = '',
   $tomcat_script_manager_password = '',
-  
-  $logging_directory = '/var/log/tomcat',
+  $logging_directory = undef,
   $major_version = "7",
   $minor_version = "54",
   $port = null,
   $java_opts = '',
   $catalina_opts = '' ) {
 
+
+  #requires storeconfigs to be set in puppet master with a db adapter
+#  Java<<| name == 'java-8' |>> -> Class['tomcat']
   #Java required
-  Class['java'] -> Class['tomcat']
-     
+  if (versioncmp("${major_version}", 8) == 0){
+    Java["java-7"] -> Class['tomcat']
+    #manual check?
+  } elsif (versioncmp("${major_version}", 7) == 0) {
+    Java["java-6"] -> Class['tomcat']
+  }
+
+  #ls -l /var/log | grep tomcat
+  #lrwxrwxrwx 1 root   root       25 Apr 11 08:00 tomcat8 -> /var/hosting/tomcat8/logs
+
   notify {
     "${module_name} installation completed":
   }  
@@ -46,10 +56,14 @@ class tomcat (
   $catalina_home        = "${tomcat_install_dir}${tomcat_short_ver}"
   $tomcat_users         = "${catalina_home}/conf/tomcat-users.xml"
   $tomcat_server_config = "${catalina_home}/conf/server.xml"
-  $tomcat_env_file		  = "setenv.sh" 
-  
-  if $::operatingsystem == 'CentOS' {
+  $tomcat_env_file		  = "setenv.sh"
+
+  if ("{$operatingsystem}" == "CentOS") {
     notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/java/default"
+  } elsif ("${operatingsystem}" == "Ubuntu"){
+    notify {    "Using operating system:$::operatingsystem": }
+    $java_home            = "/usr/lib/jvm/default"
   } else {
     notify {  "Operating system not supported:$::operatingsystem":  }  
   }
@@ -123,12 +137,13 @@ class tomcat (
     require   =>  Exec["Rename to ${tomcat_short_ver}"],
     notify	  =>  Service["${tomcat_service_file}"],
   }
-   
+
+  #Needs to be contextual to the OS
   file {  "Set JAVA_HOME":
     owner     =>  "${tomcat_user}",
     group     =>  "${tomcat_group}",
     path      =>  "/etc/profile.d/java.sh",
-    content   =>  "#!/bin/bash export JAVA_HOME=/usr/java/default",
+    content   =>  "export JAVA_HOME=/usr/java/default",
     require   =>  Exec["Unpack tomcat archive"],
   }
 
@@ -142,9 +157,11 @@ class tomcat (
   
   #Link a specified folder to the tomcat/log folder
   #How to ensure the link can be created when the parent folder(s) doesn't exist.
-  file { "/var/log/${tomcat_short_ver}":
-    ensure  =>  link,
-    target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
+  if ($logging_directory != undef){
+    file { "${logging_directory}":
+      ensure  =>  link,
+      target  =>  "${$tomcat_install_dir}${tomcat_short_ver}/logs",
+    }
   }
 
   file { "/usr/bin/${tomcat_short_ver}":
@@ -153,11 +170,21 @@ class tomcat (
   }
 
   if ("${port}" != null){ 
-  	#Create an iptables (firewall) exception, persist and restart iptables 
-    class { 'iptables':
-      port => "${port}",
-      require => File["Set CATALINA_HOME"]
+    if ("${operatingsystem}"=="CentOS") {
+      #Create an iptables (firewall) exception, persist and restart iptables 
+      class { 'iptables':
+        port => "${port}",
+        require => File["Set CATALINA_HOME"]
+      }
+    } elsif ("${operatingsystem}"=="Ubuntu"){
+      ufw {"test":
+        port => '8080',
+        isTCP => true
+      }
+    } else {
+      fail("Operating system not supported:$::operatingsystem")  
     }
+
   }
 
   file {  "${tomcat_users}":
@@ -167,7 +194,7 @@ class tomcat (
   }
   
   file { "${tomcat_server_config}":
-    content => template("${module_name}/server.xml.erb"),
+    content => template("${module_name}/server.xml.${tomcat_short_ver}.erb"),
     require =>  File["Set CATALINA_HOME"],
     notify  =>  Service["${tomcat_service_file}"] 
   }
@@ -187,7 +214,7 @@ class tomcat (
   #Tomcat service startup script
   file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
-    content =>  template("${module_name}/tomcat.erb"),
+    content =>  template("${module_name}/${operatingsystem}/tomcat.erb"),
     ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],
@@ -211,6 +238,7 @@ class tomcat (
   service { ["${tomcat_service_file}"]:
     ensure  =>  running,
     enable  =>  true,
+    provider => "init",
     require =>  [File["${tomcat_service_file}"],File["Set CATALINA_HOME"]]
   }  
 

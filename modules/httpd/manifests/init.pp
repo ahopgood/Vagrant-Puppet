@@ -21,12 +21,11 @@ class httpd {
   $httpd_user = "apache"
   $httpd_group = "apache"
 
-#  Class["httpd"] -> Class["iptables"]
   $os = "$operatingsystem$operatingsystemmajrelease"  
   group { "${httpd_group}":
     ensure    =>  present,
   }
-  
+
   user { "${httpd_user}":
     ensure      =>  present,
     home        =>  "/home/${httpd_user}",
@@ -41,6 +40,7 @@ class httpd {
       httpd_user => $httpd_user,
       httpd_group => $httpd_group,
     }
+    contain 'httpd::centos'
   } elsif ("${operatingsystem}" == "Ubuntu") {
     notify{"Using ${operatingsystem}":}
     class{"httpd::ubuntu":
@@ -48,6 +48,7 @@ class httpd {
       minor_version => "4",
       patch_version => "12"
     }
+    contain "httpd::ubuntu"
   } else {
     notify{"${operatingsystem} version ${operatingsystemmajrelease}":}
   }

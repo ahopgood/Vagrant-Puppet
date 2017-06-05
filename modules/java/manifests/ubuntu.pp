@@ -1,6 +1,6 @@
 define java::ubuntu(
-  $version = "6",
-  $updateVersion = "45",
+  $major_version = "6",
+  $update_version = "45",
   $is64bit = true,
   $multiTenancy = undef
 ){
@@ -20,18 +20,18 @@ define java::ubuntu(
   }
 
     #create name of java deb file
-    $jdk = "oracle-java${$version}-jdk_${$version}u${$updateVersion}_${platform}-${::operatingsystem}_${::operatingsystemmajrelease}.deb"
+    $jdk = "oracle-java${major_version}-jdk_${major_version}u${update_version}_${platform}-${::operatingsystem}_${::operatingsystemmajrelease}.deb"
     #Java deb format example oracle_java8-jdk_8u112_amd64-Ubuntu_15.10.deb
     
     if $::operatingsystemmajrelease == "15.10" {
       notify{"We're on Ubuntu wiley trying to use Java package ${jdk}":}
  
       if ($multiTenancy){
-        notify{"Java ${version}":
+        notify{"Java ${major_version}":
           message => "Multi tenancy JVMs allowed"
         }
       } else {
-        notify{"Java ${version}":
+        notify{"Java ${major_version}":
           message => "Multi tenancy JVMs not supported"
         }
       
@@ -42,7 +42,7 @@ define java::ubuntu(
         }   
       
         package {
-          $versionsToRemove["${version}"]:
+          $versionsToRemove["${major_version}"]:
           ensure      => "purged",
           provider    =>  'dpkg',
         }
@@ -67,19 +67,21 @@ define java::ubuntu(
 
       #Clear any previous update versions
       package {
-      "oracle-java${version}-jdk":
+      "remove oracle-java${major_version}-jdk":
+        name        => "oracle-java${major_version}-jdk",
         ensure      => "purged",
         provider    =>  'dpkg',
+        #onlyif      => "${major_version} ${update_version} aren't equal
       }
       
-      $package_name = "${jdk}"
+      $package_name = "orcale-java${major_version}-jdk"
       package {
       "${package_name}":
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${jdk}",
         require     =>  [
           File["${jdk}"],
-          Package["oracle-java${version}-jdk"]]
+          Package["oracle-java${major_version}-jdk"]]
       }
     }
 }
@@ -102,7 +104,7 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libasound_data}"]
       }
       package {
-      "${libasound_data}":
+      "libasound2-data":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libasound_data}",
@@ -117,11 +119,14 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libasound}"]
       }
       package {
-      "${libasound}":
+      "libasound2":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libasound}",
-        require     =>  [File["${libasound}"],Package["${libasound_data}"]]
+        require     =>  [File["${libasound}"],
+#          Package["${libasound_data}"],
+          Package["libasound2-data"],
+        ]
       }
 
       $libgtk_common = "libgtk2.0-common_2.24.28-1ubuntu1.1_all.deb"
@@ -132,7 +137,7 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libgtk_common}"]
       }
       package {
-      "${libgtk_common}":
+      "libgtk2.0-common":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libgtk_common}",
@@ -147,17 +152,20 @@ class java::ubuntu::wily(){
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${libgtk}"]
       }
       package {
-      "${libgtk}":
+      "libgtk2.0-0":
         ensure      => installed,
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${libgtk}",
-        require     =>  [File["${libgtk}"],Package["${libgtk_common}"]]
+        require     =>  [File["${libgtk}"],
+#          Package["${libgtk_common}"],
+          Package["libgtk2.0-common"]
+        ]
       } 
 }
 
 /**
  * Used to set a particular JDK as a default using debian alternatives.
- * Requires a Java JDK setation.
+ * Requires a Java JDK.
  */
 define java::ubuntu::default::set(
   $version = undef,

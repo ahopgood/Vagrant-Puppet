@@ -5,7 +5,7 @@ minorVersion=$1
 
 #sudo puppet apply --execute "java{"java-$version:\
 #version => '$version', \
-#updateVersion => '$minorVersion',\
+#update_version => '$minorVersion',\
 #}"
 
 #Validation check

@@ -33,20 +33,7 @@ class kanboard (
 #  Class["php"]
 #  ->  
 #  Class["kanboard"]
- 
-  $unzip_file = "unzip-6.0-2.el6_6.x86_64.rpm"
-  file{
-    "${local_install_dir}${unzip_file}":
-    ensure => present,
-    source => "puppet:///${puppet_file_dir}${unzip_file}",
-  }
-  package {"unzip":
-    ensure => present,
-    provider => 'rpm',
-    source => "${local_install_dir}${unzip_file}",
-    require => File["${local_install_dir}${unzip_file}"],
-  }
-  
+    
   $wget_file = "wget-1.12-5.el6_6.1.x86_64.rpm"
   file{
     "${local_install_dir}${wget_file}":
@@ -60,29 +47,39 @@ class kanboard (
     require => File["${local_install_dir}${wget_file}"],
     #1.12
   }
-
+  class{"unzip":}
+  
   Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ] }
 
-  $kanboard_file = "kanboard-${major_version}-${minor_version}-${patch_version}.zip"
+  $kanboard_name = "kanboard-${major_version}.${minor_version}.${patch_version}"
+  $kanboard_file_zip = "${kanboard_name}.zip"
 
   file{
-    "${kanboard_file}":
+    "${kanboard_file_zip}":
     ensure => present,
-    path => "/var/www/html/${kanboard_file}",
-    source => ["puppet:///${puppet_file_dir}${kanboard_file}"],
+    path => "/var/www/html/${kanboard_file_zip}",
+    source => ["puppet:///${puppet_file_dir}${kanboard_file_zip}"],
     require => Class["php"],
   }
 
   exec{
     "unzip":
-    require => [Package["unzip"],File["${kanboard_file}"]],
-    command => "unzip -u /var/www/html/${kanboard_file}",
+    require => [Class["unzip"],File["${kanboard_file_zip}"]],
+    command => "unzip -uo /var/www/html/${kanboard_file_zip}",
     cwd => "/var/www/html",
   }
   
+#  exec {
+#    "rename":
+#      command => "mv -f /var/www/html/${kanboard_name} /var/www/html/kanboard",
+#      cwd => "/var/www/html",
+#      require => [Exec["unzip"]]
+#  }
+#  
   exec{
     "chown":
-    require => Exec["unzip"],
+    require => [Exec["unzip"]],
+#    , Exec["rename"]],
     command => "chown -R apache:apache kanboard/data",
     cwd => "/var/www/html",
   }
@@ -94,7 +91,7 @@ class kanboard (
   Class["mysql"]
   ->
   mysql::create_database{
-    "create_lanboard_database":
+    "create_kanboard_database":
     dbname => "${dbname}",
     dbusername => "${dbusername}",
     dbpassword => "${dbpassword}",
@@ -127,13 +124,32 @@ class kanboard (
     group => "apache",
     require => Exec["chown"]
   }
-  
+
+  if (versioncmp("CentOS", "${operatingsystem}") == 0){
+    if (versioncmp("7", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/usr/bin/systemctl restart httpd"
+    } elsif (versioncmp("6", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/etc/init.d/httpd restart"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not supported")
+    }
+  } elsif (versioncmp("Ubuntu", "${operatingsystem}") == 0){
+    if (versioncmp("15.10", "${operatingsystemmajrelease}") == 0){
+      $restart_command = "/etc/init.d/apache2 restart"
+    } else {
+      fail("${operatingsystem} version ${operatingsystemmajrelease} is not supported")
+    }
+  } else {
+    fail("${operatingsystem} is not supported")
+  }
+
   exec {
     "restart_apache_for_kanban":
-    require => File["config.php"],
-#    command => "/etc/init.d/httpd restart",#centos 6
-    cwd => "/usr/bin/",
-    command => "systemctl restart httpd"
+      cwd => "/usr/bin/",
+      command => "${restart_command}",
+      require => [
+        Php::Php_ini_file["php.ini"],
+        File["config.php"]],
   } 
   
   notify {

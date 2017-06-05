@@ -1,1 +1,3 @@
-class {'jekyll':}
+class {'jekyll':
+  showDrafts => "true"
+}

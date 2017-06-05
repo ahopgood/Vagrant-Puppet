@@ -9,7 +9,7 @@
 # systemctl restart httpd.service
 
 #cd /var/www/html
-#unzip /vagrant/files/kanboard-1-0-19.zip
+#unzip /vagrant/files/kanboard-1.0.19.zip
 #chown -R apache:apache kanboard/data
 
 # Use the iptable module here
