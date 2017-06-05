@@ -36,9 +36,18 @@ define ufw (
     onlyif => "ufw status | /bin/grep inactive",
     notify => Service["ufw"]
   }
+  exec { "Enable Firewall [${name}]":
+    path    => "/usr/sbin/",
+    command => "ufw --force enable",
+    onlyif  => "ufw status | /bin/grep inactive",
+    notify  => Service["ufw"],
+    before => Ufw::Service["ufw-service"],
+  }
+}
 
+define ufw::service{
   service {"ufw":
     ensure => running,
-    enable => true
+    enable => true,
   }
 }
