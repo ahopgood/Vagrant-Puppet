@@ -57,7 +57,7 @@ define httpd::virtual_host(
         "set directive[last()+1] IncludeOptional",
         "set directive[last()]/arg[1] sites-enabled/*.conf",
       ]
-      augeas { "load httpd.conf":
+      augeas { "load httpd.conf for ${name} virtual host":
         incl    => "${httpd_conf_location}",
         lens    => "Httpd.lns",
         context => "/files${httpd_conf_location}/",
@@ -65,37 +65,23 @@ define httpd::virtual_host(
         onlyif  => "match /files${httpd_conf_location}/directive[. = 'IncludeOptional']/arg[. = 'sites-enabled/*.conf'] size == 0",
         require => Package["${httpd_package_name}"]
       }
-
-      #Create the /etc/httpd/sites-enabled/ directory
-      file { "sites-enabled directory for ${name} virtual host":
-        ensure => directory,
-        path   => "${sites_enabled_location}",
-        require => Augeas["load httpd.conf"]
-      }
-
-      #Create the /etc/httpd/sites-available/ directory
-      file { "sites-available directory for ${name} virtual host":
-        ensure => directory,
-        path   => "${sites_available_location}",
-        require => Augeas["load httpd.conf"]
-      }
-
-      file {"${conf_file_name}.conf":
-        ensure => present,
-        path => "${sites_available_location}${conf_file_name}.conf",
-        mode => 0777,
-        require => Augeas["load httpd.conf"],
+    
+      file { "${conf_file_name}.conf":
+        ensure  => present,
+        path    => "${sites_available_location}${conf_file_name}.conf",
+        mode    => 0777,
+        require => [Augeas["load httpd.conf for ${name} virtual host"],Class["httpd::virtual_host::sites"]]
       }
 
       #Create the symbolic link form our *.conf in available to enabled.
-      file {"enable ${conf_file_name}.conf":
-        ensure => link,
-        target => "${sites_available_location}${conf_file_name}.conf",
-        path => "${sites_enabled_location}${conf_file_name}.conf",
-        before => [Augeas["${server_name}.conf VirtualHost DocumentRoot setup"], Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      file { "enable ${conf_file_name}.conf":
+        ensure  => link,
+        target  => "${sites_available_location}${conf_file_name}.conf",
+        path    => "${sites_enabled_location}${conf_file_name}.conf",
+        before  => [Augeas["${server_name}.conf VirtualHost DocumentRoot setup"], Augeas["${server_name}.conf VirtualHost ServerName setup"]],
         require => File["${conf_file_name}.conf"]
       }
-
+    
       #Add Document Root
       $virtual_host_document_root_changes = [
         "set VirtualHost/arg *:80",
@@ -177,3 +163,53 @@ define httpd::virtual_host::server_alias($alias = $title,
     }
   }
 }
+
+class httpd::virtual_host::sites(){
+  if (versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS7") == 0) {
+    $httpd_conf_location = "/etc/httpd/conf/httpd.conf"
+    $sites_available_location = "/etc/httpd/sites-available/"
+    $sites_enabled_location = "/etc/httpd/sites-enabled/"
+    $conf_file_name = "${server_name}"
+    $httpd_package_name = "httpd"
+
+    $httpd_major_version = "2"
+    $httpd_minor_version = "4"
+  } elsif (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu15.10") == 0) {
+    $httpd_conf_location = "/etc/apache2/apache2.conf"
+    $sites_available_location = "/etc/apache2/sites-available/"
+    $sites_enabled_location = "/etc/apache2/sites-enabled/"
+
+    $conf_file_name = "${server_name}"
+    $httpd_package_name = "apache2"
+
+    $httpd_major_version = "2"
+    $httpd_minor_version = "4"
+  } elsif (versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS6") == 0) {
+    $httpd_conf_location = "/etc/httpd/conf/httpd.conf"
+    $sites_available_location = "/etc/httpd/conf/"
+    $conf_file_name = "httpd"
+    $httpd_package_name = "httpd"
+
+    $httpd_major_version = "2"
+    $httpd_minor_version = "2"
+  } else {
+    fail("${operatingsystem} ${operatingsystemmajrelease} not currently supported")
+  }
+  
+  if (versioncmp("${httpd_major_version}.${httpd_minor_version}","2.4") == 0) {
+    #Create the /etc/httpd/sites-enabled/ directory
+    file { "sites-enabled directory for ${name} virtual host":
+      ensure  => directory,
+      path    => "${sites_enabled_location}",
+#      require => Augeas["load httpd.conf for ${name} virtual host"],
+    }
+
+    #Create the /etc/httpd/sites-available/ directory
+    file { "sites-available directory for ${name} virtual host":
+      ensure  => directory,
+      path    => "${sites_available_location}",
+#      require => Augeas["load httpd.conf for ${name} virtual host"]
+    }
+  }
+}
+
