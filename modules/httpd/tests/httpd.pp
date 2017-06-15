@@ -9,6 +9,9 @@ Package{
     "${local_install_dir}":
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
-  } 
+  }
+  if (versioncmp("${operatingsystem}","Ubuntu") == 0) {
+    ufw::service{"ufw-service":}
+  }
 
   class { "httpd": }

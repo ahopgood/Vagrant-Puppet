@@ -39,6 +39,8 @@ function run_manifest {
     remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     remove_warning "Warning: Non-string values for the file mode property are deprecated. It must be a string, either a symbolic mode like 'o+w,a+r' or an octal representation like '0644' or '755'."
+    
+   "(at /usr/lib/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
