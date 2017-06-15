@@ -10,11 +10,11 @@ define httpd::virtual_host(
   #Add server admin
 
   contain 'httpd'
-
-  if ("${server_name}" == undef){
+  
+  if ($server_name == undef){
     fail("A server_name is needed for creating a virtual host")
   }
-  if ("${document_root}" == undef){
+  if ($document_root == undef){
     fail("A document_root is needed for creating a virtual host")
   }
 
@@ -119,15 +119,20 @@ define httpd::virtual_host(
       before => Augeas["${server_name}.conf VirtualHost ServerName setup"],
       require => Package["${httpd_package_name}"]
     }
-->
-  httpd::virtual_host::server_alias{$server_alias:
-    sites_available_location => $sites_available_location,
-    sites_enabled_location => $sites_enabled_location,
-    conf_file_name => $conf_file_name,
-    server_name => $server_name,
-    before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
+
+  if ($server_alias != undef){
+    each($server_alias) |$value|{
+      httpd::virtual_host::server_alias{ "Server Alias ${value}":
+        server_alias => $value,
+        sites_available_location => $sites_available_location,
+        sites_enabled_location => $sites_enabled_location,
+        conf_file_name => $conf_file_name,
+        server_name => $server_name,
+        require => Augeas["${server_name}.conf VirtualHost DocumentRoot setup"],
+        before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
+      }
+    }
   }
-->
   #Add server name
     augeas { "${server_name}.conf VirtualHost ServerName setup":
       incl    => "${sites_available_location}${conf_file_name}.conf",
@@ -139,26 +144,27 @@ define httpd::virtual_host(
     }
 }
 
-define httpd::virtual_host::server_alias($alias = $title,
+define httpd::virtual_host::server_alias(
+  $server_alias,
   $sites_available_location,
   $sites_enabled_location,
   $conf_file_name,
   $server_name,
 ){
-  if ("${alias}" == undef){
+  if ("${server_alias}" == undef){
     notify{"No alias defined":}
   } else {
     #  notify{"in server alias ${alias}":}
     #Add server Alias name
-    augeas { "${server_name}.conf VirtualHost ServerAlias  ${alias} setup":
+    augeas { "${server_name}.conf VirtualHost ServerAlias ${server_alias} setup":
       incl    => "${sites_available_location}${conf_file_name}.conf",
       lens    => "Httpd.lns",
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => [
         "set VirtualHost[last()]/directive[last()+1] ServerAlias",
-        "set VirtualHost[last()]/directive[last()]/arg ${alias}",
+        "set VirtualHost[last()]/directive[last()]/arg ${server_alias}",
       ],
-      onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerAlias']/arg[. = '${alias}'] size == 0",
+      onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerAlias']/arg[. = '${server_alias}'] size == 0",
       #   notify => Service["${httpd_package_name}"]
     }
   }
@@ -201,6 +207,7 @@ class httpd::virtual_host::sites(){
     file { "sites-enabled directory for ${name} virtual host":
       ensure  => directory,
       path    => "${sites_enabled_location}",
+      require => Package["${httpd_package_name}"]
 #      require => Augeas["load httpd.conf for ${name} virtual host"],
     }
 
@@ -208,6 +215,7 @@ class httpd::virtual_host::sites(){
     file { "sites-available directory for ${name} virtual host":
       ensure  => directory,
       path    => "${sites_available_location}",
+      require => Package["${httpd_package_name}"]
 #      require => Augeas["load httpd.conf for ${name} virtual host"]
     }
   }
