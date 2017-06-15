@@ -15,14 +15,14 @@ class perl (
 ) {
   notify{ "perl Module running": }
 
-  $OS = "${operatingsystem}"
-  $OS_version = "${operatingsystemmajrelease}"
+  $os = "${operatingsystem}"
+  $os_version = "${operatingsystemmajrelease}"
   
   $puppet_file_dir = "modules/perl/"
   $local_install_dir = "${local_install_path}installers/"
 
-  if (versioncmp("${OS}","CentOS") == 0){
-    if (versioncmp("${OS_version}", "7") == 0) {
+  if (versioncmp("${os}","CentOS") == 0){
+    if (versioncmp("${os_version}", "7") == 0) {
       $perl_libs_package="5.16.3-291.el7"
       $perl_digest_package="2.13-9.el7"
       $perl_Time_HiRes_package="1.9725-3.el7"
@@ -31,7 +31,7 @@ class perl (
       $perl_Net_SSLeay_package = "1.55-4.el7"
       $perl_IO_Socket_SSL_package="1.94-5.el7"
 
-    } elsif (versioncmp("${OS_version}", "6") == 0) {
+    } elsif (versioncmp("${os_version}", "6") == 0) {
       $perl_libs_package="5.10.1-141.el6_7.1"
       $perl_digest_package="2.12-2.el6"
       $perl_Time_HiRes_package="1.9721-141.el6_7.1"
@@ -54,20 +54,20 @@ class perl (
 
       file {"${perl_version}":
         ensure => present,
-        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_version}",
+        source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_version}",
         path   => "${local_install_dir}/${perl_version}",
         before => Package["perl"]
       }
       file { "${perl_Pod_Escapes}":
         ensure => present,
-        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Pod_Escapes}",
+        source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Pod_Escapes}",
         path   => "${local_install_dir}/${perl_Pod_Escapes}",
         before => Package["perl"]
       }
 
       file { "${perl_Module_Pluggable}":
         ensure => present,
-        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Module_Pluggable}",
+        source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Module_Pluggable}",
         path   => "${local_install_dir}/${perl_Module_Pluggable}",
         before => Package["perl"]
       }
@@ -75,7 +75,7 @@ class perl (
 
       file { "${perl_Pod_Simple}":
         ensure => present,
-        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Pod_Simple}",
+        source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Pod_Simple}",
         path   => "${local_install_dir}/${perl_Pod_Simple}",
         before => Package["perl"]
       }
@@ -88,12 +88,12 @@ class perl (
     $perl_Net_SSLeay = "perl-Net-SSLeay-${perl_Net_SSLeay_package}.x86_64.rpm"
     $perl_IO_Socket_SSL="perl-IO-Socket-SSL-${perl_IO_Socket_SSL_package}.noarch.rpm"
 
-    if (versioncmp("${OS}","CentOS") == 0){
-      if (versioncmp("${OS_version}", "7") == 0) {
+    if (versioncmp("${os}","Centos") == 0){
+      if (versioncmp("${os_version}", "7") == 0) {
         $perl_package_names=["perl","perl-libs","perl-Time-HiRes"]
         $perl_package_versions=["${perl_package}","${perl_libs_package}","${perl_Time_HiRes_package}"]
         $perl_package_files=["${local_install_dir}/${perl}","${local_install_dir}/${perl_libs}","${local_install_dir}/${perl_Time_HiRes}"]
-      } elsif (versioncmp("${OS_version}","6") == 0){
+      } elsif (versioncmp("${os_version}","6") == 0){
         $perl_package_names=["perl","perl-libs","perl-Time-HiRes",
           "perl-Module-Pluggable", "perl-Pod-Escapes", "perl-Pod-Simple", "perl-version"]
 
@@ -112,19 +112,19 @@ class perl (
 
     file { "${perl_libs}":
       ensure => present,
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_libs}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_libs}",
       path   => "${local_install_dir}/${perl_libs}",
     }
 
     file { "${perl_Time_HiRes}":
       ensure => present,
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Time_HiRes}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Time_HiRes}",
       path   => "${local_install_dir}/${perl_Time_HiRes}",
     }
 
     file { "${perl}":
       ensure => present,
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl}",
       path   => "${local_install_dir}/${perl}",
     }
 
@@ -139,7 +139,7 @@ class perl (
 
     file { "${perl_digest}":
       ensure => present,
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_digest}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_digest}",
       path   => "${local_install_dir}/${perl_digest}",
     }
 
@@ -155,12 +155,12 @@ class perl (
     #perl(IO::Socket::IP) >= 0.20 is needed by perl-IO-Socket-SSL-1.94-5.el7.noarch
     #   provider: perl-IO-Socket-IP.noarch 0.21-4.el7
     #CentOS 7 only
-    if (versioncmp("${OS}${OS_version}","CentOS7") == 0){
+    if (versioncmp("${os}${os_version}","CentOS7") == 0){
       $perl_IO_Socket_IP = "perl-IO-Socket-IP-0.21-4.el7.noarch.rpm"
       file { "${perl_IO_Socket_IP}":
         ensure => present,
         path   => "${local_install_dir}/${perl_IO_Socket_IP}",
-        source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_IP}",
+        source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_IO_Socket_IP}",
       }
 
       package { "perl-IO-Socket-IP":
@@ -177,7 +177,7 @@ class perl (
     file { "${perl_Net_LibIDN}":
       ensure => present,
       path   => "${local_install_dir}/${perl_Net_LibIDN}",
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_LibIDN}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Net_LibIDN}",
     }
     package{ "perl-Net-LibIDN":
       ensure   => "${perl_Net_LibIDN_package}",
@@ -192,7 +192,7 @@ class perl (
     file { "${perl_Net_SSLeay}":
       ensure => present,
       path   => "${local_install_dir}/${perl_Net_SSLeay}",
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_Net_SSLeay}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_Net_SSLeay}",
     }
     package{ "perl-Net-SSLeay":
       ensure   => "${perl_Net_SSLeay_package}",
@@ -203,7 +203,7 @@ class perl (
 
     file { "${perl_IO_Socket_SSL}":
       ensure => present,
-      source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${perl_IO_Socket_SSL}",
+      source => "puppet:///${puppet_file_dir}${os}/${os_version}/${perl_IO_Socket_SSL}",
       path   => "${local_install_dir}/${perl_IO_Socket_SSL}",
     }
 
