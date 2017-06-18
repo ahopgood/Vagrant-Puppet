@@ -28,6 +28,8 @@ Can be declared via the *httpd* class:
 ```
 or directly via the *httpd::ubuntu* class:
 ```
+    service ufw::service{"ufw-service":}
+    
 	class {"httpd::ubuntu":
 	  major_version => "2",
 	  minor_version => "4",
@@ -42,7 +44,12 @@ or directly via the *httpd::centos* class:
 	}
 ```
 ## Dependencies
+### CentOS
 * iptables module is required [raw readme here](../iptables/README.markdown)
+* Port exception added for `port 80` to ensure http traffic can get through to the HTTP server
+### Ubuntu
+* `ufw` module is required [raw readme here](../ufw/README.markdown)
+* Need to declare the ufw `service ufw::service{"ufw-service":}` somewhere in your manifest
 * Port exception added for `port 80` to ensure http traffic can get through to the HTTP server
 
 ## Testing performed:
@@ -314,11 +321,23 @@ Required parameters:
 * document_root - the location of the web resources you will be serving via your virtual host
 
 Optional parameters:  
-* server_alias - an array of strings that represent the server aliase
+* server_alias - an array of strings that represent the server aliases
 
 This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
 The document root / web page assets are not instantiated through this definition, you create those elsewhere however you want.
 A list of server aliases can be used to setup separate `ServerAlias` entries in the configuration file for a site.
+### Usage
+```
+class {"httpd::virtual_host::sites":}
+httpd::virtual_host{"www.cv.alexanderhopgood.com":
+  server_name   => "www.cv.alexanderhopgood.com",
+  document_root => "/var/www/alexander/cv/",
+  server_alias => ["cv.alexanderhopgood.net","cv.alexanderhopgood.co.uk","cv.alexanderhopgood.com"],
+}
+```
+### Dependencies
+* Requires sites directories (`sites-enabled` and `sites-available`) to be present on apache 2.4+, provided by the `httpd::virtual_host::sites` class
+
 ### Support
 * CentOS 7
 * CentOS 6
