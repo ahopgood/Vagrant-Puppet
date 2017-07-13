@@ -43,6 +43,4 @@ Package{
   ->
   class{"augeas":}
   ->
-  httpd::xclacks{"x-clacks":}
-  ->
   httpd::content_security_policy{"CSP":}
