@@ -57,6 +57,6 @@ Package{
   ->
   class{"augeas":}
   ->
-  httpd::content_security_policy{"www.alexander.com":
+  httpd::xclacks{"www.alexander.com":
     virtual_host => "www.alexander.com"
   }

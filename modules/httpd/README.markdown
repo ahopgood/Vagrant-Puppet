@@ -163,7 +163,7 @@ An explanation can be found [here](http://www.gnuterrypratchett.com/).
   ->
   httpd::xclacks{"x-clacks":}
 ```
-This will add a directive on the `/var/www/html` directory (support for other document roots could be added at a later point).
+This will add a directive on the `/var/www/html` directory.
 The directive looks like this on Ubuntu:
 ```
 <Directory "/var/www/html/">
@@ -180,8 +180,31 @@ header set X-Clacks-Overhead "GNU Terry Pratchett"
 </Directory>
 </IfModule>
 ```
+
+To add to a virtual host you do the following:  
+```
+  class { "httpd": }
+  ->
+  httpd::xclacks{"x-clacks":
+    virtual_host => "www.alexander.com"
+  }
+```
+This will add the x-clacks header to the conf file for the virtual host.
+On Ubuntu this looks like the following in `/etc/apache2/sites-enabled/www.alexander.com.conf`:
+```
+<VirtualHost *:80>
+....
+<IfModule headers_module>
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</IfModule>
+</VirtualHost>
+```
+And like this on CentOS (7 in `/etc/httpd/sites-enabled/www.alexander.com.conf` and 6 in `/etc/httpd/conf/conf.d`
+
 ### Depdendencies
-This will only work if the headers module is installed.
+This will only work if the headers module is installed on apache which is done by this module.
+This module requires virtual host sites support:
+`class {"httpd::virtual_host::sites":}`
 
 ## Content Security Policy header <a name="Content_Security_Policy_header"></a>
 An apache/httpd implementation of a [Content Security Policy](https://content-security-policy.com/) header.
@@ -293,8 +316,6 @@ It is advisable to run the x-clacks first and then CSP as the CSP module has fin
 * Add an onlyif clause to the augeas executable
   * Externalise the equality condition as a variable 
   * Externalise the size condition as a variable matched to grep -c and awk
-* Make xclacks use header module
-* Try xclacks **and** csp header
 * Extract augeas bits into a separate define section?
 * Move the restarting of apache sections into their own definition
 * Have x-clacks use the httpd::restart definition

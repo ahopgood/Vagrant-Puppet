@@ -22,23 +22,9 @@ Package{
     server_alias => ["alexander.com","alexander.net"]
   }
   ->
-  file {"/var/www/alexander/":
+  file { "/var/www/alexander/":
     ensure => directory,
     #    require => Class["httpd"]
-  }
-  ->
-  file {"/var/www/alexander/index.html":
-    ensure => present,
-    content => "
-    <html>
-      <head>
-        <script src=\"https://code.jquery.com/jquery-3.2.1.min.js\"></script>
-        <title>Test Page</title>
-      </head>
-      <body>
-        <h1>Alex's test page</h1>
-      </body>
-    </html>"
   }
   ->
   file {"/var/www/html/index.html":
@@ -57,6 +43,4 @@ Package{
   ->
   class{"augeas":}
   ->
-  httpd::content_security_policy{"www.alexander.com":
-    virtual_host => "www.alexander.com"
-  }
+  httpd::xclacks{"x-clacks":}
