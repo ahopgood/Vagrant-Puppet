@@ -1,0 +1,10 @@
+ins Directory after /files/etc/apache2/apache2.conf/Directory[last()]
+set /files/etc/apache2/apache2.conf/Directory[last()]/arg \"/var/www/html/\"
+set /files/etc/apache2/apache2.conf/Directory[last()]/IfModule/arg headers_module
+set /files/etc/apache2/apache2.conf/Directory[last()]/IfModule/directive[1] header
+set /files/etc/apache2/apache2.conf/Directory[last()]/IfModule/directive[1]/arg[1] set
+set /files/etc/apache2/apache2.conf/Directory[last()]/IfModule/directive[1]/arg[2] Content-Security-Policy
+set /files/etc/apache2/apache2.conf/Directory[last()]/IfModule/directive[1]/arg[3] "\"default-src 'self';\""
+save
+print /augeas//error
+print /files/etc/apache2/apache2.conf/Directory[arg = '\"/var/www/html/\"']

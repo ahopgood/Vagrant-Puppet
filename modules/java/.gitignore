@@ -2,3 +2,9 @@
 /.vagrant
 /files/*.rpm
 /files/*.bin
+/files/Ubuntu/*.bin
+/files/Ubuntu/*.tar.gz
+/files/Ubuntu/*/*.deb
+/files/CentOS/*/*.rpm
+/.project
+/.settings

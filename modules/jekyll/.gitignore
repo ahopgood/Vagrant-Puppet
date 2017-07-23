@@ -1,2 +1,4 @@
 /.project
 /.vagrant/
+/files/*.gem
+published_blog

@@ -3,6 +3,7 @@
 	<name>java</name>
 	<comment></comment>
 	<projects>
+		<project>alternatives</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -1,0 +1,392 @@
+apache2
+  Depends: apache2-bin (= 2.4.12-2ubuntu2)
+  Depends: apache2-data (= 2.4.12-2ubuntu2)
+  Depends: apache2-utils (>= 2.4)
+  Depends: lsb-base
+  Depends: mime-support
+  Depends: perl
+  Depends: procps
+  PreDepends: dpkg (>= 1.17.14)
+apache2-bin
+  Depends: libapr1 (>= 1.5.0)
+  Depends: libaprutil1 (>= 1.5.0)
+  Depends: libaprutil1-dbd-freetds
+  Depends: libaprutil1-dbd-mysql
+  Depends: libaprutil1-dbd-odbc
+  Depends: libaprutil1-dbd-pgsql
+  Depends: libaprutil1-dbd-sqlite3
+  Depends: libaprutil1-ldap
+  Depends: libc6 (>= 2.14)
+  Depends: libldap-2.4-2 (>= 2.4.7)
+  Depends: liblua5.1-0
+  Depends: libpcre3
+  Depends: libssl1.0.0 (>= 1.0.2~beta3)
+  Depends: libxml2 (>= 2.7.4)
+  Depends: perl
+  Depends: zlib1g (>= 1:1.1.4)
+libapr1
+  Depends: libc6 (>= 2.15)
+  Depends: libuuid1 (>= 2.16)
+libc6
+  Depends: libgcc1
+libgcc1
+  Depends: gcc-5-base (= 5.2.1-22ubuntu2)
+  Depends: libc6 (>= 2.14)
+gcc-5-base
+libuuid1
+  Depends: libc6 (>= 2.4)
+  Depends: passwd
+passwd
+  Depends: debianutils (>= 2.15.2)
+  Depends: libaudit1 (>= 1:2.2.1)
+  Depends: libc6 (>= 2.14)
+  Depends: libpam-modules
+  Depends: libpam0g (>= 0.99.7.1)
+  Depends: libselinux1 (>= 1.32)
+  Depends: libsemanage1 (>= 2.0.3)
+debianutils
+  Depends: sensible-utils
+  PreDepends: libc6 (>= 2.15)
+sensible-utils
+libaudit1
+  Depends: libaudit-common (>= 1:2.4.2-1ubuntu1)
+  Depends: libc6 (>= 2.14)
+libaudit-common
+libpam-modules
+  PreDepends: debconf (>= 0.5)
+  PreDepends: debconf-2.0
+  PreDepends: libaudit1 (>= 1:2.2.1)
+  PreDepends: libc6 (>= 2.15)
+  PreDepends: libdb5.3
+  PreDepends: libpam-modules-bin (= 1.1.8-3.1ubuntu3)
+  PreDepends: libpam0g (>= 1.1.3-2)
+  PreDepends: libselinux1 (>= 2.1.9)
+debconf
+  PreDepends: perl-base (>= 5.6.1-4)
+perl-base
+  PreDepends: dpkg (>= 1.17.17)
+  PreDepends: libc6 (>= 2.14)
+dpkg
+  PreDepends: libbz2-1.0
+  PreDepends: libc6 (>= 2.14)
+  PreDepends: liblzma5 (>= 5.1.1alpha+20120614)
+  PreDepends: libselinux1 (>= 2.3)
+  PreDepends: tar (>= 1.23)
+  PreDepends: zlib1g (>= 1:1.1.4)
+libbz2-1.0
+  Depends: libc6 (>= 2.4)
+liblzma5
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+multiarch-support
+  Depends: libc6 (>= 2.3.6-2)
+libselinux1
+  Depends: libc6 (>= 2.14)
+  Depends: libpcre3
+libpcre3
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+tar
+  PreDepends: libacl1 (>= 2.2.51-8)
+  PreDepends: libc6 (>= 2.17)
+  PreDepends: libselinux1 (>= 1.32)
+libacl1
+  Depends: libattr1 (>= 1:2.4.46-8)
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libattr1
+  Depends: libc6 (>= 2.4)
+  PreDepends: multiarch-support
+zlib1g
+  Depends: libc6 (>= 2.14)
+debconf-2.0
+libdb5.3
+  Depends: libc6 (>= 2.17)
+libpam-modules-bin
+  Depends: libaudit1 (>= 1:2.2.1)
+  Depends: libc6 (>= 2.14)
+  Depends: libpam0g (>= 0.99.7.1)
+  Depends: libselinux1 (>= 1.32)
+libpam0g
+  Depends: debconf (>= 0.5)
+  Depends: debconf-2.0
+  Depends: libaudit1 (>= 1:2.2.1)
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libsemanage1
+  Depends: libaudit1 (>= 1:2.2.1)
+  Depends: libbz2-1.0
+  Depends: libc6 (>= 2.14)
+  Depends: libselinux1 (>= 2.1.12)
+  Depends: libsemanage-common (= 2.3-1build2)
+  Depends: libsepol1 (>= 2.1.4)
+  Depends: libustr-1.0-1 (>= 1.0.4)
+libsemanage-common
+libsepol1
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libustr-1.0-1
+  Depends: libc6 (>= 2.14)
+libaprutil1
+  Depends: libapr1 (>= 1.4.8-2~)
+  Depends: libc6 (>= 2.14)
+  Depends: libdb5.3
+  Depends: libexpat1 (>= 2.0.1)
+  Depends: libssl1.0.0 (>= 1.0.0)
+  PreDepends: multiarch-support
+libexpat1
+  Depends: libc6 (>= 2.14)
+libssl1.0.0
+  Depends: debconf (>= 0.5)
+  Depends: debconf-2.0
+  Depends: libc6 (>= 2.14)
+libaprutil1-dbd-freetds
+libaprutil1-dbd-mysql
+  Depends: libaprutil1 (= 1.5.4-1)
+  Depends: libc6 (>= 2.4)
+  Depends: libmysqlclient18 (>= 5.5.24+dfsg-1)
+libmysqlclient18
+  Depends: libc6 (>= 2.17)
+  Depends: libstdc++6 (>= 4.1.1)
+  Depends: mysql-common (>= 5.5)
+  Depends: zlib1g (>= 1:1.1.4)
+  PreDepends: multiarch-support
+libstdc++6
+  Depends: gcc-5-base (= 5.2.1-22ubuntu2)
+  Depends: libc6 (>= 2.18)
+  Depends: libgcc1 (>= 1:4.1.1)
+mysql-common
+libaprutil1-dbd-odbc
+  Depends: libaprutil1 (= 1.5.4-1)
+  Depends: libc6 (>= 2.14)
+  Depends: libodbc1 (>= 2.3.1)
+libodbc1
+  Depends: libc6 (>= 2.14)
+  Depends: libltdl7 (>= 2.4.2)
+  PreDepends: multiarch-support
+libltdl7
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libaprutil1-dbd-pgsql
+  Depends: libaprutil1 (= 1.5.4-1)
+  Depends: libc6 (>= 2.14)
+  Depends: libpq5
+libpq5
+  Depends: libc6 (>= 2.14)
+  Depends: libgssapi-krb5-2 (>= 1.10+dfsg~)
+  Depends: libldap-2.4-2 (>= 2.4.7)
+  Depends: libssl1.0.0 (>= 1.0.0)
+libgssapi-krb5-2
+  Depends: libc6 (>= 2.14)
+  Depends: libcomerr2 (>= 1.34)
+  Depends: libk5crypto3 (>= 1.8+dfsg)
+  Depends: libkrb5-3 (= 1.13.2+dfsg-2)
+  Depends: libkrb5support0 (>= 1.13~alpha1+dfsg)
+libcomerr2
+  Depends: libc6 (>= 2.17)
+  PreDepends: multiarch-support
+libk5crypto3
+  Depends: libc6 (>= 2.14)
+  Depends: libkrb5support0 (>= 1.13~alpha1+dfsg)
+libkrb5support0
+  Depends: libc6 (>= 2.14)
+libkrb5-3
+  Depends: libc6 (>= 2.16)
+  Depends: libcomerr2 (>= 1.34)
+  Depends: libk5crypto3 (>= 1.9+dfsg~beta1)
+  Depends: libkeyutils1 (>= 1.5.9)
+  Depends: libkrb5support0 (= 1.13.2+dfsg-2)
+libkeyutils1
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libldap-2.4-2
+  Depends: libc6 (>= 2.14)
+  Depends: libgnutls-deb0-28 (>= 3.3.9)
+  Depends: libgssapi3-heimdal (>= 1.4.0+git20110226)
+  Depends: libsasl2-2
+  PreDepends: multiarch-support
+libgnutls-deb0-28
+  Depends: libc6 (>= 2.17)
+  Depends: libgmp10 (>= 2:6)
+  Depends: libhogweed4
+  Depends: libnettle6
+  Depends: libp11-kit0 (>= 0.20.7)
+  Depends: libtasn1-6 (>= 4.3-0)
+  Depends: zlib1g (>= 1:1.1.4)
+libgmp10
+  Depends: libc6 (>= 2.14)
+libhogweed4
+  Depends: libc6 (>= 2.14)
+  Depends: libgmp10 (>= 2:6.0.0)
+  Depends: libnettle6 (= 3.1.1-4)
+libnettle6
+  Depends: libc6 (>= 2.14)
+libp11-kit0
+  Depends: libc6 (>= 2.16)
+  Depends: libffi6 (>= 3.0.4)
+libffi6
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+libtasn1-6
+  Depends: libc6 (>= 2.14)
+libgssapi3-heimdal
+  Depends: libasn1-8-heimdal (>= 1.4.0+git20110226)
+  Depends: libc6 (>= 2.14)
+  Depends: libcomerr2 (>= 1.01)
+  Depends: libhcrypto4-heimdal (>= 1.4.0+git20110226)
+  Depends: libheimntlm0-heimdal (>= 1.4.0+git20110226)
+  Depends: libkrb5-26-heimdal (>= 1.6~git20131117)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+libasn1-8-heimdal
+  Depends: libc6 (>= 2.14)
+  Depends: libcomerr2 (>= 1.01)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+libroken18-heimdal
+  Depends: libc6 (>= 2.15)
+libhcrypto4-heimdal
+  Depends: libasn1-8-heimdal (>= 1.4.0+git20110226)
+  Depends: libc6 (>= 2.14)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+libheimntlm0-heimdal
+  Depends: libc6 (>= 2.4)
+  Depends: libhcrypto4-heimdal (>= 1.4.0+git20110226)
+  Depends: libkrb5-26-heimdal (>= 1.4.0+git20110226)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+libkrb5-26-heimdal
+  Depends: libasn1-8-heimdal (>= 1.6~git20131117)
+  Depends: libc6 (>= 2.15)
+  Depends: libcomerr2 (>= 1.41.11)
+  Depends: libhcrypto4-heimdal (>= 1.4.0+git20110226)
+  Depends: libheimbase1-heimdal (>= 1.6~git20131117)
+  Depends: libhx509-5-heimdal (>= 1.4.0+git20110226)
+  Depends: libroken18-heimdal (>= 1.6~git20131117)
+  Depends: libsqlite3-0 (>= 3.5.9)
+  Depends: libwind0-heimdal (>= 1.6~git20120311)
+libheimbase1-heimdal
+  Depends: libc6 (>= 2.14)
+libhx509-5-heimdal
+  Depends: libasn1-8-heimdal (>= 1.4.0+git20110226)
+  Depends: libc6 (>= 2.14)
+  Depends: libcomerr2 (>= 1.34)
+  Depends: libhcrypto4-heimdal (>= 1.4.0+git20110226)
+  Depends: libheimbase1-heimdal (>= 1.6~git20131117)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+  Depends: libwind0-heimdal (>= 1.4.0+git20110226)
+libwind0-heimdal
+  Depends: libc6 (>= 2.14)
+  Depends: libcomerr2 (>= 1.01)
+  Depends: libroken18-heimdal (>= 1.4.0+git20110226)
+libsqlite3-0
+  Depends: libc6 (>= 2.14)
+libsasl2-2
+  Depends: libc6 (>= 2.15)
+  Depends: libsasl2-modules-db (>= 2.1.26.dfsg1-14)
+libsasl2-modules-db
+  Depends: libc6 (>= 2.14)
+  Depends: libdb5.3
+libaprutil1-dbd-sqlite3
+  Depends: libaprutil1 (= 1.5.4-1)
+  Depends: libc6 (>= 2.4)
+  Depends: libsqlite3-0 (>= 3.5.9)
+libaprutil1-ldap
+  Depends: libaprutil1 (= 1.5.4-1)
+  Depends: libc6 (>= 2.4)
+  Depends: libldap-2.4-2 (>= 2.4.7)
+liblua5.1-0
+  Depends: libc6 (>= 2.14)
+  Depends: libstdc++6 (>= 4.1.1)
+libxml2
+  Depends: libc6 (>= 2.15)
+  Depends: libicu55 (>= 55.1-1~)
+  Depends: zlib1g (>= 1:1.2.3.3)
+libicu55
+  Depends: libc6 (>= 2.14)
+  Depends: libgcc1 (>= 1:4.1.1)
+  Depends: libstdc++6 (>= 5.2)
+perl
+  Depends: libbz2-1.0
+  Depends: libc6 (>= 2.14)
+  Depends: libdb5.3
+  Depends: libgdbm3 (>= 1.8.3)
+  Depends: perl-base (= 5.20.2-6)
+  Depends: perl-modules (>= 5.20.2-6)
+  Depends: zlib1g (>= 1:1.2.2.3)
+  PreDepends: dpkg (>= 1.17.17)
+libgdbm3
+  Depends: dpkg (>= 1.15.4)
+  Depends: install-info
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support
+install-info
+  Depends: libc6 (>= 2.14)
+  PreDepends: dpkg (>= 1.16.1)
+perl-modules
+  Depends: perl-base (>= 5.20.2-1)
+  PreDepends: dpkg (>= 1.17.17)
+apache2-data
+apache2-utils
+  Depends: libapr1 (>= 1.4.8-2~)
+  Depends: libaprutil1 (>= 1.5.0)
+  Depends: libc6 (>= 2.14)
+  Depends: libssl1.0.0 (>= 1.0.1)
+lsb-base
+mime-support
+procps
+  Depends: initscripts
+  Depends: libc6 (>= 2.15)
+  Depends: libncurses5 (>= 5.5-5~)
+  Depends: libncursesw5 (>= 5.6+20070908)
+  Depends: libprocps3
+  Depends: libtinfo5
+  Depends: lsb-base (>= 4.1+Debian11ubuntu7)
+initscripts
+  Depends: coreutils (>= 5.93)
+  Depends: debianutils (>= 4)
+  Depends: file-rc
+  Depends: lsb-base (>= 3.2-14)
+  Depends: mount (>= 2.11x-1)
+  Depends: sysv-rc
+  Depends: sysvinit-utils (>= 2.88dsf-50)
+coreutils
+  PreDepends: libacl1 (>= 2.2.51-8)
+  PreDepends: libattr1 (>= 1:2.4.46-8)
+  PreDepends: libc6 (>= 2.17)
+  PreDepends: libselinux1 (>= 2.1.13)
+file-rc
+mount
+  PreDepends: libblkid1 (>= 2.17.2)
+  PreDepends: libc6 (>= 2.17)
+  PreDepends: libmount1 (>= 2.25)
+  PreDepends: libsmartcols1 (>= 2.25)
+  PreDepends: libudev1 (>= 183)
+libblkid1
+  Depends: libc6 (>= 2.17)
+  Depends: libuuid1 (>= 2.16)
+libmount1
+  Depends: libblkid1 (>= 2.17.2)
+  Depends: libc6 (>= 2.17)
+  Depends: libselinux1 (>= 1.32)
+libsmartcols1
+  Depends: libc6 (>= 2.17)
+libudev1
+  Depends: libc6 (>= 2.16)
+sysv-rc
+  Depends: debconf (>= 0.5)
+  Depends: debconf-2.0
+  Depends: insserv (>> 1.12.0-10)
+  Depends: sysvinit-utils (>= 2.86.ds1-62)
+insserv
+  Depends: libc6 (>= 2.14)
+sysvinit-utils
+  Depends: libc6 (>= 2.14)
+libncurses5
+  Depends: libc6 (>= 2.15)
+  Depends: libtinfo5 (= 5.9+20150516-2ubuntu1)
+libtinfo5
+  Depends: libc6 (>= 2.15)
+libncursesw5
+  Depends: libc6 (>= 2.15)
+  Depends: libtinfo5 (= 5.9+20150516-2ubuntu1)
+libprocps3
+  Depends: libc6 (>= 2.14)
+  PreDepends: multiarch-support

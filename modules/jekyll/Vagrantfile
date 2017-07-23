@@ -5,57 +5,62 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  #config.vm.box = "puppetlabs/centos-6.6-64-puppet"
-  config.vm.box = "precise64"
-  
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
+
+  config.vm.box_version = "1.0.1"  
   config.vm.box_check_update = false
+  config.ssh.insert_key = false
 
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # If true, then any SSH connections made will enable agent forwarding.
-  # Default value: false
-  # config.ssh.forward_agent = true
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  	config.vm.synced_folder "../", 	"/etc/puppet/modules"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Don't boot with headless mode
-  #   vb.gui = true
-  #
-  #   # Use VBoxManage to customize the VM. For example to change memory:
-  #   vb.customize ["modifyvm", :id, "--memory", "1024"]
-  # end
-  #
-  # View the documentation for the provider you're using for more
-  # information on available options.
-
+  config.vm.synced_folder "../", 	"/etc/puppet/modules"
+#	config.vm.synced_folder "templates",
+	 
   # Enable provisioning with Puppet stand alone.  Puppet manifests
   # are contained in a directory path relative to this Vagrantfile.
   # You will need to create the manifests directory and a manifest in
   # the file default.pp in the manifests_path directory.
   
-  config.vm.provision "puppet" do |puppet|
-    puppet.manifests_path = "manifests"
-    puppet.manifest_file  = "init.pp"
+  config.vm.define "server" do | server |
+	server.vm.box = "puppetlabs/centos-6.6-64-puppet"
+#	server.vm.network "public_network", :mac => "080027D3418F", :bridge => "Realtek PCIe GBE Family Controller"
+	server.vm.provision "puppet" do |puppet|
+		puppet.manifests_path = "manifests"
+		puppet.manifest_file  = "jekyll.pp"
+#    	puppet.options = ["--templatesdir","/tmp/vagrant-puppet-3/template"]
+	end
   end
+
+  config.vm.define "ubuntu" do | ubuntu |
+	ubuntu.vm.box = "ubuntu/wily64"
+	ubuntu.vm.box_version = "20160329.0.0"
+	ubuntu.vm.hostname = "dev.jekyll"
+	
+	ubuntu.vm.network "private_network", ip: "192.168.33.25"
+	ubuntu.vm.network "forwarded_port", guest: "4000", host: "8888"
+	
+	ubuntu.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
+	ubuntu.vm.synced_folder "published_blog", "/published_blog"
+	
+	ubuntu.vm.synced_folder "../", "/etc/puppet/modules"
+#	ubuntu.vm.provision "puppet" do |puppet|
+#		puppet.manifests_path = "manifests"
+#		puppet.manifest_file  = "jekyll.pp"
+#	end
+
+  end 
+  
+      config.vm.define "CentOS_7_test" do |centos7|
+      	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
+      	centos7.vm.box_version = "1.0.1"
+      	centos7.vm.box_check_update = false
+      end
+    
+      config.vm.define "CentOS_6_test" do |centos6|
+      	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
+      	centos6.vm.box_version = "1.0.1"
+      	centos6.vm.box_check_update = false
+      end
+    
+      config.vm.define "Ubuntu_15_test" do |ubuntu|
+        ubuntu.vm.box = "ubuntu/wily64"
+        ubuntu.vm.box_check_update = false
+      end
 end

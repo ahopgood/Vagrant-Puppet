@@ -1,0 +1,1 @@
+match /files/etc/apache2/apache2.conf/Directory[.]/IfModule[.]/directive[. = 'header']/arg[. = 'Content-Security-Policy']

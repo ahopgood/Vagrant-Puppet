@@ -11,41 +11,53 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   	config.vm.box = "puppetlabs/centos-6.6-64-puppet"
-  	config.vm.box_check_update = true
-  	config.vm.box_version = "1.0.1"
-    config.vm.hostname = "httpd.vm"
-#	config.vm.network "private_network", ip:" 192.168.33.27", auto_config: true
-    config.vm.network "private_network", ip: "192.168.33.11", auto_config: true
-	config.vm.synced_folder "../", 	"/etc/puppet/modules"
-#	config.vm.synced_folder "templates", "/tmp/vagrant-puppet-3/templates"
+  	config.ssh.insert_key = false
+	config.vm.box_check_update = false
+#    config.vm.network "private_network", ip: "192.168.33.11", auto_config: true
+	config.vm.synced_folder "../", 	"/etc/puppet/modules"    
+	config.vm.synced_folder "files/", "/files/"
 
-# 	config.vm.provision :shell, :path => "files/install.sh"    
 
-  config.vm.provision "puppet" do |puppet|
-  	puppet.manifests_path = "manifests"
-#  	puppet.manifest_file  = "init.pp"
- 	puppet.manifest_file  = "httpd.pp"
-#  	puppet.options = ["--templatedir","/tmp/vagrant-puppet-3/templates"]
-  end
-  
   config.vm.define "ubuntu" do |ubuntu|
-	ubuntu.vm.box = "hashicorp/precise64"
-	ubuntu.vm.box_check_update = false
-	ubuntu.vm.box_version = "1.1.0"
-	ubuntu.vm.network "private_network", ip:" 192.168.33.25"
-	ubuntu.vm.synced_folder "files/", "/files/"
+    ubuntu.vm.hostname = "apache-dev-ubuntu"
+    ubuntu.vm.network "private_network", ip: "192.168.33.25"
+    ubuntu.vm.box = "ubuntu/wily64"
+
   end
   
-  config.vm.define "centos7" do |centos7|
-  	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
-	centos7.vm.box_check_update = false
-	centos7.vm.synced_folder "files/", "/files/"
-  end
   
   config.vm.define "centos6" do |centos6|
   	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	centos6.vm.box_check_update = false
-	centos6.vm.network "private_network", ip:" 192.168.33.26"
-	centos6.vm.synced_folder "files/", "/files/"
+	centos6.vm.network "private_network", ip: "192.168.33.26"
+	centos6.vm.box_version = "1.0.1"
+	centos6.vm.hostname = "httpd.centos6.vm"
   end
+
+  config.vm.define "centos7" do |centos7|
+  	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
+    centos7.vm.network "private_network", ip: "192.168.33.27"
+	centos7.vm.box_version = "1.0.1"
+    centos7.vm.hostname = "httpd.centos7.vm"
+  end
+
+  config.vm.define "CentOS_7_test" do |centos7|
+  	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
+    centos7.vm.network "private_network", ip: "192.168.33.27"
+  	centos7.vm.box_version = "1.0.1"
+  	centos7.vm.box_check_update = false
+  end
+
+  config.vm.define "CentOS_6_test" do |centos6|
+  	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
+    centos6.vm.network "private_network", ip: "192.168.33.26"
+  	centos6.vm.box_version = "1.0.1"
+  	centos6.vm.box_check_update = false
+  end
+
+  config.vm.define "Ubuntu_15_test" do |ubuntu|
+    ubuntu.vm.network "private_network", ip: "192.168.33.25"
+    ubuntu.vm.box = "ubuntu/wily64"
+    ubuntu.vm.box_check_update = false
+  end
+
 end

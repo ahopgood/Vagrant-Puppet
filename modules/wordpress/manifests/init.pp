@@ -88,13 +88,14 @@ class wordpress (
     dbusername => "${database_username}",
     dbpassword => "${database_password}",
     backup_path => "/vagrant/backups/",
-    minute => "*/2"
+    hour => "*",  
+    minute => "0",
   } 
   #Install mysql
   #Setup wordpress database
   #Setup root user and password on mysql
   #
-  #Unzipping of wordpres-4.3.1.tar.gz into html shared folder
+  #Unzipping of wordpress-4.3.1.tar.gz into html shared folder
   #Set firewall port in iptables
   #generate a wp-config.php with the database values inside
   #Backup 
@@ -239,7 +240,7 @@ define wordpress::plugin_restore(
   
   exec {"restore-plugins":
     command => "/usr/local/bin/restore-plugins.sh",
-    user => vagrant,
+    user => "apache",
     require => File["restore-plugins.sh"]
   }
 }
