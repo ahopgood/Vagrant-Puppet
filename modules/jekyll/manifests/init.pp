@@ -20,6 +20,7 @@ class jekyll (
   
   file {"${local_install_dir}":
     ensure => directory,
+    
   }
   
   $addressable_gem_file = "addressable-2.5.0.gem"
@@ -284,26 +285,52 @@ class jekyll (
     $drafts = ""
   }
   
-  file{"stop-jekyll-script":
-    ensure => present,
-    path => "${local_install_dir}stop-jekyll.sh",
-    source => "puppet:///${puppet_file_dir}stop-jekyll.sh",
-  }
+#  file{"stop-jekyll-script":
+#    ensure => present,
+#    path => "${local_install_dir}stop-jekyll.sh",
+#    source => "puppet:///${puppet_file_dir}stop-jekyll.sh",
+#  }
 #SIGTERM causes issues, try this as a script instead
   exec {"stop-jekyll":
-    path => "/usr/bin/",
-    command => "${local_install_dir}stop-jekyll.sh",
-    require => File["stop-jekyll-script"],
+    path => "/usr/local/bin/",
+    command => "/bin/bash /usr/local/bin/jekyll.sh stop",
+    require => [
+#      File["stop-jekyll-script"],
+      File["jekyll.sh"],
+    ],
     onlyif => "/bin/ps -aux | /bin/grep jekyll | /bin/grep -v grep",
-    returns => [143,1],
-  
+#    returns => [143,1],
   }
+  
+#  $upstart_file = "upstart_1.13.2-0ubuntu16_amd64.deb"
+#  package {"upstart":
+#    ensure => "1.13.2-0ubuntu16",
+#    provider => "dpkg",
+#    source => "${local_install_dir}${upstart_file}"
+#  }
+
+  file { "jekyll.sh":
+    path    => "/usr/local/bin/jekyll.sh",
+    ensure  =>  present,
+    mode => 0655,
+    content => template("${module_name}/jekyll.sh.erb")
+  }
+
   exec {"start-jekyll-server":
     path => "/usr/local/bin/",
-    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} --force_polling &",
-#    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} &",
-    require => Package["jekyll"],
+    command => "/bin/bash /usr/local/bin/jekyll.sh start &",
+    require => [
+      File["jekyll.sh"],
+      Package["jekyll"]
+    ]
   }
+  
+#  exec {"start-jekyll-server":
+#    path => "/usr/local/bin/",
+#    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} --force_polling &",
+##    command => "jekyll serve --host ${blog_host_address} -s ${blog_source_directory} -d ${blog_output_directory} --watch ${drafts} &",
+#    require => Package["jekyll"],
+#  }
 #exec
 #jekyll serve --host 192.168.33.25 -s /blog/ -d /published_blog/ --watch --drafts --force_polling
 
