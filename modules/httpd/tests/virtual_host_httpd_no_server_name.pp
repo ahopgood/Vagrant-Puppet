@@ -10,7 +10,10 @@ Package{
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
   }
-  
+  if (versioncmp("${operatingsystem}","Ubuntu") == 0) {
+    ufw::service{"ufw-service":}
+  }
+  class {"httpd::virtual_host::sites":}
   class { "httpd": }
 
   httpd::virtual_host{"test":

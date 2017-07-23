@@ -1,11 +1,15 @@
 # httpd / Apache2
-
 This is the httpd module. It provides... [httpd / Apache2 functionality](https://httpd.apache.org/)
 
 The module can be passed the following parameters as Strings:  
 * Major version number, e.g. "2"
 * Minor version number, e.g. "4"
 * Patch version number e.g. "14"
+
+Supplementary Documentation:
+* [Virtual Hosts](#VirtualHosts)
+* [Terry Pratchett x-clacks header](#Terry_Pratchett_x-clacks_header)
+* [Content Security Policy header](#Content_Security_Policy_header)
   
 ## Current Status / Support
 Tested to work on the following operating systems:
@@ -13,31 +17,39 @@ Tested to work on the following operating systems:
 * CentOS 7 - Apache 2.4.6
 
 ### Known Issues  
-**64-bit support only**  
-[CentOS Known Issues](#CentOS_known_issues)  
-[Ubuntu Known Issues](#Ubuntu_known_issues)  
+* **64-bit support only**  
+* [CentOS Known Issues](#CentOS_known_issues)  
+* [Ubuntu Known Issues](#Ubuntu_known_issues)  
 
 ## Usage 
 Can be declared via the *httpd* class:
-	
+```	
 	class{"httpd":}
-	
+```
 or directly via the *httpd::ubuntu* class:
-
+```
+    service ufw::service{"ufw-service":}
+    
 	class {"httpd::ubuntu":
 	  major_version => "2",
 	  minor_version => "4",
 	  patch_version => "12",
 	}
-
+```
 or directly via the *httpd::centos* class:
-	
+```	
 	class{httpd::centos":
 	  httpd_user => "httpd", 
 	  httpd_group => "httpd",
-	}	   
+	}
+```
 ## Dependencies
+### CentOS
 * iptables module is required [raw readme here](../iptables/README.markdown)
+* Port exception added for `port 80` to ensure http traffic can get through to the HTTP server
+### Ubuntu
+* `ufw` module is required [raw readme here](../ufw/README.markdown)
+* Need to declare the ufw `service ufw::service{"ufw-service":}` somewhere in your manifest
 * Port exception added for `port 80` to ensure http traffic can get through to the HTTP server
 
 ## Testing performed:
@@ -68,10 +80,10 @@ Command line service calls are as follows:
 * `sudo systemctl restart httpd` to restart the service
 * `sudo systemctl status httpd` to get the current status of the service
 
-### <a href="CentOS_known_issues">Known issues</a>
+### Known issues <a name="CentOS_known_issues"></a>
 * CentOS 6 is on a very out of date version of apache (2.2.15), the repositories for this version of CentOS are no longer being updated.
 
-### <a href="CentOS_file_naming_conventions">CentOS file naming conventions</a>
+### CentOS file naming conventions <a name="CentOS_file_naming_conventions"></a>
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct apache httpd version.  
 Ensuring this pattern is followed will allow the module to locate files correctly, it was decided not to rename all the rpms into a common naming structure since this places the onus on the person running the module to rename files every time there is an update.  
 
@@ -80,27 +92,25 @@ This decision may be revisited in future in order to simplify the module if the 
 Ensure that a new directory is present in the /file/CentOS/* directory named after the new version of CentOS and ensure the apache installer is present.    
 For the **existing** dependencies if they are still applicable then you need to add them to the new version directory.   
 You will also need to add these new file names/versions to the main **centos.pp** manifest and include a new condition to resolve for your version of the OS.  
-
+```
 	$apr_file = $os ? {
     	'CentOS7' => "apr-1.4.8-3.el7.x86_64.rpm",
     	'CentOS6' => "apr-1.3.9-5.el6_2.x86_64.rpm",
     	default => undef,
 	}
-
+```
 For the apr library cecomes the following for CentOS 8:  
-
-
+```
 	$apr_file = $os ? {
     	'CentOS7' => "apr-1.4.8-3.el7.x86_64.rpm",
     	'CentOS6' => "apr-1.3.9-5.el6_2.x86_64.rpm",
 		'CentOS8 => "apr-1.5.1-2-el8.x86_64.rpm",
     	default => undef,
 	}
-
-
+```
 If there are **new** dependencies then you'll need to add their installers to the **/files/CentOS/x/** folder where x is the CentOS version and you'll need to create a whole new conditional resolution for the library name, similar to the **apr** example above to ensure that name resolves correctly.  
 As well as name resolution you'll also need to add a conditional section based on the OS version to actually obtain the installer file and then install the package, an example for the apr installer is found below:  
-
+```
 	file{
     	"${local_install_dir}${apr_file}":
     	ensure => present,
@@ -113,8 +123,7 @@ As well as name resolution you'll also need to add a conditional section based o
     	source => "${local_install_dir}${apr_file}",
     	require => File["${local_install_dir}${apr_file}"]
 	}
-
-
+```
 All dependencies and the actual Apache installer itself are best obtained by running `yumdownloader <installername>` on the target CentOS version, sometimes this will require `sudo apt-get install yum-utils` to be installed first.  
 
 ### Adding new major versions of Apache
@@ -136,11 +145,11 @@ Command line service calls are as follows:
 * `sudo service apache2 restart` to restart the service
 * `sudo service apache2 status` to get the current status of the service
 
-### <a href="Ubuntu_known_issues">Ubuntu known issues</a>
+### Ubuntu known issues<a name="Ubuntu_known_issues"></a>
 * iptables isn't supported by default on Ubuntu 15.10 - modular dependency between httpd and iptables will cause module to fail.
 * Ubuntu support is still under development
 
-### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
+### Debian File naming conventions <a name="Debian_file_naming_conventions"></a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct apache2 version.  
 <!--
 The naming of these *.deb* files should follow the following convention in order for the correct version to be selected:  
@@ -151,7 +160,7 @@ an example would be:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
 
-## Terry Pratchett x-clacks header
+## Terry Pratchett x-clacks header <a name="Terry_Pratchett_x-clacks_header"></a>
 Support has been added for the following HTTP header:
 `X-Clacks-Overhead "GNU Terry Pratchett"`
 An explanation can be found [here](http://www.gnuterrypratchett.com/).
@@ -161,7 +170,7 @@ An explanation can be found [here](http://www.gnuterrypratchett.com/).
   ->
   httpd::xclacks{"x-clacks":}
 ```
-This will add a directive on the `/var/www/html` directory (support for other document roots could be added at a later point).
+This will add a directive on the `/var/www/html` directory.
 The directive looks like this on Ubuntu:
 ```
 <Directory "/var/www/html/">
@@ -177,23 +186,179 @@ And this on CentOS:
 header set X-Clacks-Overhead "GNU Terry Pratchett"
 </Directory>
 </IfModule>
+```
+
+To add to a virtual host you do the following:  
+```
+  class { "httpd": }
+  ->
+  httpd::xclacks{"x-clacks":
+    virtual_host => "www.alexander.com"
+  }
+```
+This will add the x-clacks header to the conf file for the virtual host.
+On Ubuntu this looks like the following in `/etc/apache2/sites-enabled/www.alexander.com.conf`:
+```
+<VirtualHost *:80>
+....
+<IfModule headers_module>
+header set X-Clacks-Overhead "GNU Terry Pratchett"
+</IfModule>
+</VirtualHost>
+```
+And like this on CentOS (7 in `/etc/httpd/sites-enabled/www.alexander.com.conf` and 6 in `/etc/httpd/conf/conf.d`
+
+### Depdendencies
+This will only work if the headers module is installed on apache which is done by this module.
+This module requires virtual host sites support:
+`class {"httpd::virtual_host::sites":}`
+
+## Content Security Policy header <a name="Content_Security_Policy_header"></a>
+An apache/httpd implementation of a [Content Security Policy](https://content-security-policy.com/) header.
+I had to roll my own augeas header solution due to conflicts with string escaping on puppet and augeas conspiring to prevent me using strings such as "default-src 'self';".
+
+### Usage
+When using the CSP module the `--parser=future` parameter is required on puppet 3.7.x up to 4.0.0 to make use of some of the more advanced parser features to manipulate parameters.
+
+#### Notes on CSP rules
+A csp rule takes the form of a series of semi-colon separated entries encapsulated within double quotation marks ("something").  
+Each entry contains a prefix to indicate what type of content it applies to. 
+This is followed by a space separated list of domains it can be loaded from and / or the entries 'self' to indicate loading from the same origin or 'none' to indicate no restrictions (note the single quotation marks 'something').  
+ 
+There is a slightly annoying amount of string escaping required on the single and double quotations to reach our desired CSP rule.  
+String escaping on the puppet level is required to pass the quotation marks to Augeas.  
+Further string escaping is required to allow Augeas to interpret the quotation marks as actual quotation marks.  
+Below is a series of examples:
+##### Desired rule
+```
+"script-src 'self' mydomain.com; style-src 'none';"
+```
+##### String required by Augeas 
+In Augeas the double quotes need to be escaped so they aren't interpreted as terminating string characters.
+```
+\"script-src 'self' mydomain.com; style-src 'none';\"
+```
+##### String required by Puppet  
+We need to add Puppet escaping to allow `\"` to pass to augeas, so this becomes `\\\"`.
+```
+\\\"script-src 'self' mydomain.com; style-src 'none';\\\"
+```
+In Puppet the single quotes also need to be escaped:
+```
+\\\"script-src \'self\' mydomain.com; style-src \'none\';\\\"
+```
+Augeas also needs the entire thing wrapped in double quotes so it can interpret it as a string expression internally so we add another set of escaped quotes around it: 
+```
+\"\\\"script-src \'self\' mydomain.com; style-src \'none\';\\\"\"
+```
+And finally as this is a puppet string itself the whole lot is encapsulated again in double quotes:
+```
+"\"\\\"script-src \'self\' mydomain.com; style-src \'none\';\\\"\""
+```
+
+#### Global
+To set a global content security policy:
+```
+  class { "httpd": }
+  ->
+  httpd::content_security_policy{"CSP":
+    csp_rule => "\"\\\"default-src \'self\'\\\"\"" 
+  }
+```
+This will add a directive on the `/var/www/` directory .
+The directive looks like this on Ubuntu:
+```
+<Directory "/var/www/">
+<IfModule headers_module>
+header set Security-Content-Policy "default-src 'self';"
+</IfModule>
+</Directory>
+```
+And this on CentOS:
+```
+<IfModule mod_headers.c>
+<Directory "/var/www/">
+header set Security-Content-Policy "default-src 'self';"
+</Directory>
 </IfModule>
 ```
-#### Depdendencies
+#### Virtual Host
+To set a content security policy on a virtual host:
+```
+  class { "httpd": }
+  ->
+  httpd::content_security_policy{"CSP":
+    virtual_host => "www.alexander.com"
+    csp_rule => "\"\\\"default-src \'self\'\\\"\""
+  }
+```
+This will add a directive on:
+* CentOS in the `/etc/httpd/sites-available/www.virtualhost.com.conf` file.
+* Ubuntu in the `/etc/apache2/sites-available/www.virtualhost.com.conf` file.
+The directive looks like this:
+```
+<VirtualHost *:80>
+DocumentRoot /var/www/virtualhost/
+ServerAlias virtualhost.com
+ServerAlias virtualhost.net
+ServerName www.virtualhost.com
+<IfModule headers_module>
+header set Content-Security-Policy "default-src 'self'"
+</IfModule>
+</VirtualHost>
+
+```
+### Depdendencies
 This will only work if the headers module is installed.
+The Augeas class is required.  
+**Note** Use of the x-clacks-overhead *after* this module call will overwrite your **global** CSP header currently, virtual host policies will not be impacted.
+It is advisable to run the x-clacks first and then CSP as the CSP module has finer grained onlyif statements for detecting duplication, existing and/or modified values.
+```
+  httpd::xclacks{"x-clacks":}
+  httpd::content_security_policy{"CSP": }
+```
+### ToDo
+* Move testfile.txt into a variable
+* Delete testfile.txt as part of the module tidyup
+* Add an onlyif clause to the augeas executable
+  * Externalise the equality condition as a variable 
+  * Externalise the size condition as a variable matched to grep -c and awk
+* Extract augeas bits into a separate define section?
+* Move the restarting of apache sections into their own definition
+* Have x-clacks use the httpd::restart definition
+* Replace CSP restarts with httpd::restart
+* Combine the virtualhost CSP section into one place
+* Update readme section with actual config file entries for apache2 and httpd for virtualhost
+* See if we can add the:
+```
+        "save",
+        "print /augeas//error"
+```
+call to the header module header_contents array.
 
-
-## Virtual Hosts
+## Virtual Hosts <a name="VirtualHosts"></a>
 Required parameters:  
 * server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
 * document_root - the location of the web resources you will be serving via your virtual host
 
 Optional parameters:  
-* server_alias - an array of strings that represent the server aliase
+* server_alias - an array of strings that represent the server aliases
 
 This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
 The document root / web page assets are not instantiated through this definition, you create those elsewhere however you want.
 A list of server aliases can be used to setup separate `ServerAlias` entries in the configuration file for a site.
+### Usage
+```
+class {"httpd::virtual_host::sites":}
+httpd::virtual_host{"www.cv.alexanderhopgood.com":
+  server_name   => "www.cv.alexanderhopgood.com",
+  document_root => "/var/www/alexander/cv/",
+  server_alias => ["cv.alexanderhopgood.net","cv.alexanderhopgood.co.uk","cv.alexanderhopgood.com"],
+}
+```
+### Dependencies
+* Requires sites directories (`sites-enabled` and `sites-available`) to be present on apache 2.4+, provided by the `httpd::virtual_host::sites` class
+
 ### Support
 * CentOS 7
 * CentOS 6

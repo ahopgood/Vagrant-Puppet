@@ -30,15 +30,18 @@ define ufw (
     unless => "ufw status | /bin/grep ${port}/${protocol} .* ALLOW"
   }
   ->
-  exec {"Enable Firewall":
-    path => "/usr/sbin/",
+  exec { "Enable Firewall [${name}]":
+    path    => "/usr/sbin/",
     command => "ufw --force enable",
-    onlyif => "ufw status | /bin/grep inactive",
-    notify => Service["ufw"]
+    onlyif  => "ufw status | /bin/grep inactive",
+    notify  => Service["ufw"],
+    before => Ufw::Service["ufw-service"],
   }
+}
 
+define ufw::service{
   service {"ufw":
     ensure => running,
-    enable => true
+    enable => true,
   }
 }

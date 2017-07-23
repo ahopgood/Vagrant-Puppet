@@ -29,5 +29,34 @@ Package{
   ->
   file {"/var/www/alexander/index.html":
     ensure => present,
-    content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
+    content => "
+    <html>
+      <head>
+        <script src=\"https://code.jquery.com/jquery-3.2.1.min.js\"></script>
+        <title>Test Page</title>
+      </head>
+      <body>
+        <h1>Alex's test page</h1>
+      </body>
+    </html>"
+  }
+  ->
+  file {"/var/www/html/index.html":
+    ensure => present,
+    content => "
+    <html>
+      <head>
+        <script src=\"https://code.jquery.com/jquery-3.2.1.min.js\"></script>
+        <title>Test Page</title>
+      </head>
+      <body>
+        <h1>HTTPD test page</h1>
+      </body>
+    </html>"
+  }
+  ->
+  class{"augeas":}
+  ->
+  httpd::content_security_policy{"www.alexander.com":
+    virtual_host => "www.alexander.com"
   }
