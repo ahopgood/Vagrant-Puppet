@@ -12,7 +12,9 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-
+    
+  config.vm.synced_folder "../", "/etc/puppet/modules"
+  
   config.ssh.insert_key = false
   config.vm.define "dev" do |dev|
     dev.vm.hostname = "jenkins-dev"

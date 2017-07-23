@@ -60,8 +60,8 @@ class jenkins (
   #running the module again causes issues as the java module removes old versions before installing Java again which is a dependency of Jenkins and causes a failure
   $daemon = "daemon_0.6.4-1_amd64.deb"
   java{"install-java":
-    version => "${java_major_version}",
-    updateVersion => "${java_update_version}",
+    major_version => "${java_major_version}",
+    update_version => "${java_update_version}",
   }
   ->
   file {

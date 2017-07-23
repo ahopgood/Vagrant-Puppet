@@ -19,9 +19,10 @@ file {
     ensure     =>  directory,
 }
 ->
-class { 'jenkins': }
--> jenkins::backup{"test-backup":
-  backup_location => "/vagrant/backups/",
-}
+class{"jenkins": }
+#-> 
+#jenkins::backup{"test-backup":
+#  backup_location => "/vagrant/backups/",
+#}
 
 
