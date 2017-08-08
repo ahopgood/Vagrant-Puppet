@@ -67,16 +67,16 @@ define java::ubuntu(
 
       #Clear any previous update versions
 #      package {
-#      "remove oracle-java${major_version}-jdk":
+#      "remove orcale-java${major_version}-jdk":
 #        name        => "oracle-java${major_version}-jdk",
 #        ensure      => "purged",
 #        provider    =>  'dpkg',
 #        #onlyif      => "${major_version} ${update_version} aren't equal
 #      }
       
-      $package_name = "orcale-java${major_version}-jdk"
+      $package_name = "oracle-java${major_version}-jdk"
       package {
-      "${package_name}-${update_version}":
+      "${package_name}u${update_version}":
 #        name        => "${package_name}",
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${jdk}",

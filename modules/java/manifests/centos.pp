@@ -41,14 +41,12 @@ define java::centos(
     #you'll end up with both versions installed so we need to ensure the previous version is absent
     #if version is 5,6,7 (i.e. less than 8
     if (versioncmp("${major_version}", "8") < 0){
-#      $package_name  = "jdk"
-
       # package name = jdk1.8.0_31
       # package version = 1.8.0_31-fcs
       $package_name = "jdk-1.${major_version}.0_${update_version}-fcs.x86_64"
       $package_version = "1.${major_version}.0_${update_version}-fcs"
-      #rpm package version = jdk1.8.0_112-1.8.0_112-fcs.x86_64
     } elsif (versioncmp("${major_version}", "8") == 0){
+      #rpm package version = jdk1.8.0_112-1.8.0_112-fcs.x86_64
       $package_name  = "jdk1.${major_version}.0_${update_version}"
       $package_version = "1.${major_version}.0_${update_version}-fcs"
     } 
@@ -67,7 +65,6 @@ define java::centos(
       #Remove old minor versions of this major java package, cannot wildcard as we don't know which major versions we need to keep
       $removeOldJavaPackages = "rpm -e $(rpm -qa | grep jdk*${major_version}* | grep -v '${package_name}')"
       $checkOldPackagesExist = "rpm -qa | grep jdk*${major_version}* | grep -v '${package_name}'"
-
     } else {
       notify{"Multi-tenancy not allowed":}
       #Hack: duplicate notify declaration prevents multiple major versions being installed.
@@ -76,7 +73,7 @@ define java::centos(
       $removeOldJavaPackages = "rpm -e $(rpm -qa | grep jdk* | grep -v '${package_name}')"
       $checkOldPackagesExist = "rpm -qa | grep jdk* | grep -v '${package_name}'"
       $versionsToRemove = {
-        "6" => ["jdk1.7.0_*","jdk1.8.0_*"],
+        "6" => ["jdk1.7.0_.*","jdk1.8.0_.*"],
         "7" => ["jdk1.6.0_.*","jdk1.8.0_.*"],
         "8" => ["jdk1.6.0_.*","jdk1.7.0_.*"],
       }
@@ -85,7 +82,6 @@ define java::centos(
     package {
       "${package_name}":
       ensure      => "${package_version}",
-#      ensure      => installed,
       provider    =>  'rpm',
       source      =>  "${local_install_dir}${jdk}",
       require     =>  File["${jdk}"],
@@ -102,10 +98,7 @@ define java::centos(
     java::default::remove{$versionsToRemove["${major_version}"]:
       major_version => "${major_version}", 
     }
-
-#  sudo alternatives --remove java /usr/java/jdk1.7.0_76/jre/bin/java
-
-
+  
   #How to uninstall via rpm: rpm -e package name
     #How to query via rpm: rpm -qa | grep 'jdk' 
     #Perhaps we need to clear out any other jdk versions? Perhaps a flag could be set?
