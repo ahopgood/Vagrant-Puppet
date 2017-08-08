@@ -93,3 +93,47 @@ define alternatives::set(
     cwd         =>  '/usr/sbin/',
   }
 }
+
+define alternatives::remove(
+  $executableName = undef,
+  $executableLocation = undef,
+  $execAlias = undef,
+  $priority = undef,
+  $slaveAlias = undef,
+  $onlyif = undef,
+){
+  #Decide which alternatives program we have based on OS
+  if $::operatingsystem == 'CentOS' {
+    $alternativesName = "alternatives"
+  } elsif $::operatingsystem == 'Ubuntu' {
+    $alternativesName = "update-alternatives"
+  } else {
+    notify {"${::operatingsystem} is not supported":}
+  }
+
+  if ($execAlias != undef){ #some alternatives alias to the same executable, need to be able to use the desired exec name for the install and a different for the symlink
+    $targetExecutable = "${execAlias}"
+  } else {
+    $targetExecutable = "${executableName}"
+  }
+
+  if ($slaveHash != undef){
+    $slaveArray = $slaveHash.map |$key, $value| { "--slave /usr/bin/$key $key $value$key" }
+    $slaves = $slaveArray.reduce |$memo, $value| { "$memo $value" }
+  }
+  
+  if ($onlyif != undef){
+    $remove_onlyif = $onlyif
+  } else {
+    $remove_onlyif = "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"${executableLocation}${targetExecutable} - priority *\" > /dev/null"
+  }
+  
+  exec {
+    "remove-alternative-${executableName}-${executableLocation}":
+      command     =>  "${alternativesName} --remove ${executableName} \$(${alternativesName} --display ${executableName}| /bin/grep \"${executableLocation}${targetExecutable} \" | /bin/awk '{ print \$1 }')",
+      onlyif      =>  "${remove_onlyif}",  
+      path        =>  '/usr/sbin/',
+      cwd         =>  '/usr/sbin/',
+  }
+}
+#"/usr/sbin/alternatives --display firefox-javaplugin.so | /bin/grep \"link currently points to /usr/java/jdk1.8.0_*/jre/lib/amd64/firefox-javaplugin.so" > /dev/null",

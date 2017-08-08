@@ -411,42 +411,42 @@ define java::default::set(
   $manLocation     = "${jdkLocation}man/man1/"
   $priority = 1500 + "${major_version}"
 
-  if ($version == 7 or $version == 8){
-    #7 & 8
-    #/bin
-    alternatives::set{
-     "jmc-set-alternative":
-      executableName      => "jmc",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-#     manExecutable       => "jmc${manExt}",
-#     manLocation         => "${jdkBinLocation}",
-    }
-    #7 & 8
-    #/bin
-    alternatives::set{
-      "jcmd-set-alternative":
-      executableName      => "jcmd",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-#     manExecutable       => "jcmd${manExt}",
-#     manLocation         => "${manLocation}",
-    }
-  }
-  if ($version == 8){
-    #8
-    #/bin
-    alternatives::set{
-      "jdeps-set-alternative":
-      executableName      => "jdeps",
-      executableLocation  => "${jdkBinLocation}",
-      priority            => $priority,
-#      manExecutable       => "jdeps${manExt}",
-#      manLocation         => "${manLocation}",
-    }
-  } else { #java 6 & 7
-
-  }
+#  if ((versioncmp($major_version, 7) == 0) or (versioncmp($major_version, 8) == 0)){
+#    #7 & 8
+#    #/bin
+#    alternatives::set{
+#     "jmc-set-alternative":
+#      executableName      => "jmc",
+#      executableLocation  => "${jdkBinLocation}",
+#      priority            => $priority,
+##     manExecutable       => "jmc${manExt}",
+##     manLocation         => "${jdkBinLocation}",
+#    }
+#    #7 & 8
+#    #/bin
+#    alternatives::set{
+#      "jcmd-set-alternative":
+#      executableName      => "jcmd",
+#      executableLocation  => "${jdkBinLocation}",
+#      priority            => $priority,
+##     manExecutable       => "jcmd${manExt}",
+##     manLocation         => "${manLocation}",
+#    }
+#  }
+#  if ($major_version == 8){
+#    #8
+#    #/bin
+#    alternatives::set{
+#      "jdeps-set-alternative":
+#      executableName      => "jdeps",
+#      executableLocation  => "${jdkBinLocation}",
+#      priority            => $priority,
+##      manExecutable       => "jdeps${manExt}",
+##      manLocation         => "${manLocation}",
+#    }
+#  } else { #java 6 & 7
+#
+#  }
 
   #/jre/lib/amd64
   alternatives::set{
@@ -485,6 +485,13 @@ define java::default::set(
     executableName      => "javac",
     executableLocation  => "${jdkBinLocation}",
     priority            => $priority,
+  }
+  #/jre/lib
+  alternatives::set{
+    "jexec-set-alternative":
+      executableName      => "jexec",
+      executableLocation  => "${jdkLocation}jre/lib/",
+      priority            => $priority,
   }
   #/jre/lib/amd64
   alternatives::set{
@@ -528,7 +535,7 @@ define java::jce(
   # Require java with a specific major major_version, how to check this?
   Java <<| |>> -> Java::Jce["${name}"]
 
-  #Require unzip (mostly for CentOS 7 but let's not take any chances
+  #Require unzip mostly for CentOS 7 but let's not take any chances
   Class['unzip']-> Java::Jce["${name}"]
 
   # Derive jdk location based on OS
