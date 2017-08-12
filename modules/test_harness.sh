@@ -33,12 +33,16 @@ function run_manifest {
     remove_warning "Warning: Permanently added '\[localhost\]:[0-9]\{4\}' (RSA\|ECDSA) to the list of known hosts."
     remove_warning "Warning: alias is a metaparam; this value will inherit to all contained resources in the [a-zA-Z:_]* definition"
     remove_warning "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored on line [0-9]* in file [a-zA-Z/]*.pp"
+    remove_warning "Warning: You cannot collect exported resources without storeconfigs being set; the collection will be ignored at [a-zA-Z/]*.pp:[0-9]*:"
+
     remove_warning "Warning: Not collecting exported resources without storeconfigs"
     remove_warning "Warning: The package type's allow_virtual parameter will be changing its default value from false to true in a future release. If you do not want to allow virtual packages, please explicitly set allow_virtual to false."
     remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/package.rb:430:in \`default')"
     remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/package.rb:430:in \`.*')"
     remove_warning "Warning: Non-string values for the file mode property are deprecated. It must be a string, either a symbolic mode like 'o+w,a+r' or an octal representation like '0644' or '755'."
+    
+   "(at /usr/lib/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/site_ruby/1.8/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/share/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
     remove_warning "   (at /usr/lib/ruby/vendor_ruby/puppet/type/file/mode.rb:69:in \`.*')"
@@ -238,4 +242,3 @@ for each in "${RESULTS_ARRAY[@]}"
 do
   echo "$each"
 done
-

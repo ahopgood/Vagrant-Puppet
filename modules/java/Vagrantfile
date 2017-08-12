@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.hostname = "java-dev-ubuntu"
     ubuntu.vm.network "private_network", ip: "192.168.33.15"
     ubuntu.vm.box = "ubuntu/wily64"
+    ubuntu.vm.box_version = "20160329.0.0"
 	  ubuntu.vm.synced_folder "files", "/vagrant/debs"
   end
 end

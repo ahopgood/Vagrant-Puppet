@@ -18,17 +18,17 @@ class ddclient{
   $minor_version        = "8"
   $patch_version        = "3"
 
-  $OS = $operatingsystem
-  $OS_version = $operatingsystemmajrelease
-  notify { "In ${OS} ${OS_version}": }
+  $os = $operatingsystem
+  $os_version = $operatingsystemmajrelease
+  notify { "In ${os} ${os_version}": }
 
-  if (versioncmp("${OS}","Ubuntu") == 0){
+  if (versioncmp("${os}","Ubuntu") == 0){
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
-  } elsif (versioncmp("${OS}","CentOS") == 0){
-    if (versioncmp("${OS_version}", "7") == 0) {
+  } elsif (versioncmp("${os}","CentOS") == 0){
+    if (versioncmp("${os_version}", "7") == 0) {
       $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
-    } elsif (versioncmp("${OS_version}", "6") == 0) {
+    } elsif (versioncmp("${os_version}", "6") == 0) {
       $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-1.el6.noarch.rpm"
     }
     $provider = "rpm"
@@ -44,7 +44,7 @@ class ddclient{
   file{ "${ddclient_file}":
     ensure => present,
     path   => "${local_install_dir}/${ddclient_file}",
-    source => "puppet:///${puppet_file_dir}${OS}/${OS_version}/${ddclient_file}",
+    source => "puppet:///${puppet_file_dir}${os}/${os_version}/${ddclient_file}",
   }
 
   package { "ddclient":

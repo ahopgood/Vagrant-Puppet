@@ -114,8 +114,12 @@ define httpd::header::set_virtual(
   if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
     $conf_file_location = "/etc/apache2/sites-available/${virtual_host}.conf"
   } elsif (versioncmp ("${operatingsystem}", "CentOS") == 0){
-    $conf_file_location = "/etc/httpd/sites-available/${virtual_host}.conf"
-  }
+    if (versioncmp ("${operatingsystemmajrelease}", "6") == 0){
+      $conf_file_location = "/etc/httpd/conf/httpd.conf"
+    } else {
+      $conf_file_location = "/etc/httpd/sites-available/${virtual_host}.conf"
+    }
+  } 
   $context = "/files${conf_file_location}/"
   $virtual_host_name = "${virtual_host}"
   $virtual_host_name_search_term = "\"${virtual_host_name}\""

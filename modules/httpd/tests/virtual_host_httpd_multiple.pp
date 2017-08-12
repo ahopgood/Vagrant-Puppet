@@ -5,7 +5,6 @@ Package{
   if (versioncmp("${operatingsystem}","Ubuntu") == 0) {
     ufw::service{"ufw-service":}
   }
-
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
 
@@ -15,8 +14,9 @@ Package{
     ensure     =>  directory,
   }
   class { "httpd": }
+  
   class {"httpd::virtual_host::sites":}
-  httpd::virtual_host{"test":
+  httpd::virtual_host{"test-alexander":
     server_name => "www.alexander.com",
     document_root => "/var/www/alexander/",
     server_alias => ["alexander.com","alexander.net"]
@@ -29,34 +29,21 @@ Package{
   ->
   file {"/var/www/alexander/index.html":
     ensure => present,
-    content => "
-    <html>
-      <head>
-        <script src=\"https://code.jquery.com/jquery-3.2.1.min.js\"></script>
-        <title>Test Page</title>
-      </head>
-      <body>
-        <h1>Alex's test page</h1>
-      </body>
-    </html>"
+    content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
+  }
+  
+  httpd::virtual_host{"test-katherine":
+    server_name => "www.katherine.com",
+    document_root => "/var/www/katherine/",
+    server_alias => ["katherine.com"]
   }
   ->
-  file {"/var/www/html/index.html":
+  file {"/var/www/katherine/":
+    ensure => directory,
+    #    require => Class["httpd"]
+  }
+  ->
+  file {"/var/www/katherine/index.html":
     ensure => present,
-    content => "
-    <html>
-      <head>
-        <script src=\"https://code.jquery.com/jquery-3.2.1.min.js\"></script>
-        <title>Test Page</title>
-      </head>
-      <body>
-        <h1>HTTPD test page</h1>
-      </body>
-    </html>"
-  }
-  ->
-  class{"augeas":}
-  ->
-  httpd::content_security_policy{"www.alexander.com":
-    virtual_host => "www.alexander.com"
+    content => "<html><title>Test Page</title><body><h1>Alex's test page</h1></body></html>"
   }
