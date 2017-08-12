@@ -12,15 +12,18 @@ Support for the following operating systems:
 * [Known Issues CentOS](#Known_issues_centos)  
 
 ## Usage
+Adding to sudo
 ```
-class {"sudo":
-    username => "bob",
-}
+sudo {"bob":}
+```
+
+Removing sudo privileges
+```
+sudo::remove {"bob":}
 ```
 
 ### Dependencies
-A [user resource](https://docs.puppet.com/puppet/latest/types/user.html) for the specified username is a required resource. 
-
+For adding sudo privileges a [user resource](https://docs.puppet.com/puppet/latest/types/user.html) for the specified username is a required resource. 
 
 ## Testing performed
 Works on clean installs of:
@@ -41,5 +44,4 @@ Installs sudo privileges to the `/etc/sudoers.d/` directory in a single file bas
 ### Known Issues Ubuntu
 
 ## To Do
-* Add support for multiple declarations of sudo module for multiple users
-* Add removal of sudo privileges for a specified user
+* Add finer grained control of sudo privileges, currently we're all in with no compromises.

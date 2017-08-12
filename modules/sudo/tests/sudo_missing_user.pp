@@ -7,6 +7,4 @@
 #  groups => "alexander",
 #}
 # missing user
-class {"sudo":
-  username => "alexander"
-}
+sudo {"${username}":}

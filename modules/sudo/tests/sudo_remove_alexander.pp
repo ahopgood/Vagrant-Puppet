@@ -14,3 +14,5 @@ user {"${username}":
 }
 
 sudo {"${username}":}
+->
+sudo::remove {"${username}":}
