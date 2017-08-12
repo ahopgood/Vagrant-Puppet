@@ -15,6 +15,7 @@ Supplementary Documentation:
 Tested to work on the following operating systems:
 * CentOS 6 - Apache 2.2.15, **it is advisable to move on from CentOS 6 - these repositories are no longer being updated**
 * CentOS 7 - Apache 2.4.6
+* Ubuntu 15.10 - Apache 2.4.6
 
 ### Known Issues  
 * **64-bit support only**  
@@ -24,22 +25,22 @@ Tested to work on the following operating systems:
 ## Usage 
 Can be declared via the *httpd* class:
 ```	
-	class{"httpd":}
+class{"httpd":}
 ```
 or directly via the *httpd::ubuntu* class:
 ```
-	class {"httpd::ubuntu":
-	  major_version => "2",
-	  minor_version => "4",
-	  patch_version => "12",
-	}
+class {"httpd::ubuntu":
+  major_version => "2",
+  minor_version => "4",
+  patch_version => "12",
+}
 ```
 or directly via the *httpd::centos* class:
 ```	
-	class{httpd::centos":
-	  httpd_user => "httpd", 
-	  httpd_group => "httpd",
-	}
+class{httpd::centos":
+  httpd_user => "httpd", 
+  httpd_group => "httpd",
+}
 ```
 ## Dependencies
 * iptables module is required [raw readme here](../iptables/README.markdown)
