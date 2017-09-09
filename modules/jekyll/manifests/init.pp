@@ -297,7 +297,7 @@ class jekyll (
   file { "jekyll.sh":
     path    => "/usr/local/bin/jekyll.sh",
     ensure  =>  present,
-    mode => 0655,
+    mode => 0755,
     content => template("${module_name}/jekyll.sh.erb")
   }
 #
@@ -322,10 +322,11 @@ class jekyll (
     command => "systemctl enable ${local_install_dir}${jekyll_service_file}",
     require => [
       File["jekyll.sh"],
-      File["${jekyll_service_file}"]
+      File["${jekyll_service_file}"],
+      Package["jekyll"]
     ]
   }
-  
+  ->
   service {"jekyll":
     ensure => "running",
   }
