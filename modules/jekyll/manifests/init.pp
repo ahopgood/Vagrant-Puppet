@@ -329,6 +329,7 @@ class jekyll (
   ->
   service {"jekyll":
     ensure => "running",
+    require => Exec["set-jekyll-as-a-service"]
   }
 
   #exec
