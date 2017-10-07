@@ -1,0 +1,8 @@
+[Unit]
+Description = Jekyll Server
+[Service]
+ExecStart=/usr/local/bin/jekyll.sh start
+ExecStop=/usr/local/bin/jekyll.sh stop
+Restart=always
+[Install]
+WantedBy = multi-user.target
