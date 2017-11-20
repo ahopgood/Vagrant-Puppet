@@ -180,6 +180,8 @@ class jenkins (
     # <hudson.security.HudsonPrivateSecurityRealm_-Details>
     # <passwordHash>#jbcrypt:$2a$10$w1rRmLGv5zeEEGeZBbG.3.4dSHWN6Rv9SZdgthf69k9fiJ4g0c.xG</passwordHash>
     #set "/files/var/lib/jenkins/users/admin/config.xml/user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text", "#jbcrypt:$2a$10$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka"
+    $restore_plugin_script="retrieve-plugin.sh"
+    $restore_all_plugins_script="retrieve-all-plugins.sh"
     
     file {"jenkins.install.InstallUtil.lastExecVersion":
       ensure => present,
@@ -190,27 +192,31 @@ class jenkins (
       content => "$major_version.$minor_version.$patch_version",
       path => "/var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion",
     }
-    $restore_plugin_script="retrieve-plugin.sh"
+    ->
     file {"${restore_plugin_script}":
       ensure => present,
       require => [Augeas['jenkins_admin_config']],
       path => "/usr/local/bin/${restore_plugin_script}",
       source => "puppet:///${puppet_file_dir}${restore_plugin_script}",
     }
-    $restore_all_plugins_script="retrieve-all-plugins.sh"
     file {"${restore_all_plugins_script}":
       ensure => present,
       require => [File["${local_install_dir}"],File["${restore_plugin_script}"]],
       path => "/usr/local/bin/${restore_all_plugins_script}",
       source => "puppet:///${puppet_file_dir}${restore_all_plugins_script}",
     }
-
     exec {"Restore plugins":
       #user => 'root',
       path => ["/bin/","/usr/bin/"],
       #cwd => "/usr/local/bin/",
       command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
-      require => File["${restore_all_plugins_script}"]
+      require => File["${restore_all_plugins_script}"],
+    }
+    ->
+    exec {"Restart Jenkins":
+      #user => 'root',
+      path => ["/usr/sbin/","/etc/init.d/"],
+      command => "jenkins restart",
     }
   }
 }
