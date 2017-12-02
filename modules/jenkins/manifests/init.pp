@@ -16,7 +16,6 @@ class jenkins (
   $patch_version = "1",
   $perform_manual_setup = false,
   $password_bcrypt_hash = "\$2a\$10\$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka", #admin
-  $backup_location = "",
   $plugin_backup = "") {
 
   $jenkins_short_ver     = "jenkins"
@@ -107,7 +106,7 @@ class jenkins (
     source => "${local_install_dir}${jenkins}",
     require => [File["${jenkins}"], Package["daemon"], Java["install-java"]]
   }
-
+  ->
   service {
     "jenkins":
       enable => true,
@@ -157,29 +156,11 @@ class jenkins (
       lens => 'Xml.lns',
       context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
       changes => [
-        # 'set hudson.security.HudsonPrivateSecurityRealm_-Details',
-        # 'set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash',
         "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
-        #     'set authorizationStrategy/#attribute/class hudson.security.FullControlOnceLoggedInAuthorizationStrategy',
-        #     'rm securityRealm/#empty',
-        #     'set securityRealm/#attribute/class hudson.plugins.active_directory.ActiveDirectorySecurityRealm',
-        #     'set securityRealm/#attribute/plugin active-directory@1.42',
-        #     'touch securityRealm/removeIrrelevantGroups',
-        #     'touch securityRealm/groupLookupStrategy',
-        #     'set securityRealm/groupLookupStrategy/#text AUTO',
-        #     'set securityRealm/removeIrrelevantGroups/#text false',
       ],
-      # onlyif => "",
       require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
     }
-    #set /files/var/lib/jenkins/users/admin/config.xml/user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:$2a$10$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka
-    #sudo puppet apply --parser=future --debug /vagrant/manifests/jenkins.pp
-    #sudo puppet apply --parser=future /vagrant/manifests/jenkins.pp
-    #sudo apt-get install augeas-tools
-    #sudo augtool -At "Xml.lns incl /var/lib/jenkins/users/admin/config.xml"
-    # <hudson.security.HudsonPrivateSecurityRealm_-Details>
-    # <passwordHash>#jbcrypt:$2a$10$w1rRmLGv5zeEEGeZBbG.3.4dSHWN6Rv9SZdgthf69k9fiJ4g0c.xG</passwordHash>
-    #set "/files/var/lib/jenkins/users/admin/config.xml/user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text", "#jbcrypt:$2a$10$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka"
+
     $restore_plugin_script="retrieve-plugin.sh"
     $restore_all_plugins_script="retrieve-all-plugins.sh"
     
@@ -206,17 +187,14 @@ class jenkins (
       source => "puppet:///${puppet_file_dir}${restore_all_plugins_script}",
     }
     exec {"Restore plugins":
-      #user => 'root',
       path => ["/bin/","/usr/bin/"],
-      #cwd => "/usr/local/bin/",
       command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
       require => File["${restore_all_plugins_script}"],
     }
     ->
     exec {"Restart Jenkins":
-      #user => 'root',
       path => ["/usr/sbin/","/etc/init.d/"],
       command => "jenkins restart",
     }
-  }
+  }# Close manual check
 }
