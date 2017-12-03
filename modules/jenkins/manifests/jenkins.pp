@@ -32,6 +32,6 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 
 class {'jenkins':
   perform_manual_setup => false,
-  plugin_backup => "/vagrant/backup/test/",
+  plugin_backup => "/vagrant/backup/jenkins/",
 }
 
