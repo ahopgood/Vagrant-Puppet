@@ -17,7 +17,9 @@ Vagrant.configure(2) do |config|
   #Getting the error:Cannot allocate memory - fork(2)
   #Ruby needs more headroom to fork processes as it copies the entire parent context before collapsing it down.
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
+    vb.memory = "2048"
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
   config.ssh.insert_key = false
   config.vm.define "dev" do |dev|

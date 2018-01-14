@@ -64,3 +64,10 @@ Currently there is no enforced naming conventions beyond the following:
 ## ToDo
 ### CentOS
 ### Ubuntu
+* Create a credentials.xml file for adding our github token. Need to provide a credentials version from our plugin file
+* Create a directory for the seed job in the jobs folder where the folder name is the job name
+* Create a builds folder within the job folder
+* Create a config.xml file
+*
+* Add /files/var/lib/jenkins/credentials.xml/ to backup routine
+*
