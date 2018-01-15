@@ -280,13 +280,8 @@ define jenkins::seed_job(
 define jenkins::java_jdk(
   $major_version = undef,
   $update_version = undef,
+  $appendNewJdk = false,
 ){
-
-  # $jdkNamesArray = $jdksMap.map |$major_version, $update_version| { "1.${major_version}.0_${update_version}" }
-  # $jdkNames = $jdkNamesArray.reduce |$memo, $value| { "$memo $value" }
-  #
-  # $jdkLocationsArray = $jdksMap.map |$major_version, $update_version| { "/usr/lib/jvm/jdk-${major_version}-oracle-x64/" }
-  # $jdkLocations = $jdkLocationsArray.reduce |$memo, $value| { "$memo $value" }
 
   $jdk_name = "1.${major_version}.0_${update_version}"
   if (versioncmp("${operatingsystem}", "Ubuntu")){
@@ -294,23 +289,36 @@ define jenkins::java_jdk(
   } else {
     fail("Operating System [${operatingsystem}] is not supported for setting a Java Jdk")
   }
-  exec {"chmod-jenkins-config":
-    path => "/bin/",
-    command => "chmod 777 /var/lib/jenkins/config.xml"
+  # exec {"chmod-jenkins-config":
+  #   path => "/bin/",
+  #   command => "chmod 777 /var/lib/jenkins/config.xml"
+  # }
+  # ->
+
+  if ($appendNewJdk == true){
+    $changes = [
+      "clear jdks",
+      "set jdks/jdk[last()+1]/name/#text ${jdk_name}",
+      "set jdks/jdk[last()]/home/#text  ${jdk_location}",
+      "set jdks/jdk[last()]/properties #empty",
+    ]
+  } else {
+    $changes = [
+      "clear jdks",
+      "rm jdks",
+      "set jdks/jdk/name/#text ${jdk_name}",
+      "set jdks/jdk/home/#text  ${jdk_location}",
+      "set jdks/jdk/properties #empty",
+    ]
   }
-  ->
-  augeas{ 'jenkins_general_config_java':
+
+  augeas{ "jenkins_general_config_java_${major_version}_${update_version}":
     show_diff => true,
     incl => '/var/lib/jenkins/config.xml',
     lens => 'Xml.lns',
     context => '/files/var/lib/jenkins/config.xml/hudson/',
-    changes => [
-      "clear jdks",
-      "set jdks/jdk/name/#text ${jdk_name}test",
-      "set jdks/jdk/home/#text  ${jdk_location}",
-      "set jdks/jdk/properties #empty",
-          ],
-          # require => []
+    changes => $changes,
+          # require => [] #restart of jenkins service?
   }
   # <jdks>
   #   <jdk>

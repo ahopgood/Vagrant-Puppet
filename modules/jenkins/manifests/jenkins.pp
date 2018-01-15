@@ -55,6 +55,18 @@ jenkins::java_jdk{"Java-8":
   major_version => "${java_major_version}",
   update_version => "${java_update_version}",
 }
+->
+jenkins::java_jdk{"Java-7":
+  major_version => "7",
+  update_version => "173",
+  appendNewJdk => true,
+}
+->
+jenkins::java_jdk{"Java-6":
+  major_version => "6",
+  update_version => "99",
+  appendNewJdk => true,
+}
 
 # $maven_major_version="3"
 # $maven_minor_version="0"
