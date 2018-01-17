@@ -95,3 +95,38 @@ class augeas {
     require => [File["${augeas_file}"]],
   }
 }
+
+define augeas::xmlstarlet{
+
+  $major_version = "1"
+  $minor_version = "6"
+  $patch_version = "1"
+  $xmlstarlet = "xmlstarlet"
+  $puppet_file_dir = "modules/augeas/"
+  $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
+
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+    if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0){
+      $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-1_amd64.deb"
+      $provider = "dpkg"
+      $ensure = "present"
+    } else {
+      fail("${operatingsystem} ${operatingsystemmajrelease} not supported")
+    }
+  } else {
+    fail("${operatingsystem} ${operatingsystemmajrelease} not supported")
+  }
+  file {"${xmlstarlet_file}":
+    ensure => present,
+    path => "${local_install_dir}${xmlstarlet_file}",
+    source => ["puppet:///${puppet_file_dir}${file_location}${xmlstarlet_file}"],
+    require => [File["${local_install_dir}"]],
+  }
+  package{"${xmlstarlet}":
+    provider => "${provider}",
+    ensure => "${ensure}",
+    source => "${local_install_dir}${xmlstarlet_file}",
+    require => [File["${xmlstarlet_file}"]],
+  }
+
+}

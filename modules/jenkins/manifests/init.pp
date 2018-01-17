@@ -202,8 +202,6 @@ define jenkins::gitCredentials(
   $git_hub_api_token = undef,
   $token_name = undef,
 ) {
-  class{"augeas":}
-
   file {"/var/lib/jenkins/credentials.xml":
     ensure => present,
     mode => "755",
@@ -266,7 +264,6 @@ define jenkins::seed_job(
   $github_dsl_job_url = undef,
   $github_credentials_name = undef,
 ){
-
   if ($github_dsl_job_url == undef){
     fail("A url for the DSL job in jenkins is required")
   }
@@ -275,6 +272,68 @@ define jenkins::seed_job(
     fail("A named set of github credentials are required")
   }
 
+  $puppet_file_dir    = "modules/jenkins/"
+  $job_name = "jenkins-ci"
+
+  file{["/var/lib/jenkins/jobs/",
+    "/var/lib/jenkins/jobs/${job_name}"]:
+    ensure => directory,
+    mode => "777",
+    owner => "jenkins",
+    group => "jenkins",
+  }
+  ->
+  file{"${job_name}/config.xml":
+    source => "puppet:///${puppet_file_dir}job-config.xml",
+    path => "/var/lib/jenkins/jobs/${job_name}/config.xml",
+    mode => "777",
+    owner => "jenkins",
+    group => "jenkins",
+    before => Augeas["create-seed-job-config.xml"]
+  }
+
+  $changes = [
+    "set project/actions/ #empty",
+    "set project/description/#text \"A seed job for creating jobs using the netflix Jenkins DSL.\"",
+    "set project/keepDependencies/#text false",
+    "set project/properties/ #empty",
+    "set project/scm/#attribute/class hudson.plugins.git.GitSCM",
+    "set project/scm/#attribute/plugin git@3.7.0",
+    "set project/scm/configVersion/#text 2",
+    "set project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url/#text ${github_dsl_job_url}",
+    "set project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/credentialsId/#text ${github_credentials_name}",
+    "set project/scm/branches/hudson.plugins.git.BranchSpec/name/#text */master",
+    "set project/scm/doGenerateSubmoduleConfigurations/#text false",
+    "set project/scm/submoduleCfg #empty",
+    "set project/scm/submoduleCfg/#attribute/class list",
+    "set project/scm/extensions #empty",
+    "set project/canRoam/#text true",
+  ]
+  #xmlstarlet format --indent-tab
+
+  #   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
+  #   <configVersion>2</configVersion>
+  # <userRemoteConfigs>
+  # <hudson.plugins.git.UserRemoteConfig>
+  #   <url>https://github.com/ahopgood/jenkins-ci.git</url>
+  # <credentialsId>github_token</credentialsId>
+  # </hudson.plugins.git.UserRemoteConfig>
+  #   </userRemoteConfigs>
+  augeas{"create-seed-job-config.xml":
+    show_diff => true,
+    incl => "/var/lib/jenkins/jobs/${job_name}/config.xml",
+    lens => 'Xml.lns',
+    context => "/files/var/lib/jenkins/jobs/${job_name}/config.xml/",
+    changes => $changes,
+  }
+  ->
+  augeas::xmlstarlet{"install xml pretty print":}
+  ->
+  exec {"format /var/lib/jenkins/jobs/${job_name}/config.xml":
+    path => ["/usr/bin/","/bin/"],
+    cwd => "/var/lib/jenkins/jobs/${job_name}/",
+    command => "xmlstarlet format --indent-tab /var/lib/jenkins/jobs/${job_name}/config.xml > /var/lib/jenkins/jobs/${job_name}/config.xml.tmp && mv /var/lib/jenkins/jobs/${job_name}/config.xml.tmp /var/lib/jenkins/jobs/${job_name}/config.xml"
+  }
 }
 
 define jenkins::java_jdk(
@@ -360,9 +419,9 @@ $major_version = undef,
     lens      => 'Xml.lns',
     context   => '/files/var/lib/jenkins/hudson.tasks.Maven.xml/',
     changes   => [
-      "set hudson.tasks.Maven_-DescriptorImpl/installers/hudson.tasks.Maven_-MavenInstallation/name/#text ${jdk_name}",
-      "set hudson.tasks.Maven_-DescriptorImpl/installers/hudson.tasks.Maven_-MavenInstallation/home/#text ${jdk_location}",
-      "set hudson.tasks.Maven_-DescriptorImpl/installers/hudson.tasks.Maven_-MavenInstallation/properties #empty",
+      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/name/#text ${jdk_name}",
+      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/home/#text ${jdk_location}",
+      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/properties #empty",
     ],
   }
   #hudson.tasks.Maven.xml
