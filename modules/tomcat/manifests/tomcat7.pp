@@ -10,10 +10,9 @@
 #
 # Sample Usage:
 #
-
-class { 'java':
-  version => '7',
-  updateVersion => '71'
+java{"java-7":
+  major_version => '7',
+  update_version => '71'
 }
 
 class { 'tomcat':
