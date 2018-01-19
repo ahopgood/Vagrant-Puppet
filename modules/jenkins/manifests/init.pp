@@ -186,7 +186,7 @@ class jenkins (
       source => "puppet:///${puppet_file_dir}${restore_all_plugins_script}",
     }
     exec {"Restore plugins":
-      path => ["/bin/;/usr/bin/;/usr/local/bin"],
+      path => ["/bin/","/usr/bin/","/usr/local/bin/"],
       command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
       require => File["${restore_all_plugins_script}"],
     }
@@ -308,6 +308,25 @@ define jenkins::seed_job(
     "set project/scm/submoduleCfg/#attribute/class list",
     "set project/scm/extensions #empty",
     "set project/canRoam/#text true",
+    "set project/disabled/#text false",
+    "set project/blockBuildWhenDownstreamBuilding/#text false",
+    "set project/blockBuildWhenUpstreamBuilding/#text false",
+    "set project/triggers #empty",
+    "set project/concurrentBuild/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#attribute/plugin job-dsl@1.66",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets/#text *.groovy",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/usingScriptText/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/sandbox/#text true",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreExisting/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreMissingFiles/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/failOnMissingPlugin/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/unstableOnDeprecation/#text false",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedJobAction/#text IGNORE",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedViewAction/#text IGNORE",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedConfigFilesAction/#text IGNORE",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/lookupStrategy/#text JENKINS_ROOT",
+    "set project/publishers #empty",
+    "set project/buildWrappers #empty",
   ]
   #xmlstarlet format --indent-tab
 

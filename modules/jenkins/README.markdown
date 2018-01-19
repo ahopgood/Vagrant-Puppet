@@ -61,6 +61,10 @@ Currently there is no enforced naming conventions beyond the following:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Jenkins
 
+### Useful to know
+[Job/Script security](https://github.com/jenkinsci/job-dsl-plugin/wiki/Script-Security) with the Jobs DSL
+
+
 ## ToDo
 ### CentOS
 ### Ubuntu
@@ -68,6 +72,7 @@ Currently there is no enforced naming conventions beyond the following:
 * Create a directory for the seed job in the jobs folder where the folder name is the job name
 * Create a builds folder within the job folder
 * Create a config.xml file
-*
 * Add /files/var/lib/jenkins/credentials.xml/ to backup routine
-*
+* xmlstarlet -> create a definition for pretty_print to allow for reuse.
+* Move httpd header augeas type definition into the augeas class
+* extend augeas definition to allow for pretty print
