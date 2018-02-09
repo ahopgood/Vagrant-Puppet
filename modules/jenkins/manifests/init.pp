@@ -275,6 +275,16 @@ define jenkins::seed_job(
   $puppet_file_dir    = "modules/jenkins/"
   $job_name = "jenkins-ci"
 
+  file{"disable-job-security":
+    ensure => present,
+    source => "puppet:///${puppet_file_dir}disable-job-security.xml",
+    path => "/var/lib/jenkins/javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration.xml",
+    mode => "777",
+    owner => "jenkins",
+    group => "jenkins",
+    before => File["/var/lib/jenkins/jobs/${job_name}"]
+  }
+
   file{["/var/lib/jenkins/jobs/",
     "/var/lib/jenkins/jobs/${job_name}"]:
     ensure => directory,
@@ -311,10 +321,10 @@ define jenkins::seed_job(
     "set project/disabled/#text false",
     "set project/blockBuildWhenDownstreamBuilding/#text false",
     "set project/blockBuildWhenUpstreamBuilding/#text false",
-    "set project/triggers #empty",
     "set project/concurrentBuild/#text false",
+    "set project/triggers/hudson.triggers.SCMTrigger/spec/#text  H 4 * * *\n* * * * *",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#attribute/plugin job-dsl@1.66",
-    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets/#text *.groovy",
+    "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets/#text **/*.groovy",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/usingScriptText/#text false",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/sandbox/#text true",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreExisting/#text false",
@@ -328,6 +338,11 @@ define jenkins::seed_job(
     "set project/publishers #empty",
     "set project/buildWrappers #empty",
   ]
+
+
+  # H 4 * * *
+  # * * * * *
+
   #xmlstarlet format --indent-tab
 
   #   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
@@ -353,6 +368,9 @@ define jenkins::seed_job(
     cwd => "/var/lib/jenkins/jobs/${job_name}/",
     command => "xmlstarlet format --indent-tab /var/lib/jenkins/jobs/${job_name}/config.xml > /var/lib/jenkins/jobs/${job_name}/config.xml.tmp && mv /var/lib/jenkins/jobs/${job_name}/config.xml.tmp /var/lib/jenkins/jobs/${job_name}/config.xml"
   }
+  #https://stackoverflow.com/questions/44884121/jenkins-disable-tag-every-build-in-dsl
+  #Manage Jenkins >> Configure Global Security >> Access Control for Builds >> Project default Build Authorization
+  #Choose Run as the specified user >> admin, jenkins
 }
 
 define jenkins::java_jdk(
