@@ -202,62 +202,36 @@ define jenkins::gitCredentials(
   $git_hub_api_token = undef,
   $token_name = undef,
 ) {
-  file {"/var/lib/jenkins/credentials.xml":
+  $credentials_file = "/var/lib/jenkins/credentials.xml"
+  file {"${credentials_file}":
     ensure => present,
     mode => "755",
     group => "jenkins",
     owner => "jenkins",
     content => "<?xml version='1.0' encoding='UTF-8'?>\n<com.cloudbees.plugins.credentials.SystemCredentialsProvider></com.cloudbees.plugins.credentials.SystemCredentialsProvider>",
-    # content => ["<?xml version='1.0' encoding='UTF-8'?>\n<com.cloudbees.plugins.credentials.SystemCredentialsProvider plugin=\"credentials@2.1.16\">\n</com.cloudbees.plugins.credentials.SystemCredentialsProvider>"],
-    # source => template()
   }
 
   augeas { 'jenkins_git_credentials_config':
     show_diff => true,
-    incl      => '/var/lib/jenkins/credentials.xml',
+    incl      => "${credentials_file}",
     lens      => 'Xml.lns',
     context   => '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/',
-    require   => [Class["augeas"],File["/var/lib/jenkins/credentials.xml"]],
+    require   => [File["/var/lib/jenkins/credentials.xml"]],
     changes   => [
-      # "set /files/var/lib/jenkins/credentials.xml/#declaration/#attribute/version 1.0",
-      # "set /files/var/lib/jenkins/credentials.xml/#declaration/#attribute/encoding UTF-8",
-      "set /files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/#attribute/plugin credentials@2.1.16",
-      "set /files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/#text \"\n  \"",
+      "set #attribute/plugin credentials@2.1.6",
       "set domainCredentialsMap/#attribute/class hudson.util.CopyOnWriteMap\$Hash",
-      "set domainCredentialsMap/#text[1] \"\n    \"",
-      "set domainCredentialsMap/entry/#text[1] \"\n      \"",
-      "set domainCredentialsMap/entry/com.cloudbees.plugins.credentials.domains.Domain/#text[1] \"\n    \"",
       "set domainCredentialsMap/entry/com.cloudbees.plugins.credentials.domains.Domain/specifications #empty",
-      "set domainCredentialsMap/entry/com.cloudbees.plugins.credentials.domains.Domain/#text[2] \"      \"",
-      # "set domainCredentialsMap/entry/#text[2] \"    \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/#text[1] \"\n        \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[1] \"\n          \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/scope",
       "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/scope/#text \"GLOBAL\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[2] \"          \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/id",
       "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/id/#text \"${token_name}\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[3] \"          \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/description",
       "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/description/#text \"Github api token\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[4] \"          \"",
-      # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/username",
       "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/username/#text \"ahopgood\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[5] \"          \"",
-      # # "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/password",
       "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/password/#text \"${git_hub_api_token}\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/#text[6] \"        \"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/#text[2] \"      \"",
-      "set domainCredentialsMap/entry/#text[3] \"    \"",
-      "set domainCredentialsMap/#text[2] \"  \"",
     ]
   }
-  # augtool -At "Xml.lns incl /var/lib/jenkins/credentials.xml"
-  # How is the token encrypted? - Using a secret specific to the jenkins install
-  # If the token cannot be decrypted then Jenkins will assume that the token is in plaintext and will encrypt it.
-  #
+  ->
+  augeas::formatXML{"format ${credentials_file}":
+    filepath => "${credentials_file}"
+  }
 }
 
 define jenkins::seed_job(
@@ -338,13 +312,6 @@ define jenkins::seed_job(
     "set project/publishers #empty",
     "set project/buildWrappers #empty",
   ]
-
-
-  # H 4 * * *
-  # * * * * *
-
-  #xmlstarlet format --indent-tab
-
   #   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
   #   <configVersion>2</configVersion>
   # <userRemoteConfigs>
@@ -361,12 +328,8 @@ define jenkins::seed_job(
     changes => $changes,
   }
   ->
-  augeas::xmlstarlet{"install xml pretty print":}
-  ->
-  exec {"format /var/lib/jenkins/jobs/${job_name}/config.xml":
-    path => ["/usr/bin/","/bin/"],
-    cwd => "/var/lib/jenkins/jobs/${job_name}/",
-    command => "xmlstarlet format --indent-tab /var/lib/jenkins/jobs/${job_name}/config.xml > /var/lib/jenkins/jobs/${job_name}/config.xml.tmp && mv /var/lib/jenkins/jobs/${job_name}/config.xml.tmp /var/lib/jenkins/jobs/${job_name}/config.xml"
+  augeas::formatXML{"format /var/lib/jenkins/jobs/${job_name}/config.xml":
+    filepath => "/var/lib/jenkins/jobs/${job_name}/config.xml"
   }
   #https://stackoverflow.com/questions/44884121/jenkins-disable-tag-every-build-in-dsl
   #Manage Jenkins >> Configure Global Security >> Access Control for Builds >> Project default Build Authorization
@@ -385,12 +348,6 @@ define jenkins::java_jdk(
   } else {
     fail("Operating System [${operatingsystem}] is not supported for setting a Java Jdk")
   }
-  # exec {"chmod-jenkins-config":
-  #   path => "/bin/",
-  #   command => "chmod 777 /var/lib/jenkins/config.xml"
-  # }
-  # ->
-
   if ($appendNewJdk == true){
     $changes = [
       "clear jdks",
@@ -416,6 +373,10 @@ define jenkins::java_jdk(
     changes => $changes,
           # require => [] #restart of jenkins service?
   }
+  ->
+  augeas::formatXML{"format /var/lib/jenkins/config.xml java ${jdk_name}":
+    filepath => "/var/lib/jenkins/config.xml"
+  }
   # <jdks>
   #   <jdk>
   #     <name>java 1.8</name>
@@ -435,16 +396,19 @@ $major_version = undef,
   $minor_version = undef,
   $patch_version = undef,
 ){
-  $jdk_name = "Maven-${major_version}-${minor_version}-${patch_version}"
+  $maven_name = "Maven-${major_version}-${minor_version}-${patch_version}"
   if (versioncmp("${operatingsystem}", "Ubuntu")){
-    $jdk_location = "/usr/share/maven${major_version}/"
+    $maven_location = "/usr/share/maven${major_version}/"
   } else {
     fail("Operating System [${operatingsystem}] is not supported for setting maven tooling")
   }
-  $puppet_file_dir    = "modules/jenkins/"
-  file{"hudson.tasks.Maven.xml":
-    source => "puppet:///${puppet_file_dir}hudson.tasks.Maven.xml",
-    path => "/var/lib/jenkins/hudson.tasks.Maven.xml",
+  $puppet_file_dir        = "modules/jenkins/"
+  $maven_config_file_name = "hudson.tasks.Maven.xml"
+  $maven_config_file      = "/var/lib/jenkins/${maven_config_file_name}"
+
+  file{"${maven_config_file_name}":
+    source => "puppet:///${puppet_file_dir}${maven_config_file_name}",
+    path => "${maven_config_file}",
     mode => "777",
     owner => "jenkins",
     group => "jenkins",
@@ -452,14 +416,17 @@ $major_version = undef,
   ->
   augeas { 'jenkins_general_config_maven':
     show_diff => true,
-    incl      => '/var/lib/jenkins/hudson.tasks.Maven.xml',
+    incl      => "${maven_config_file}",
     lens      => 'Xml.lns',
-    context   => '/files/var/lib/jenkins/hudson.tasks.Maven.xml/',
+    context   => "/files${maven_config_file}",
     changes   => [
-      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/name/#text ${jdk_name}",
-      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/home/#text ${jdk_location}",
+      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/name/#text ${maven_name}",
+      "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/home/#text ${maven_location}",
       "set hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/properties #empty",
     ],
   }
-  #hudson.tasks.Maven.xml
+  ->
+  augeas::formatXML{"${maven_config_file}":
+    filepath => "${maven_config_file}"
+  }
 }

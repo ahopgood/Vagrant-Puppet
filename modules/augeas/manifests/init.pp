@@ -96,7 +96,7 @@ class augeas {
   }
 }
 
-define augeas::xmlstarlet{
+class augeas::xmlstarlet{
 
   $major_version = "1"
   $minor_version = "6"
@@ -128,5 +128,14 @@ define augeas::xmlstarlet{
     source => "${local_install_dir}${xmlstarlet_file}",
     require => [File["${xmlstarlet_file}"]],
   }
+}
 
+define augeas::formatXML(
+  $filepath = undef
+){
+  exec {"format ${name}":
+    path => ["/usr/bin/","/bin/"],
+    command => "xmlstarlet format --indent-tab ${filepath} > ${filepath}.tmp && mv ${filepath}.tmp ${filepath}",
+    require => Class["augeas::xmlstarlet"]
+  }
 }

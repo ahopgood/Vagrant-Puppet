@@ -18,6 +18,10 @@ Package{
 }
 $java_major_version = "8"
 $java_update_version = "112"
+
+$maven_major_version="3"
+$maven_minor_version="0"
+$maven_patch_version="5"
 file {
   "/etc/puppet/installers/":
     ensure     =>  directory,
@@ -34,23 +38,25 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 # }
 # ->
 # sudo puppet apply --parser=future /vagrant/manifests/jenkins.pp
-# class {'jenkins':
-#   perform_manual_setup => false,
-#   plugin_backup => "/vagrant/backup/jenkins/",
-#   java_major_version => "${java_major_version}",
-#   java_update_version => "${java_update_version}",
-# }
-# ->
-# jenkins::gitCredentials{"git-api-token":
-#   git_hub_api_token => "40b1e712b2e3bac9b48fb6a66022ee0063fde35a",
-#   token_name => "github_token",
-# }
-#
-# jenkins::seed_job{"seed-dsl":
-#   github_credentials_name => "github_token",
-#   github_dsl_job_url => ""
-# }
-
+class{"augeas::xmlstarlet":}
+->
+class {'jenkins':
+  perform_manual_setup => false,
+  plugin_backup => "/vagrant/backup/plugins/02-plugins/",
+  java_major_version => "${java_major_version}",
+  java_update_version => "${java_update_version}",
+}
+->
+jenkins::gitCredentials{"git-api-token":
+  git_hub_api_token => "215cef666c89c2425128abcf8cb842ebaee99054",
+  token_name => "github_token",
+}
+->
+jenkins::seed_job{"seed-dsl":
+  github_credentials_name => "github_token",
+  github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
+}
+->
 jenkins::java_jdk{"Java-8":
   major_version => "${java_major_version}",
   update_version => "${java_update_version}",
@@ -67,20 +73,18 @@ jenkins::java_jdk{"Java-6":
   update_version => "99",
   appendNewJdk => true,
 }
-
-# $maven_major_version="3"
-# $maven_minor_version="0"
-# $maven_patch_version="5"
-# class { 'maven':
-#   major_version => $maven_major_version,
-#   minor_version => $maven_minor_version,
-#   patch_version => $maven_patch_version,
-# }
-# class{'augeas':}
-# ->
-# jenkins::maven{"maven-global-setup":
-#   major_version => $maven_major_version,
-#   minor_version => $maven_minor_version,
-#   patch_version => $maven_patch_version,
-# }
+->
+class { 'maven':
+  major_version => $maven_major_version,
+  minor_version => $maven_minor_version,
+  patch_version => $maven_patch_version,
+}
+->
+class{'augeas':}
+->
+jenkins::maven{"maven-global-setup":
+  major_version => $maven_major_version,
+  minor_version => $maven_minor_version,
+  patch_version => $maven_patch_version,
+}
 

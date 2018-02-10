@@ -22,6 +22,11 @@ Supports:
 [CentOS Known Issues](#CentOS_known_issues)
 [Ubuntu Known Issues](#Ubuntu_known_issues)
 
+### Credentials.xml
+How is the github token encrypted?
+Using a secret specific to the jenkins install.
+If the token cannot be decrypted then Jenkins will assume that the token is in plaintext and will encrypt it.
+  
 ## Usage
 First time manual setup can be declared via the *jenkins* class:
 ```
@@ -76,3 +81,5 @@ Currently there is no enforced naming conventions beyond the following:
 * xmlstarlet -> create a definition for pretty_print to allow for reuse.
 * Move httpd header augeas type definition into the augeas class
 * extend augeas definition to allow for pretty print
+
+### Notes
