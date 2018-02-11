@@ -430,3 +430,22 @@ $major_version = undef,
     filepath => "${maven_config_file}"
   }
 }
+
+define jenkins::backup_jobs {
+  #cp /var/lib/jenkins/jobs/*/
+
+  #Should I retain top level links?
+  #lastStable -> builds/lastStableBuild
+  #lastSuccessful -> builds/lastSuccessfulBuild
+  #nextBuildNumber
+  #builds
+  #builds/*
+  #builds/[0-9]*/
+  #builds/lastFailedBuild ->
+  #builds/lastStableBuild ->
+  #builds/lastSuccessfulBuild ->
+  #builds/lastUnstableBuild ->
+  #builds/lastUnsuccessfulBuild ->
+
+  #tar --gzip
+}
