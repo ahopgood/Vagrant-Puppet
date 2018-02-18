@@ -73,6 +73,11 @@ jenkins::java_jdk{"Java-6":
   update_version => "99",
   appendNewJdk => true,
 }
+jenkins::backup_jobs{"backup-script":
+  cron_hour => "19",
+  cron_minute => "24",
+  # job_backup_location => "/home/vagrant/backups/"
+}
 ->
 class { 'maven':
   major_version => $maven_major_version,

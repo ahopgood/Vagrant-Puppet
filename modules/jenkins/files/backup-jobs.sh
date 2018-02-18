@@ -6,13 +6,13 @@ function backup_job(){
 	print "[$2] is the jobs folder"
 	print "[$3] is the job name"
 	FULLPATH="$1$3/"
-	mkdir "${FULLPATH}"
-	cp "$2/$3/nextBuildNumber" "${FULLPATH}"
-	cp -R "$2/$3/builds" "${FULLPATH}builds"
-	cp -P "$2/$3/lastStable" "${FULLPATH}"
-        cp -P "$2/$3/lastSuccessful" "${FULLPATH}"
-	print "Attempting to create archive ${3%/}.tar.gz"
-	tar -C "$1" -czf "${FULLPATH%/}.tar.gz" "$3"
+
+	tar -C "$1" -czf "$1${3%/}.tar.gz" \
+	"$2/$3/nextBuildNumber" \
+	"$2/$3/builds" \
+	"$2/$3/lastStable" \
+	"$2/$3/lastSuccessful"
+	print "Attempting to create archive $1${3%/}.tar.gz"
 }
 
 function print(){
@@ -22,12 +22,31 @@ function print(){
 }
 
 PREFIX="$0"
+if [ -z $1 ];then
+	print "Please pass a backup location as the first parameter"
+	exit -1 
+elif [ ! -d $1 ];then
+	print "Please pass a backup location that is a  directory as the first parameter"
+	exit -1
+fi
+BACKUP=$1
 print "In backup-jobs.sh"
-
-#backup_job "/home/vagrant/backups/" "/var/lib/jenkins/jobs/" "jenkins-ci/" 
-find /var/lib/jenkins/jobs/* -maxdepth 0 -type d |
-while read job_name
+JOBS=""
+while read -r job_name
 do
 	print "Backing up ${job_name}"
-	backup_job "/home/vagrant/backups/" "/var/lib/jenkins/jobs/" "${job_name#/var/lib/jenkins/jobs/}"
+	backup_job "${BACKUP}" "/var/lib/jenkins/jobs/" "${job_name#/var/lib/jenkins/jobs/}"
+	JOBS="${JOBS}${job_name#/var/lib/jenkins/jobs/}.tar.gz "
+done < <(find /var/lib/jenkins/jobs/* -maxdepth 0 -type d)
+
+DATE=$(date +"%Y-%m-%d-%H%M%S")
+print "Creating combined backup tar ${BACKUP}${DATE}.tar.gz"
+tar -C ${BACKUP} -czf "${BACKUP}${DATE}.tar.gz" ${JOBS}
+
+JOBARRAY=(${JOBS})
+for index in ${!JOBARRAY[*]} 
+do
+	print "Removing temp archive ${BACKUP}${JOBARRAY[index]}"
+	rm "${BACKUP}${JOBARRAY[index]}"
 done
+

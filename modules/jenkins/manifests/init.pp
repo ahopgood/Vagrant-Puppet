@@ -87,7 +87,6 @@ class jenkins (
     require => File["${daemon}"]
   }
 
-  
   $jenkins = "jenkins_${major_version}.${minor_version}.${patch_version}_all.deb"
   file {
     "${jenkins}":
@@ -312,14 +311,7 @@ define jenkins::seed_job(
     "set project/publishers #empty",
     "set project/buildWrappers #empty",
   ]
-  #   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
-  #   <configVersion>2</configVersion>
-  # <userRemoteConfigs>
-  # <hudson.plugins.git.UserRemoteConfig>
-  #   <url>https://github.com/ahopgood/jenkins-ci.git</url>
-  # <credentialsId>github_token</credentialsId>
-  # </hudson.plugins.git.UserRemoteConfig>
-  #   </userRemoteConfigs>
+
   augeas{"create-seed-job-config.xml":
     show_diff => true,
     incl => "/var/lib/jenkins/jobs/${job_name}/config.xml",
@@ -340,15 +332,15 @@ define jenkins::java_jdk(
   $major_version = undef,
   $update_version = undef,
   $appendNewJdk = false,
-){
+) {
 
   $jdk_name = "1.${major_version}.0_${update_version}"
-  if (versioncmp("${operatingsystem}", "Ubuntu")){
+  if (versioncmp("${operatingsystem}", "Ubuntu")) {
     $jdk_location = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
   } else {
     fail("Operating System [${operatingsystem}] is not supported for setting a Java Jdk")
   }
-  if ($appendNewJdk == true){
+  if ($appendNewJdk == true) {
     $changes = [
       "clear jdks",
       "set jdks/jdk[last()+1]/name/#text ${jdk_name}",
@@ -365,30 +357,18 @@ define jenkins::java_jdk(
     ]
   }
 
-  augeas{ "jenkins_general_config_java_${major_version}_${update_version}":
+  augeas { "jenkins_general_config_java_${major_version}_${update_version}":
     show_diff => true,
-    incl => '/var/lib/jenkins/config.xml',
-    lens => 'Xml.lns',
-    context => '/files/var/lib/jenkins/config.xml/hudson/',
-    changes => $changes,
-          # require => [] #restart of jenkins service?
+    incl      => '/var/lib/jenkins/config.xml',
+    lens      => 'Xml.lns',
+    context   => '/files/var/lib/jenkins/config.xml/hudson/',
+    changes   => $changes,
+    # require => [] #restart of jenkins service?
   }
   ->
-  augeas::formatXML{"format /var/lib/jenkins/config.xml java ${jdk_name}":
+  augeas::formatXML { "format /var/lib/jenkins/config.xml java ${jdk_name}":
     filepath => "/var/lib/jenkins/config.xml"
   }
-  # <jdks>
-  #   <jdk>
-  #     <name>java 1.8</name>
-  #     <home>/var/lib/jvm/jdk_1.8.0</home>
-  #     <properties/>
-  #   </jdk>
-  #   <jdk>
-  #     <name>java 1.9</name>
-  #     <home>/var/lib/jvm/jdk_1.9.0</home>
-  #     <properties/>
-  #   </jdk>
-  # </jdks>
 }
 
 define jenkins::maven(
@@ -431,21 +411,33 @@ $major_version = undef,
   }
 }
 
-define jenkins::backup_jobs {
-  #cp /var/lib/jenkins/jobs/*/
+define jenkins::backup_jobs(
+  $cron_hour = "*",
+  $cron_minute = "0",
+  $job_backup_location = undef
+){
+  $backup_job_script = "backup-jobs.sh"
+  file{"${backup_job_script}":
+    ensure => present,
+    source => "puppet:///${jenkins::puppet_file_dir}${backup_job_script}",
+    path => "/usr/local/bin/${backup_job_script}"
+  }
 
-  #Should I retain top level links?
-  #lastStable -> builds/lastStableBuild
-  #lastSuccessful -> builds/lastSuccessfulBuild
-  #nextBuildNumber
-  #builds
-  #builds/*
-  #builds/[0-9]*/
-  #builds/lastFailedBuild ->
-  #builds/lastStableBuild ->
-  #builds/lastSuccessfulBuild ->
-  #builds/lastUnstableBuild ->
-  #builds/lastUnsuccessfulBuild ->
-
-  #tar --gzip
+  if ($job_backup_location == undef){
+    $backup_enabled = "absent"
+  } else {
+    $backup_enabled = "present"
+  }
+  cron {"schedule-backup-jobs":
+    command => "/usr/local/bin/${backup_job_script} ${job_backup_location} >> /var/lib/jenkins/logs/${backup_job_script}.log 2>&1",
+    hour => "${cron_hour}",
+    minute => "${cron_minute}",
+    ensure => "${backup_enabled}",
+    user => 'root',
+    require => File["${backup_job_script}"],
+  }
 }
+
+# define jenkins::restore_jobs(){
+#
+# }
