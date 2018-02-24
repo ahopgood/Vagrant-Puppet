@@ -45,12 +45,45 @@ Automatic setup from a previous backup:
     }
 ```
 
+Job backup script:  
+```
+    jenkins::backup_jobs{"backup-script":}
+
+```
+Job backup script on a crontab:
+```
+    jenkins::backup_jobs{"backup-script":
+        cron_hour => "19",
+        cron_minute => "24",
+        job_backup_location => "/home/vagrant/backups/"
+    }
+```
+
 ### Ubuntu
 Back up and restore functionality is provided by a series of local scripts:
 * `/usr/local/bin/retrieve-all-plugins.sh` will parse the `plugins.txt` from a backup location and loop through each line trying to restore a plugin.
+    * **Param 1.** Backup location directory, the location where `plugins.txt` and the optional plugin files (.jpi/.hpi) are located
+    * **Param 2.** Restore location directory, the location that the plugins will be restored to.
+    * The `plugins.txt` file is read and each line is broken down into a plugin name, version and hash.
+    * If there is a file in the restore location that matches the hash it is restored locally.
+    * If there is no file or the hash doesn't match then the version of the plugin is retrieved from the jenkins plugin centre using the `retrieve-plugin.sh` script.
+    * If there is no hash then the plugin is downloaded as is from the jenins plugin centre using the `retrieve-plugin.sh` script.
+    * If the downloaded file doesn't match the hash (if provided) then an error is thrown
 * `/usr/local/bin/retrieve-plugin.sh` is used to restore a single plugin:version:hash string value, this will check for a local version with a matching hash first and then resort to the plugin centre. If no version is provided it will pull the latest version of the plugin by default.
-* `/usr/local/bin/backup-plugins.sh` is present in both manual and automatic install (in case the of the need for a manual backup) and will trigger every five minutes via cron on the manual install.
-
+    * **Param 1.** Plugin name
+    * **Param 2.** (Optional) Plugin version, defaults to "LATEST"
+    * **Param 3.** (Optional) Download destination directory, defaults to current directory
+    * This script when provided with a plugin name will check the jenkins plugin centre to see if the plugin is a .jpi/.hpi file extension and then retrieve it.
+* `/usr/local/bin/backup-plugins.sh` is present in both manual and automatic install (in case of the need for a manual backup) and will trigger every five minutes via cron on the manual install.
+    * **Param 1.** Directory location to backup to.
+    * Will take all plugin .jpi/.hpi files found in */var/lib/jenkins/plugins/* and back them up to the specified location.
+    * For each one it will calculate the hash, version number and name for each and write to the `plugins.txt` file which is used for restoration.  
+* `/usr/local/bin/backup-jobs.sh` is a separate dependency that is used to copy the jobs folder (but not the config.xml) for each job to a tarred and gzipped archive, it can be scheduled as a cron job.
+    * **Param 1.** Directory location to backup to.
+    * **Param 2.** (Optional parameter) Directory location to backup the jobs from; defaults to */var/lib/jenkins/jobs/*
+* `/usr/local/bin/restore-jobs.sh` is present in the automatic install to ensure that job history is restored on startup.
+    * **Param 1.** Directory location of the dated *YYYY-mm-DD-HHMMSS.tar.gz* backup files
+    * **Param 2.** (Optional parameter) Directory location to restore the jobs to; defaults to */var/lib/jenkins/jobs/* 
 ## Testing performed:
 * Install on a fresh system with a manual install
 	* Ubuntu 15.10
