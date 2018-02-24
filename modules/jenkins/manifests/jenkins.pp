@@ -62,13 +62,13 @@ jenkins::java_jdk{"Java-8":
   update_version => "${java_update_version}",
 }
 ->
-jenkins::java_jdk{"Java-7":
+jenkins::global::java_jdk{"Java-7":
   major_version => "7",
   update_version => "173",
   appendNewJdk => true,
 }
 ->
-jenkins::java_jdk{"Java-6":
+jenkins::global::java_jdk{"Java-6":
   major_version => "6",
   update_version => "99",
   appendNewJdk => true,
