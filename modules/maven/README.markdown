@@ -1,5 +1,17 @@
 # Maven
+Supports Ubuntu 15.10.  
+Currently only support major version multiple tenancy, e.g. maven 2 side by side with maven 3.
+## To Do
+* Improve readme
+    * Information on alternatives support
+    * Installation location
+    * Requires Java
+    * How to check installation `mvn --version`
+    * .m2 location and settings.xml
+* Support for minor and patch version granularity side by side
+* Support to specify a default for a major version
 
+# Dev notes
 ## Installing manually  
 `sudo tar -xvzf apache-maven-3.3.9-bin.tar.gz`  
 `mv apache-maven-3.3.9 /usr/lib/mvn/apache-maven3.3.9`  
@@ -34,7 +46,7 @@ The m2.conf is a symbolic link from /usr/share/maven -> /etc/maven
 Java `/usr/bin/java -> /etc/alternativies/java -> /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java`  
 Mvn `/usr/bin/mvn -> /etc/alternatives/mvn -> /usr/lib/mvn/apache-maven-3.0.5/bin/mvn`  
 
-Main installation of maven 3 -> /usr/share/maven3/
-$M2_HOME=/usr/share/maven3/
-Do we need the M2_HOME values if we already have alternatives?
-Where would the .m2 folder live with the local repositories?
+Main installation of maven 3 -> /usr/share/maven3/  
+$M2_HOME=/usr/share/maven3/  
+Do we need the M2_HOME values if we already have alternatives?  
+Where would the .m2 folder live with the local repositories?  

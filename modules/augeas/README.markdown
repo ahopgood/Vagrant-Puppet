@@ -122,3 +122,16 @@ an example would be:
 * Add support for CentOS 6
 * Add support for Ubuntu 15
 * Add support for Raspberian 
+
+<a name="xmlstarlet"></a>
+## augeas::xmlstarlet module
+This provides the [XmlStarlet]() package version 1.6.1  
+Supports:
+* Ubuntu Wily 15.10 64-bit
+
+<a name="formatXML"></a>
+### augeas::formatXML
+This definition/module will pretty print XML with tabs since augeas is incapable of doing that for itself.  
+* filepath - the path of the xml file to format.
+  
+Requires [augeas::xmlstarlet](#xmlstarlet).  

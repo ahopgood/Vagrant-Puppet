@@ -42,13 +42,14 @@ class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
   perform_manual_setup => false,
-  plugin_backup => "/vagrant/backup/plugins/02-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/02-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
+  job_backup_location => "/vagrant/backup/jobs/",
 }
 ->
 jenkins::gitCredentials{"git-api-token":
-  git_hub_api_token => "215cef666c89c2425128abcf8cb842ebaee99054",
+  git_hub_api_token => "",
   token_name => "github_token",
 }
 ->
@@ -57,7 +58,7 @@ jenkins::seed_job{"seed-dsl":
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
 }
 ->
-jenkins::java_jdk{"Java-8":
+jenkins::global::java_jdk{"Java-8":
   major_version => "${java_major_version}",
   update_version => "${java_update_version}",
 }
@@ -73,10 +74,11 @@ jenkins::global::java_jdk{"Java-6":
   update_version => "99",
   appendNewJdk => true,
 }
+->
 jenkins::backup_jobs{"backup-script":
-  cron_hour => "19",
-  cron_minute => "24",
-  # job_backup_location => "/home/vagrant/backups/"
+  cron_hour => "*",
+  cron_minute => "*/5",
+  job_backup_location => "/vagrant/backup/jobs/"
 }
 ->
 class { 'maven':
@@ -87,7 +89,7 @@ class { 'maven':
 ->
 class{'augeas':}
 ->
-jenkins::maven{"maven-global-setup":
+jenkins::global::maven{"maven-global-setup":
   major_version => $maven_major_version,
   minor_version => $maven_minor_version,
   patch_version => $maven_patch_version,

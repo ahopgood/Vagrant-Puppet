@@ -1,4 +1,4 @@
-define jenkins::gloabl::java_jdk(
+define jenkins::global::java_jdk(
   $major_version = undef,
   $update_version = undef,
   $appendNewJdk = false,

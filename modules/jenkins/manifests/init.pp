@@ -18,8 +18,8 @@ class jenkins (
   $java_major_version = undef,
   $java_update_version = undef,
   $password_bcrypt_hash = "\$2a\$10\$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka", #admin
-  $plugin_backup = "",
-  $job_backup = undef) {
+  $plugin_backup_location = "",
+  $job_backup_location = undef) {
 
   $jenkins_short_ver     = "jenkins"
   $jenkins_group         = "${jenkins_short_ver}"
@@ -123,7 +123,7 @@ class jenkins (
   # iptables port exemption needed?
   if ($perform_manual_setup == true){
     cron {"schedule-backup":
-      command => "/usr/local/bin/${backup_script} ${plugin_backup} >> /var/lib/jenkins/logs/${backup_script}.log 2>&1",
+      command => "/usr/local/bin/${backup_script} ${plugin_backup_location} >> /var/lib/jenkins/logs/${backup_script}.log 2>&1",
       minute => "*/5",
       user => 'root',
       require => File["${backup_script}"],
@@ -167,7 +167,7 @@ class jenkins (
     }
     exec {"Restore plugins":
       path => ["/bin/","/usr/bin/","/usr/local/bin/"],
-      command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
+      command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup_location} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
       require => File["${restore_all_plugins_script}"],
     }
     ->
@@ -175,12 +175,12 @@ class jenkins (
       ensure => present,
       require => File["${local_install_dir}"],
       path => "/usr/local/bin/${restore_jobs_script}",
-      source => "puppet://${puppet_file_dir}${restore_jobs_script}"
+      source => "puppet:///${puppet_file_dir}${restore_jobs_script}"
     }
     ->
     exec {"Restore jobs":
       path => ["/bin/","/usr/bin/","/usr/local/bin/"],
-      command => "/usr/local/bin/${restore_jobs_script} ${job_backup} /var/lib/jenkins/jobs/ >> /var/lib/jenkins/logs/${restore_jobs_script}.log 2>&1",
+      command => "/usr/local/bin/${restore_jobs_script} ${job_backup_location} /var/lib/jenkins/jobs/ >> /var/lib/jenkins/logs/${restore_jobs_script}.log 2>&1",
       require => File["${restore_jobs_script}"],
     }
     ->

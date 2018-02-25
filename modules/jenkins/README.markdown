@@ -9,18 +9,24 @@ The module can be passed the following parameters as Strings:
 * patch_version e.g. "1"
 * perform_manual_setup boolean, defaults to false to allow for installation from a backup location, true will create a new installation
 * password_bcrypt_hash, a bcrypt hash of the admin password to be set, requires bcrypt 2a and a cost factor of 10.
-* backup_location
-* plugin_backup, the location of the backed up plugin archives and the plugin manifest file
+* plugin_backup_location, the location of the backed up plugin archives and the plugin manifest file
+* $job_backup_location, the location of the job backups
 The module will default to 2.19.1.
+
+Modules supported/available:  
+* [Seed job module](#seedjob)
+* [Git credentials module](#gitCredentials)
+* [Java module](#java)
+* [Maven module](#maven)
 
 ## Current Status / Support
 Supports:
 * Ubuntu 15.10 (wily)
 
 ### Known Issues
-**64-bit support only**
-[CentOS Known Issues](#CentOS_known_issues)
-[Ubuntu Known Issues](#Ubuntu_known_issues)
+**64-bit support only**  
+[CentOS Known Issues](#CentOS_known_issues)  
+[Ubuntu Known Issues](#Ubuntu_known_issues)  
 
 ### Credentials.xml
 How is the github token encrypted?
@@ -58,8 +64,7 @@ Job backup script on a crontab:
         job_backup_location => "/home/vagrant/backups/"
     }
 ```
-
-### Ubuntu
+### Ubuntu Scripts
 Back up and restore functionality is provided by a series of local scripts:
 * `/usr/local/bin/retrieve-all-plugins.sh` will parse the `plugins.txt` from a backup location and loop through each line trying to restore a plugin.
     * **Param 1.** Backup location directory, the location where `plugins.txt` and the optional plugin files (.jpi/.hpi) are located
@@ -87,7 +92,9 @@ Back up and restore functionality is provided by a series of local scripts:
 ## Testing performed:
 * Install on a fresh system with a manual install
 	* Ubuntu 15.10
-* Install on a fresh system with an install from a backup
+* Install on a fresh system with an install from a backup of the plugins
+    * Ubuntu 15.10
+* Install on a fresh system with an install from a backup of the jobs
     * Ubuntu 15.10
 
 ## Ubuntu
@@ -102,17 +109,85 @@ Currently there is no enforced naming conventions beyond the following:
 ### Useful to know
 [Job/Script security](https://github.com/jenkinsci/job-dsl-plugin/wiki/Script-Security) with the Jobs DSL
 
+<a name="modules"></a>
+## Modules
+* [seed job module](#seedjob)
+* [git credentials module](#gitCredentials)
+* [java module](#java)
+* [maven module](#maven)
+
+<a name=""></a>
+### jenkins::seed_job module
+This module provides the ability to specify a seed job defined in the [Jenkins job DSL](https://github.com/jenkinsci/job-dsl-plugin) formerly known as the netflix jenkins dsl.  
+It takes two parameters:
+* github_dsl_job_url - the repo url,
+* github_credentials_name - the name of the jenkins credentials to use for github,
+
+The module will create a jenkins job that triggers at 04:00.  
+It will check out the specified project and execute **all** groovy files located within it.  
+It will run only on the master branch.  
+It is up to the person using this module to ensure that the groovy scripts are valid for creating other jobs.  
+
+This module will **disable** global groovy job security via the *GlobalJobDslSecurityConfiguration.xml* configuration file.  
+#### Requirements
+Requires the [jenkins::gitCredentials](#gitCredentials) module to be configured and the name the credentials are saved as is used as a parameter for this module.  
+Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.   
+Plugin support: job-dsl@1.66, git@3.7.0.
+
+<a name="gitCredentials"></a>
+### jenkins::gitCredentials module
+* git_hub_api_token - the developer token used to checkout and commit on behalf of the seed job. 
+* token_name - the name these credentials will be referenced by
+#### Requirements
+Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.  
+Plugin support: credentials@2.1.6
+#### TODO
+* Need to load the token via heira
+* Encrypt the token via eyaml 
+
+<a name="java"></a>
+### jenkins::global::java_jdk module
+Allows for global configuration of a specified Java Development Kit (JDK) in the global configuration file `/var/lib/jenkins/config.xml`, useful to allow for multiple build capabilities, e.g. Java 1.6 and 1.7 side by side.  
+
+* major_version - the major java version
+* update_version - the update version
+* appendNewJdk - a boolean; if true will append this entry to the Jdks configuration section, if false will wipe out Jdks and place the current entry in there.   
+
+This will generate a globally named JDK in the following format: `1.${major_version}.0_${update_version}` which can then be referenced by your jobs.    
+If adding multiple entries, the first should have `appendNewJdk = false` will all subsequent values being true.  
+### Support
+* Ubuntu 15.10
+#### Requirements
+Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.  
+Requires the [Java module](../java/README.markdown), assumes that Java is installed to `/usr/lib/jvm/jdk-${major_version}-oracle-x64/`.  
+
+<a name="maven"></a>
+### jenkins::global::maven module
+Allows for global configuration of a specified maven version in the `hudson.tasks.Maven.xml` within jenkins.  
+* major_version - maven major version
+* minor_version - maven minor version
+* patch_version - maven path version
+
+Will generate a globally named maven entry in the following format: `Maven-${major_version}-${minor_version}-${patch_version}` allowing for reference by your jobs.  
+
+### Support
+* Ubuntu 15.10  
+* Only major versions of maven can be specified (e.g. maven2, maven3 etc), a restriction/limitation of the maven module requirement
+#### Requirements
+Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.    
+Requires maven to be installed via the [maven module](../maven/README.markdown), assumes maven is installed to `/usr/share/maven*` where * is the major version.    
+### To do
+* Remove granularity on maven - that way jobs only require a major version, would increase longevity.
+* Granularity only required if asked for, e.g. can then create a specific version for a particular job
 
 ## ToDo
 ### CentOS
 ### Ubuntu
 * Create a credentials.xml file for adding our github token. Need to provide a credentials version from our plugin file
-* Create a directory for the seed job in the jobs folder where the folder name is the job name
-* Create a builds folder within the job folder
-* Create a config.xml file
-* Add /files/var/lib/jenkins/credentials.xml/ to backup routine
-* xmlstarlet -> create a definition for pretty_print to allow for reuse.
+* **done** Create a directory for the seed job in the jobs folder where the folder name is the job name
+* **done** Create a config.xml file
+* **done** xmlstarlet -> create a definition for pretty_print to allow for reuse.
 * Move httpd header augeas type definition into the augeas class
 * extend augeas definition to allow for pretty print
-
+* Change the seed job module to trigger the build on creation and on commit to master.
 ### Notes
