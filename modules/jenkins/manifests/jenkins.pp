@@ -48,8 +48,9 @@ class {'jenkins':
   job_backup_location => "/vagrant/backup/jobs/",
 }
 ->
+class{"hiera":}
+->
 jenkins::gitCredentials{"git-api-token":
-  git_hub_api_token => "",
   token_name => "github_token",
 }
 ->

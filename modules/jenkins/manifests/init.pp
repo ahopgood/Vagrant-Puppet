@@ -192,7 +192,8 @@ class jenkins (
 }
 
 define jenkins::gitCredentials(
-  $git_hub_api_token = undef,
+  # $git_hub_api_token = undef,
+  $git_hub_api_token = hiera('jenkins::gitCredentials::git_hub_api_token','test'),
   $token_name = undef,
 ) {
   $credentials_file = "/var/lib/jenkins/credentials.xml"
