@@ -28,6 +28,12 @@ Supports:
 [CentOS Known Issues](#CentOS_known_issues)  
 [Ubuntu Known Issues](#Ubuntu_known_issues)  
 
+Some modules (gitCredentials) require the `hiera` class.  
+Currently this has two impacts:
+ 1. The hiera config file needs to be specified as `puppet apply --parser=future --hiera-config=/etc/puppet/hiera.yaml init.pp` to override the default of `~/.puppet/hiera.yaml`.
+ 2. It will require **two** runs of the manifest to ensure that the hiera files are generated in the correct location.  
+At some point in the future this will be broken out into a separate manifest call to be run prior as a setup step.  
+
 ### Credentials.xml
 How is the github token encrypted?
 Using a secret specific to the jenkins install.
@@ -136,13 +142,18 @@ Plugin support: job-dsl@1.66, git@3.7.0.
 
 <a name="gitCredentials"></a>
 ### jenkins::gitCredentials module
-* git_hub_api_token - the developer token used to checkout and commit on behalf of the seed job. 
+Has two parameters:
+* (optional) git_hub_api_token - the developer token used to checkout and commit on behalf of the seed job, 
+    * It is recommended to *exclude* this param and allow this to be pulled from the `hiera` class using the key `hiera('jenkins::gitCredentials::git_hub_api_token','test')` instead of storing the sensitive data in the manifest.
+    * Command line usage `puppet apply --parser=future --hiera-config=/etc/puppet/hiera.yaml init.pp`
+    * The inclusion of the hiera class will require a run of the `hiera.pp` manifest first to ensure the hiera files are present and configured correctly. 
 * token_name - the name these credentials will be referenced by
 #### Requirements
-Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.  
+Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.
+Requires the [hiera] module to pull in the token value from the common.yaml file.  
 Plugin support: credentials@2.1.6
+
 #### TODO
-* Need to load the token via heira
 * Encrypt the token via eyaml 
 
 <a name="java"></a>

@@ -11,6 +11,7 @@
 /modules/**/files/**/**/*.tar.gz
 /modules/**/files/**/**/*.zip
 
+/modules/*/files/*.gem
 /modules/*/files/*.deb
 /modules/*/files/*.rpm
 /modules/*/files/*.rpm.bin

@@ -5,13 +5,14 @@ define java::ubuntu(
   $multiTenancy = undef
 ){
   $local_install_path = "/etc/puppet/"
-  $local_install_dir  = "${local_install_path}${name}/"
+  $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/java/"
-      
-  file{ "${local_install_dir}":
-    ensure => directory,
-    path       =>  "${local_install_dir}",
-  }    
+
+  # If required add into manifest at sites.pp
+  # file {"${local_install_dir}":
+  #   ensure => directory,
+  #   path       =>  "${local_install_dir}",
+  # }
   
   if ("${is64bit}"=="true") {
     $platform = "amd64"
@@ -90,13 +91,14 @@ define java::ubuntu(
 
 class java::ubuntu::wily(){
   $local_install_path = "/etc/puppet/"
-  $local_install_dir  = "${local_install_path}${name}/"
+  $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/java/"
-  
-  file {"${local_install_dir}":
-    ensure => directory,
-    path       =>  "${local_install_dir}",
-  }
+
+  # If required add into manifest at sites.pp
+  # file {"${local_install_dir}":
+  #   ensure => directory,
+  #   path       =>  "${local_install_dir}",
+  # }
 
       $libasound_data = "libasound2-data_1.0.29-0ubuntu1_all.deb"
       file {"${libasound_data }":
