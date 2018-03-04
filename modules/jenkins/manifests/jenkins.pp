@@ -50,6 +50,11 @@ class {'jenkins':
 ->
 class{"hiera":}
 ->
+class{"hiera::eyaml":
+  private_key_file => "private_key.pkcs7.pem",
+  public_key_file => "public_key.pkcs7.pem",
+}
+->
 jenkins::gitCredentials{"git-api-token":
   token_name => "github_token",
 }
