@@ -16,16 +16,14 @@ class hiera {
   $hiera_conf         = "hiera.yaml"
   $hiera_data         = "hieradata/"
   $hiera_common       = "common.yaml"
+  $hiera_osfamily_debian = "Debian.yaml"
+  $hiera_osfamily_dir = "osfamily/"
 
   notify {"Puppet file directory ${puppet_file_dir}":}
 
-  file {["${puppet_home}"]:
-    ensure => directory,
-  }
-
   file {
     "${hiera_conf}":
-   require    =>  File["${puppet_home}"],
+    # require    =>  File["${puppet_home}"],
     path       =>  "${puppet_home}${hiera_conf}",
     ensure     =>  present,
     source     =>  ["puppet:///${puppet_file_dir}${hiera_conf}"],
@@ -46,4 +44,20 @@ class hiera {
     source    =>  ["puppet:///${puppet_file_dir}${hiera_common}"],
     require   =>  File["${hiera_data}"],
   }
+
+  file { "${puppet_home}${hiera_data}${hiera_osfamily_dir}":
+    ensure => directory,
+  }
+
+  file {
+    "${hiera_osfamily_debian}":
+      path      =>  "${puppet_home}${hiera_data}${hiera_osfamily_dir}${hiera_osfamily_debian}",
+      ensure    =>  present,
+      source    =>  ["puppet:///${puppet_file_dir}${operatingsystem}/${hiera_osfamily_debian}"],
+      require   =>  File["${hiera_data}"],
+  }
+}
+
+define hiera::add_hierarchy {
+
 }

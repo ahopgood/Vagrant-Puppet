@@ -1,0 +1,21 @@
+---
+:backends:
+  - eyaml
+  - yaml
+:yaml:
+  :datadir: '<%= @hiera_data%>'
+:hierarchy:
+  - common
+  - osfamily/%{::osfamily}
+:logger: console
+:merge_behaviour: native
+
+:eyaml:
+  :datadir: '<%= @hiera_data%>'
+  # If using the pkcs7 encryptor (default)
+  :pkcs7_private_key: <%= @eyaml_keys%><%= @private_key_file%>
+  :pkcs7_public_key:  <%= @eyaml_keys%><%= @public_key_file%>
+
+  # Optionally cache decrypted data (default: false)
+  :cache_decrypted: false
+  :extension: 'yaml'

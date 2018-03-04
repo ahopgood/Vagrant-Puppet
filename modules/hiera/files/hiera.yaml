@@ -2,8 +2,9 @@
 :backends:
   - yaml
 :yaml:
-  :datadir: /etc/puppet/hieradata
+  :datadir: '/etc/puppet/hieradata/'
 :hierarchy:
   - common
+  - osfamily/%{::osfamily}
 :logger: console
 :merge_behaviour: native
