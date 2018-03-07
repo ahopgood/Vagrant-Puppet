@@ -20,7 +20,6 @@ class jekyll (
   
   file {"${local_install_dir}":
     ensure => directory,
-    
   }
   
   $addressable_gem_file = "addressable-2.5.0.gem"

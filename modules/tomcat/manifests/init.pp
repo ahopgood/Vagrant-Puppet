@@ -214,7 +214,7 @@ class tomcat (
   #Tomcat service startup script
   file {  [ "${tomcat_service_file}" ]:
     path    =>  "/etc/init.d/${tomcat_service_file}",
-    content =>  template("${module_name}/${operatingsystem}/tomcat.erb"),
+    content =>  template("${module_name}/${operatingsystem}/tomcat.sh.erb"),
     ensure  =>  present,
     mode    =>  0755,
     owner   =>  ["${tomcat_user}",'vagrant'],

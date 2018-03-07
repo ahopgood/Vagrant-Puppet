@@ -8,7 +8,7 @@ define java::centos(
   $multiTenancy = false,
   ){
     $local_install_path = "/etc/puppet/"
-    $local_install_dir  = "${local_install_path}${name}/"
+    $local_install_dir  = "${local_install_path}installers/"
     $puppet_file_dir    = "modules/java/"
 
   file {

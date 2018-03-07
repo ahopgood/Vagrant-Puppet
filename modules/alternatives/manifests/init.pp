@@ -22,9 +22,13 @@ define alternatives::install(
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
-    $alternativesName = "alternatives"
+    $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    $alternativesName = "update-alternatives"
+    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+      $alternativesName = "/usr/bin/update-alternatives"
+    } else {
+      $alternativesName = "/usr/sbin/update-alternatives"
+    }
   } else {
     notify {"${::operatingsystem} is not supported":}
   }
@@ -51,10 +55,10 @@ define alternatives::install(
 
   exec {
     "${name}-install-alternative":
-    command     =>  "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave} ${binariesSlaves} ${manPagesSlaves}",
-    unless      => "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
-    path        =>  '/usr/sbin/',
-    cwd         =>  '/usr/sbin/',
+    command     => "${alternativesName} --install /usr/bin/${executableName} ${executableName} ${executableLocation}${targetExecutable} ${priority} ${slave} ${binariesSlaves} ${manPagesSlaves}",
+    unless      => "${alternativesName} --display ${executableName} | /bin/grep ${executableLocation}${targetExecutable} > /dev/null",
+    path        => '/usr/sbin/',
+    cwd         => '/usr/sbin/',
   }
 }
 
@@ -67,9 +71,13 @@ define alternatives::set(
 ){
   #Decide which alternatives program we have based on OS
   if $::operatingsystem == 'CentOS' {
-    $alternativesName = "alternatives"
+    $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    $alternativesName = "update-alternatives"
+    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+      $alternativesName = "/usr/bin/update-alternatives"
+    } else {
+      $alternativesName = "/usr/sbin/update-alternatives"
+    }
   } else {
     notify {"${::operatingsystem} is not supported":}
   }
@@ -88,7 +96,7 @@ define alternatives::set(
   exec {
     "set-alternative-${executableName}":
     command     =>  "${alternativesName} --set ${executableName} ${executableLocation}${targetExecutable} ${slaves}",
-    unless      =>  "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"link currently points to ${executableLocation}${targetExecutable}\" > /dev/null",
+    unless      =>  "${alternativesName} --display ${executableName} | /bin/grep \"link currently points to ${executableLocation}${targetExecutable}\" > /dev/null",
     path        =>  '/usr/sbin/',
     cwd         =>  '/usr/sbin/',
   }

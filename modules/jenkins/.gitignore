@@ -1,2 +1,4 @@
 /.vagrant/
 /files/*.rpm
+/files/*.deb
+/backup/**

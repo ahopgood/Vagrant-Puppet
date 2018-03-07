@@ -13,3 +13,6 @@ java::is64bit: true
 #tomcat::port: null,
 #tomcat::java_opts: '',
 #tomcat::catalina_opts: ''
+
+jenkins::gitCredentials::git_hub_api_token: ENC[PKCS7,MIIBmQYJKoZIhvcNAQcDoIIBijCCAYYCAQAxggEhMIIBHQIBADAFMAACAQEwDQYJKoZIhvcNAQEBBQAEggEAeio1r90kL+1TlJ+66VU4pxCw97ieeiT5YsazaKGji8ehpVVu5xxIg9NEo6j5Q55ul97g755+d3NaahPK4FGJ+iTppHHoItp5ME0WPUdxu13+EhibKWt1SgYJMpa4iz6eMWOS2xwJfKJzOU+j3yYXYy7qHSVmg3Q8e7PyxGwgowBJzOoLbnIA3QRCkEuOw3Y9pd4QDI4/aId0MxdfgHxB/Vjtdw9SIi1wEXJUKtRnWw6fDZ1pi5BH93MTLrq89/xzS1OOPRgqEtm2+XnscuMQBV1nJN+phtt6av0zsag0V1uBjFxasZ4F1OzutHsf+8KZCrQ+tIksb0KOgMHJ5XztpDBcBgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBBqQOH//nrnFQn8fvgwAvbYgDBKm67ywHACAWnHKhCFPE+YAUlraRD2QmLWJeIorVgYv+7EWwuB8+IWRpbSVpdWhM8=]
+

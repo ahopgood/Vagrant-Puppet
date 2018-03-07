@@ -1,0 +1,19 @@
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/#declaration/#attribute
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/#declaration/#attribute/version = "1.0"
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/#declaration/#attribute/encoding = "UTF-8"
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/#text = "\n  "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/#text[1] = "\n    "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/#text[1] = "\n      "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/name
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/name/#text = "maven-3-0-5"
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/#text[2] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/home
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/home/#text = "/usr/share/maven3/"
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/#text[3] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/properties = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/hudson.tasks.Maven_-MavenInstallation/#text[4] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/hudson.tasks.Maven.xml/hudson.tasks.Maven_-DescriptorImpl/installations/#text[2] = "  "
+augtool> quit

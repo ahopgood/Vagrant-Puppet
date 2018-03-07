@@ -1,6 +1,8 @@
 class augeas {
   $puppet_file_dir      = "modules/augeas/"
   $file_location        = "${operatingsystem}/${operatingsystemmajrelease}/"
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
 
   if (versioncmp("${operatingsystem}", "CentOS") == 0 ){
     $provider = "rpm"
@@ -55,7 +57,6 @@ class augeas {
       ensure => present,
       path => "${local_install_dir}${augeas_lenses_file}",
       source => ["puppet:///${puppet_file_dir}${file_location}${augeas_lenses_file}"],
-      require => [File["${local_install_dir}"]],
     }
     package{"${augeas_lenses}":
       provider => "${provider}",
@@ -72,7 +73,6 @@ class augeas {
     ensure => present,
     path => "${local_install_dir}${augeas_libs_file}",
     source => ["puppet:///${puppet_file_dir}${file_location}${augeas_libs_file}"],
-    require => [File["${local_install_dir}"]],
   }
   package{"${augeas_libs}":
     provider => "${provider}",
@@ -86,12 +86,81 @@ class augeas {
     ensure => present,
     path => "${local_install_dir}${augeas_file}",
     source => ["puppet:///${puppet_file_dir}${file_location}${augeas_file}"],
-    require => [File["${local_install_dir}"]],
   }
   package{"${augeas}":
     provider => "${provider}",
     ensure => "${ensure}",
     source => "${local_install_dir}${augeas_file}",
     require => [File["${augeas_file}"]],
+  }
+}
+
+class augeas::xmlstarlet{
+  $major_version = "1"
+  $minor_version = "6"
+  $patch_version = "1"
+  $xmlstarlet = "xmlstarlet"
+  $puppet_file_dir = "modules/augeas/"
+  $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
+
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+    if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0){
+      $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-1_amd64.deb"
+      $provider = "dpkg"
+      $ensure = "present"
+    } else {
+      fail("${operatingsystem} ${operatingsystemmajrelease} not supported")
+    }
+  } else {
+    fail("${operatingsystem} ${operatingsystemmajrelease} not supported")
+  }
+  file {"${xmlstarlet_file}":
+    ensure => present,
+    path => "${local_install_dir}${xmlstarlet_file}",
+    source => ["puppet:///${puppet_file_dir}${file_location}${xmlstarlet_file}"],
+    require => [File["${local_install_dir}"]],
+  }
+  package{"${xmlstarlet}":
+    provider => "${provider}",
+    ensure => "${ensure}",
+    source => "${local_install_dir}${xmlstarlet_file}",
+    require => [File["${xmlstarlet_file}"]],
+  }
+}
+
+define augeas::formatXML(
+  $filepath = undef
+){
+  exec {"format ${name}":
+    path => ["/usr/bin/","/bin/"],
+    command => "xmlstarlet format --indent-tab ${filepath} > ${filepath}.tmp && mv ${filepath}.tmp ${filepath}",
+    require => Class["augeas::xmlstarlet"]
+  }
+}
+
+class augeas::yaml_lens {
+  augeas::load_lens { "yaml.aug": }
+}
+
+define augeas::load_lens(
+  $lens_name = "${name}",
+  $custom_augeas_lens_location = undef,
+) {
+
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0 and $custom_augeas_lens_location == undef){
+    $augeas_lens_location = "/usr/share/augeas/lenses/dist/"
+  } elsif ($custom_augeas_lens_location != undef){
+    $augeas_lens_location = $custom_augeas_lens_location
+  } else {
+    fail("${operatingsystem} ${operatingsystemmajrelease} not supported")
+  }
+
+  file{"${lens_name}":
+    ensure => present,
+    mode => "0644",
+    owner => "root",
+    group => "root",
+    path => "${augeas_lens_location}${lens_name}",
+    source => "puppet:///${augeas::puppet_file_dir}lens/${lens_name}",
   }
 }

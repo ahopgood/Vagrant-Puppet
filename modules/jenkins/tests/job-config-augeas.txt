@@ -1,0 +1,117 @@
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/#declaration
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/#declaration/#attribute
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/#declaration/#attribute/version = "1.0"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/#declaration/#attribute/encoding = "UTF-8"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[1] = "\n  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/actions = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[2] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/description
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/description/#text = "A seed job for creating jobs using the netflix Jenkins DSL"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[3] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/keepDependencies
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/keepDependencies/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[4] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/properties = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[5] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#attribute
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#attribute/class = "hudson.plugins.git.GitSCM"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#attribute/plugin = "git@3.7.0"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[1] = "\n    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/configVersion
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/configVersion/#text = "2"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[2] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/#text[1] = "\n      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/#text[1] = "\n        "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url/#text = "https://github.com/ahopgood/jenkins-ci.git"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/#text[2] = "        "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/credentialsId
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/credentialsId/#text = "github_token"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/#text[3] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/userRemoteConfigs/#text[2] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[3] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/#text[1] = "\n      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/hudson.plugins.git.BranchSpec
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/hudson.plugins.git.BranchSpec/#text[1] = "\n        "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/hudson.plugins.git.BranchSpec/name
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/hudson.plugins.git.BranchSpec/name/#text = "*/master"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/hudson.plugins.git.BranchSpec/#text[2] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/branches/#text[2] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[4] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/doGenerateSubmoduleConfigurations
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/doGenerateSubmoduleConfigurations/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[5] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/submoduleCfg = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/submoduleCfg/#attribute
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/submoduleCfg/#attribute/class = "list"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[6] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/extensions = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/scm/#text[7] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[6] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/canRoam
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/canRoam/#text = "true"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[7] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/disabled
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/disabled/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[8] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/blockBuildWhenDownstreamBuilding
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/blockBuildWhenDownstreamBuilding/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[9] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/blockBuildWhenUpstreamBuilding
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/blockBuildWhenUpstreamBuilding/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[10] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/triggers = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[11] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/concurrentBuild
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/concurrentBuild/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[12] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/#text[1] = "\n    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#attribute
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#attribute/plugin = "job-dsl@1.66"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[1] = "\n      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets/#text = "*.groovy"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[2] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/usingScriptText
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/usingScriptText/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[3] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/sandbox
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/sandbox/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[4] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreExisting
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreExisting/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[5] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreMissingFiles
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/ignoreMissingFiles/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[6] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/failOnMissingPlugin
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/failOnMissingPlugin/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[7] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/unstableOnDeprecation
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/unstableOnDeprecation/#text = "false"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[8] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedJobAction
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedJobAction/#text = "IGNORE"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[9] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedViewAction
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedViewAction/#text = "IGNORE"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[10] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedConfigFilesAction
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/removedConfigFilesAction/#text = "IGNORE"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[11] = "      "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/lookupStrategy
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/lookupStrategy/#text = "JENKINS_ROOT"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#text[12] = "    "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/builders/#text[2] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[13] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/publishers = "#empty"
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/#text[14] = "  "
+/files/vagrant/backup/09-mvn-conf/jenkins/jobs/Jenkins Seed Job/config.xml/project/buildWrappers = "#empty"
