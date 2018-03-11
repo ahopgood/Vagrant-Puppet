@@ -17,14 +17,10 @@ Package{
   #restricted db username
   #restricted db password
 
-  class {"iptables": port => "80"}
   class {"httpd":}
   contain httpd
   class {"mysql":}
   class {"php":
-    major_version => '5',
-    minor_version => '4',
-    patch_version => '16',
   }
   
   #Used in the database differential backup and restore
