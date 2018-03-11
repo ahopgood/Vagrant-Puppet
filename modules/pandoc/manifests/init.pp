@@ -355,6 +355,72 @@ class pandoc{
 # Errors were encountered while processing:
 # texlive-binaries
 
-define pandoc::format{
+define pandoc::texlive-fonts-recommended {
 
+  $texlive_fonts_recommended_file_name = "texlive-fonts-recommended_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+  file {"${texlive_fonts_recommended_file_name}":
+    ensure => present,
+    path => "${local_install_dir}${texlive_fonts_recommended_file_name}",
+    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_fonts_recommended_file_name}",
+  }
+  package{"texlive-font-recommended":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${texlive_fonts_recommended_file_name}",
+    require => [File["${texlive_fonts_recommended_file_name}"], Package["texlive-base"]]
+  }
+}
+
+define pandoc::texlive-latex-extra {
+  $texlive_latex_extra = "texlive-latex-extra_2013.20140215-2_all.${pandoc::package_type}"
+  file {"${texlive_latex_extra}":
+    ensure => present,
+    path => "${local_install_dir}${texlive_latex_extra}",
+    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra}",
+  }
+  package{"texlive-latex-extra":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${texlive_latex_extra}",
+    require => [File["${texlive_latex_extra}"], Package["texlive-binaries"], Package["texlive-base"]]
+  }
+
+  $preview_latex_style = "preview-latex-style_11.87-1ubuntu2_all.${pandoc::package_type}"
+  file {"${preview_latex_style}":
+    ensure => present,
+    path => "${local_install_dir}${preview_latex_style}",
+    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style}",
+  }
+  package{"preview-latex-style":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${preview_latex_style}",
+    require => [File["${preview_latex_style}"], ]
+  }
+
+  $texlive_latex_recommended = "texlive-latex-recommended_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+  file {"${texlive_latex_recommended}":
+    ensure => present,
+    path => "${local_install_dir}${texlive_latex_recommended}",
+    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended}",
+  }
+  package{"texlive-latex-recommended":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${texlive_latex_recommended}",
+    require => [File["${texlive_latex_recommended}"], Package["texlive-base"], Package["texlive-binaries"]]
+  }
+
+  $texlive_pictures_file_name = "texlive-pictures_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+  file {"${texlive_pictures_file_name}":
+    ensure => present,
+    path => "${local_install_dir}${texlive_pictures_file_name}",
+    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
+  }
+  package{"texlive-pictures":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${texlive_pictures_file_name}",
+    require => [File["${texlive_pictures_file_name}"], Package["texlive-base"], Package["texlive-binaries"] ]
+  }
 }
