@@ -115,8 +115,11 @@ class jenkins (
   }
   $backup_script="backup-plugins.sh"
   file {"${backup_script}":
-    require => File["${local_install_dir}"],
     ensure => present,
+    mode => "755",
+    owner => "jenkins",
+    group => "jenkins",
+    require => File["${local_install_dir}"],
     path => "/usr/local/bin/${backup_script}",
     source => ["puppet:///${puppet_file_dir}${backup_script}"]
   }
@@ -155,12 +158,18 @@ class jenkins (
     ->
     file {"${restore_plugin_script}":
       ensure => present,
+      mode => "755",
+      owner => "jenkins",
+      group => "jenkins",
       require => [Augeas['jenkins_admin_config']],
       path => "/usr/local/bin/${restore_plugin_script}",
       source => "puppet:///${puppet_file_dir}${restore_plugin_script}",
     }
     file {"${restore_all_plugins_script}":
       ensure => present,
+      mode => "755",
+      owner => "jenkins",
+      group => "jenkins",
       require => [File["${local_install_dir}"],File["${restore_plugin_script}"]],
       path => "/usr/local/bin/${restore_all_plugins_script}",
       source => "puppet:///${puppet_file_dir}${restore_all_plugins_script}",
@@ -173,6 +182,9 @@ class jenkins (
     ->
     file {"${restore_jobs_script}":
       ensure => present,
+      mode => "755",
+      owner => "jenkins",
+      group => "jenkins",
       require => File["${local_install_dir}"],
       path => "/usr/local/bin/${restore_jobs_script}",
       source => "puppet:///${puppet_file_dir}${restore_jobs_script}"
@@ -330,6 +342,9 @@ define jenkins::backup_jobs(
   $backup_job_script = "backup-jobs.sh"
   file{"${backup_job_script}":
     ensure => present,
+    mode => "755",
+    owner => "jenkins",
+    group => "jenkins",
     source => "puppet:///${jenkins::puppet_file_dir}${backup_job_script}",
     path => "/usr/local/bin/${backup_job_script}"
   }
