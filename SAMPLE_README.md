@@ -1,4 +1,4 @@
-# java #
+# java
 
 This is the java module. It provides...
 the Oracle Java Development Kit (JDK)
