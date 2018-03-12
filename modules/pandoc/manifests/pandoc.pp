@@ -11,3 +11,7 @@ file {
 ->
 class{"pandoc":
 }
+->
+pandoc::texlive-fonts-recommended{"texlive_fonts_recommended":}
+->
+pandoc::texlive-latex-extra{"texlive_latex_extra":}

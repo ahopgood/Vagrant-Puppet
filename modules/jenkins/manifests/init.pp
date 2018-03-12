@@ -196,6 +196,12 @@ class jenkins (
       require => File["${restore_jobs_script}"],
     }
     ->
+    exec {"Set ownership of jobs":
+      path => ["/bin/","/usr/bin/","/usr/local/bin/"],
+      command => "chown -R jenkins:jenkins /var/lib/jenkins/jobs/",
+      require => Exec["Restore jobs"]
+    }
+    ->
     exec {"Restart Jenkins":
       path => ["/usr/sbin/","/etc/init.d/"],
       command => "jenkins restart",
