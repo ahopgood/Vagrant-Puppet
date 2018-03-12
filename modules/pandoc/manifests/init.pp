@@ -306,62 +306,16 @@ class pandoc{
   }
 }
 
-# texlive-base
-# vagrant@vagrant-ubuntu-wily-64:/var/lib/jenkins/workspace/Markdown-master-pipeline@script/publisher$ sudo dpkg -i /vagrant/files/texlive-base_2013.20140215-1ubuntu0.1_all.deb
-# Selecting previously unselected package texlive-base.
-# (Reading database ... 88611 files and directories currently installed.)
-# Preparing to unpack .../texlive-base_2013.20140215-1ubuntu0.1_all.deb ...
-# Unpacking texlive-base (2013.20140215-1ubuntu0.1) ...
-#   dpkg: dependency problems prevent configuration of texlive-base:
-# texlive-base depends on xdg-utils; however:
-# Package xdg-utils is not installed.
-#   texlive-base depends on luatex (>= 0.70.1); however:
-# Package luatex is not installed.
-#   texlive-base depends on texlive-binaries (>= 2013.20130512); however:
-# Package texlive-binaries is not configured yet.
-# texlive-base depends on libpaper-utils; however:
-# Package libpaper-utils is not installed.
-#
-#   dpkg: error processing package texlive-base (--install):
-# dependency problems - leaving unconfigured
-# Processing triggers for man-db (2.7.4-1) ...
-# Processing triggers for install-info (6.0.0.dfsg.1-3) ...
-# Processing triggers for mime-support (3.58ubuntu1) ...
-# Errors were encountered while processing:
-# texlive-base
-
-#texlive-binaries
-# vagrant@vagrant-ubuntu-wily-64:/var/lib/jenkins/workspace/Markdown-master-pipeline@script/publisher$ sudo dpkg -i /vagrant/files/texlive-binaries_2013.20130729.30972-2build3_amd64.deb
-# Selecting previously unselected package texlive-binaries.
-# (Reading database ... 88385 files and directories currently installed.)
-# Preparing to unpack .../texlive-binaries_2013.20130729.30972-2build3_amd64.deb ...
-# Unpacking texlive-binaries (2013.20130729.30972-2build3) ...
-#   dpkg: dependency problems prevent configuration of texlive-binaries:
-# texlive-binaries depends on libgs9 (>= 8.61.dfsg.1); however:
-# Package libgs9 is not installed.
-#   texlive-binaries depends on libicu52 (>= 52~m1-1~); however:
-# Package libicu52 is not installed.
-#   texlive-binaries depends on libkpathsea6; however:
-# Package libkpathsea6 is not installed.
-#   texlive-binaries depends on libpoppler44 (>= 0.24.5); however:
-# Package libpoppler44 is not installed.
-#   texlive-binaries depends on libptexenc1; however:
-# Package libptexenc1 is not installed.
-#
-#   dpkg: error processing package texlive-binaries (--install):
-# dependency problems - leaving unconfigured
-# Processing triggers for install-info (6.0.0.dfsg.1-3) ...
-# Processing triggers for man-db (2.7.4-1) ...
-# Errors were encountered while processing:
-# texlive-binaries
-
-define pandoc::texlive-fonts-recommended {
-
-  $texlive_fonts_recommended_file_name = "texlive-fonts-recommended_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+define pandoc::texlive_fonts_recommended {
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir  = "${local_install_path}installers/"
+  $puppet_file_dir    = "modules/pandoc/"
+  $package_type = "deb"
+  $texlive_fonts_recommended_file_name = "texlive-fonts-recommended_2013.20140215-1ubuntu0.1_all.${package_type}"
   file {"${texlive_fonts_recommended_file_name}":
     ensure => present,
     path => "${local_install_dir}${texlive_fonts_recommended_file_name}",
-    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_fonts_recommended_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_fonts_recommended_file_name}",
   }
   package{"texlive-font-recommended":
     ensure => installed,
@@ -371,12 +325,16 @@ define pandoc::texlive-fonts-recommended {
   }
 }
 
-define pandoc::texlive-latex-extra {
-  $texlive_latex_extra = "texlive-latex-extra_2013.20140215-2_all.${pandoc::package_type}"
+define pandoc::texlive_latex_extra {
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir  = "${local_install_path}installers/"
+  $puppet_file_dir    = "modules/pandoc/"
+  $package_type = "deb"
+  $texlive_latex_extra = "texlive-latex-extra_2013.20140215-2_all.${package_type}"
   file {"${texlive_latex_extra}":
     ensure => present,
     path => "${local_install_dir}${texlive_latex_extra}",
-    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra}",
   }
   package{"texlive-latex-extra":
     ensure => installed,
@@ -385,11 +343,11 @@ define pandoc::texlive-latex-extra {
     require => [File["${texlive_latex_extra}"], Package["texlive-binaries"], Package["texlive-base"]]
   }
 
-  $preview_latex_style = "preview-latex-style_11.87-1ubuntu2_all.${pandoc::package_type}"
+  $preview_latex_style = "preview-latex-style_11.87-1ubuntu2_all.${package_type}"
   file {"${preview_latex_style}":
     ensure => present,
     path => "${local_install_dir}${preview_latex_style}",
-    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style}",
   }
   package{"preview-latex-style":
     ensure => installed,
@@ -398,11 +356,11 @@ define pandoc::texlive-latex-extra {
     require => [File["${preview_latex_style}"], ]
   }
 
-  $texlive_latex_recommended = "texlive-latex-recommended_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+  $texlive_latex_recommended = "texlive-latex-recommended_2013.20140215-1ubuntu0.1_all.${package_type}"
   file {"${texlive_latex_recommended}":
     ensure => present,
     path => "${local_install_dir}${texlive_latex_recommended}",
-    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended}",
   }
   package{"texlive-latex-recommended":
     ensure => installed,
@@ -411,16 +369,48 @@ define pandoc::texlive-latex-extra {
     require => [File["${texlive_latex_recommended}"], Package["texlive-base"], Package["texlive-binaries"]]
   }
 
-  $texlive_pictures_file_name = "texlive-pictures_2013.20140215-1ubuntu0.1_all.${pandoc::package_type}"
+  $texlive_pictures_file_name = "texlive-pictures_2013.20140215-1ubuntu0.1_all.${package_type}"
   file {"${texlive_pictures_file_name}":
     ensure => present,
     path => "${local_install_dir}${texlive_pictures_file_name}",
-    source => "puppet:///${pandoc::puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
   }
   package{"texlive-pictures":
     ensure => installed,
     provider => dpkg,
     source => "${local_install_dir}${texlive_pictures_file_name}",
     require => [File["${texlive_pictures_file_name}"], Package["texlive-base"], Package["texlive-binaries"] ]
+  }
+}
+
+define pandoc::lmodern {
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir  = "${local_install_path}installers/"
+  $puppet_file_dir    = "modules/pandoc/"
+  $package_type = "deb"
+  $lmodern_file_name = "lmodern_2.004.4-3_all.${package_type}"
+  file {"${lmodern_file_name}":
+    ensure => present,
+    path => "${local_install_dir}${lmodern_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${lmodern_file_name}",
+  }
+  package{"lmodern":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${lmodern_file_name}",
+    require => [File["${lmodern_file_name}"], Package["fonts-lmodern"] ]
+  }
+
+  $fonts_lmodern_file_name = "fonts-lmodern_2.004.4-3_all.deb"
+  file {"${fonts_lmodern_file_name}":
+    ensure => present,
+    path => "${local_install_dir}${fonts_lmodern_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_lmodern_file_name}",
+  }
+  package{"fonts-lmodern":
+    ensure => installed,
+    provider => dpkg,
+    source => "${local_install_dir}${fonts_lmodern_file_name}",
+    require => [File["${fonts_lmodern_file_name}"] ]
   }
 }

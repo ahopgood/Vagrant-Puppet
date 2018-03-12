@@ -100,4 +100,11 @@ jenkins::global::maven{"maven-global-setup":
   minor_version => $maven_minor_version,
   patch_version => $maven_patch_version,
 }
-
+->
+class{"pandoc":}
+->
+pandoc::texlive_fonts_recommended{"texlive-fonts-recommended":}
+->
+pandoc::texlive_latex_extra{"texlive-latex-extra":}
+->
+pandoc::lmodern{"lmodern":}
