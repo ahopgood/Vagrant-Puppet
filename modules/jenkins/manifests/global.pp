@@ -80,3 +80,29 @@ define jenkins::global::maven(
     filepath => "${maven_config_file}"
   }
 }
+
+define jenkins::global::labels(
+  $labels = undef ){
+
+  if ($labels == undef){
+    fail("A label string is required in order to set a label in Jenkins")
+  }
+
+  $changes = [
+    "clear label",
+    "rm label",
+    "set label/#text '${labels}'",
+  ]
+
+  augeas { "jenkins_general_config_label_${labels}":
+    show_diff => true,
+    incl      => '/var/lib/jenkins/config.xml',
+    lens      => 'Xml.lns',
+    context   => '/files/var/lib/jenkins/config.xml/hudson/',
+    changes   => $changes,
+  }
+  ->
+  augeas::formatXML { "format /var/lib/jenkins/config.xml label ${labels}":
+    filepath => "/var/lib/jenkins/config.xml"
+  }
+}

@@ -108,3 +108,7 @@ pandoc::texlive_fonts_recommended{"texlive-fonts-recommended":}
 pandoc::texlive_latex_extra{"texlive-latex-extra":}
 ->
 pandoc::lmodern{"lmodern":}
+->
+Jenkins::Global::Labels { "labels":
+  labels => "Java6 Java7 Java8 Pandoc"
+}
