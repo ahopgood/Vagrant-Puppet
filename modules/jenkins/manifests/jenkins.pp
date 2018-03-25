@@ -55,7 +55,7 @@ class{"hiera::eyaml":
   public_key_file => "public_key.pkcs7.pem",
 }
 ->
-jenkins::gitCredentials{"git-api-token":
+jenkins::credentials::gitCredentials{"git-api-token":
   token_name => "github_token",
 }
 ->
@@ -108,3 +108,12 @@ pandoc::texlive_fonts_recommended{"texlive-fonts-recommended":}
 pandoc::texlive_latex_extra{"texlive-latex-extra":}
 ->
 pandoc::lmodern{"lmodern":}
+->
+Jenkins::Global::Labels { "labels":
+  labels => "Java6 Java7 Java8 Pandoc"
+}
+->
+jenkins::credentials::ssh{"jenkins-ssh":
+  key_name => "jenkins",
+  ssh_creds_name => "jenkins_ssh"
+}
