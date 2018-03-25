@@ -113,7 +113,7 @@ class jenkins (
   exec { "wait":
     command => "/bin/sleep 20",
   }
-  $backup_script="backup-plugins.sh"
+  $backup_script = "backup-plugins.sh"
   file {"${backup_script}":
     ensure => present,
     mode => "755",
@@ -207,42 +207,6 @@ class jenkins (
       command => "jenkins restart",
     }
   }# Close manual check
-}
-
-define jenkins::gitCredentials(
-  $git_hub_api_token = hiera('jenkins::gitCredentials::git_hub_api_token','test'),
-  $token_name = undef,
-) {
-  $credentials_file = "/var/lib/jenkins/credentials.xml"
-  file {"${credentials_file}":
-    ensure => present,
-    mode => "755",
-    group => "jenkins",
-    owner => "jenkins",
-    content => "<?xml version='1.0' encoding='UTF-8'?>\n<com.cloudbees.plugins.credentials.SystemCredentialsProvider></com.cloudbees.plugins.credentials.SystemCredentialsProvider>",
-  }
-
-  augeas { 'jenkins_git_credentials_config':
-    show_diff => true,
-    incl      => "${credentials_file}",
-    lens      => 'Xml.lns',
-    context   => '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/',
-    require   => [File["/var/lib/jenkins/credentials.xml"]],
-    changes   => [
-      "set #attribute/plugin credentials@2.1.6",
-      "set domainCredentialsMap/#attribute/class hudson.util.CopyOnWriteMap\$Hash",
-      "set domainCredentialsMap/entry/com.cloudbees.plugins.credentials.domains.Domain/specifications #empty",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/scope/#text \"GLOBAL\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/id/#text \"${token_name}\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/description/#text \"Github api token\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/username/#text \"ahopgood\"",
-      "set domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/password/#text \"${git_hub_api_token}\"",
-    ]
-  }
-  ->
-  augeas::formatXML{"format ${credentials_file}":
-    filepath => "${credentials_file}"
-  }
 }
 
 define jenkins::seed_job(
