@@ -63,7 +63,7 @@ define jenkins::credentials::gitCredentials(
   realize(File["${jenkins::credentials::credentials_file}"])
   realize(Augeas["jenkins_credentials_config"])
 
-  augeas { 'jenkins_git_credentials_config':
+  augeas { 'jenkins_git_credentials_config ${token_name}':
     show_diff => true,
     incl      => "${jenkins::credentials::credentials_file}",
     lens      => 'Xml.lns',
@@ -79,7 +79,7 @@ define jenkins::credentials::gitCredentials(
     ]
   }
   ->
-  augeas::formatXML{"format ${jenkins::credentials::credentials_file}":
+  augeas::formatXML{"format ${jenkins::credentials::credentials_file} jenkins_git_credentials_config ${token_name}":
     filepath => "${jenkins::credentials::credentials_file}"
   }
 }
