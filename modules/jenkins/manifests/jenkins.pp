@@ -117,3 +117,4 @@ jenkins::credentials::ssh{"jenkins-ssh":
   key_name => "jenkins",
   ssh_creds_name => "jenkins_ssh"
 }
+-> class {"dos2unix":}
