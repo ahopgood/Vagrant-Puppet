@@ -41,8 +41,11 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
+  major_version => "2",
+  minor_version => "73",
+  patch_version => "1",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/02-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/05-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
@@ -110,10 +113,11 @@ pandoc::texlive_latex_extra{"texlive-latex-extra":}
 pandoc::lmodern{"lmodern":}
 ->
 Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Pandoc"
+  labels => "Java6 Java7 Java8 Pandoc Dos2Unix"
 }
 ->
 jenkins::credentials::ssh{"jenkins-ssh":
   key_name => "jenkins",
   ssh_creds_name => "jenkins_ssh"
 }
+-> class {"dos2unix":}
