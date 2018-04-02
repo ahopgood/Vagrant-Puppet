@@ -94,11 +94,10 @@ class jenkins (
     source     =>  ["puppet:///${puppet_file_dir}${jenkins}"]
   }
   
-  package {
-    "jenkins":
+  package {    "jenkins":
     provider => "dpkg",
-    # ensure => "${major_version}.${minor_version}.${patch_version}",
-    ensure => installed,
+    # ensure => installed,
+    ensure => latest,
     source => "${local_install_dir}${jenkins}",
     require => [File["${jenkins}"], Package["daemon"], Java["install-java"]]
   }
