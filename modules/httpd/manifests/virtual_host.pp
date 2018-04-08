@@ -69,7 +69,7 @@ define httpd::virtual_host(
       file { "${conf_file_name}.conf":
         ensure  => present,
         path    => "${sites_available_location}${conf_file_name}.conf",
-        mode    => 0777,
+        mode    => "0777",
         require => [Augeas["load httpd.conf for ${name} virtual host"],Class["httpd::virtual_host::sites"]]
       }
 
