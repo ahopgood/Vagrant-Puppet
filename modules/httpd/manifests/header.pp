@@ -96,6 +96,9 @@ define httpd::header::install{
   }
 }
 
+/*
+ * Sets a header within a specified virtual host file.
+ */
 define httpd::header::set_virtual(
   $virtual_host = undef,
   $header_name = undef,
@@ -200,6 +203,9 @@ define httpd::header::set_virtual(
   }
 }
 
+/*
+ * Sets a header in the global apache configuration
+ */
 define httpd::header::set_global(
   $header_name = undef,
   $header_value = undef,
