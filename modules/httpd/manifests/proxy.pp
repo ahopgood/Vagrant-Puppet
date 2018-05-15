@@ -68,6 +68,7 @@ define httpd::proxy::gateway::set_virtual(
   # location "/" to indicate that all root traffic on this virtual host will have the following restraints
   # Require ip parameter
 
+
   augeas { "add ${module_name} module to httpd config":
     incl     => "${conf_file_location}",
     lens     => "Httpd.lns",

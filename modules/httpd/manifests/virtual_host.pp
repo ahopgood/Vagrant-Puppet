@@ -145,19 +145,19 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_document_root_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'DocumentRoot']/arg[. = '${document_root}'] size == 0"],
-      before => Augeas["${server_name}.conf VirtualHost ServerName setup"],
-      require => Package["${httpd_package_name}"]
+      require => Package["${httpd_package_name}"],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   } else {
-    # augeas { "${server_name}.conf VirtualHost DocumentRoot removal":
-    #   incl    => "${sites_available_location}${conf_file_name}.conf",
-    #   lens    => "Httpd.lns",
-    #   context => "/files${sites_available_location}${conf_file_name}.conf/",
-    #   changes => $virtual_host_document_root_changes,
-    #   onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'DocumentRoot']/arg[. = '${document_root}'] size == 0"],
-    #   before => Augeas["${server_name}.conf VirtualHost ServerName setup"],
-    #   require => Package["${httpd_package_name}"]
-    # }
+    augeas { "${server_name}.conf VirtualHost DocumentRoot removal":
+      incl    => "${sites_available_location}${conf_file_name}.conf",
+      lens    => "Httpd.lns",
+      context => "/files${sites_available_location}${conf_file_name}.conf/",
+      changes => "rm /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'DocumentRoot']",
+      onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'DocumentRoot'] size > 0"],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"],
+      require => Package["${httpd_package_name}"],
+    }
   }
 
   if ($access_logs == true){
@@ -167,8 +167,9 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_access_logs_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'CustomLog']/arg[. = '${log_location}${server_name}-access.log'] size == 0"],
-      require => [Package["${httpd_package_name}"],
-        Augeas["${server_name}.conf VirtualHost ServerName setup"],]
+      require => [Package["${httpd_package_name}"]],
+        # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   } else {
     augeas { "${server_name}.conf VirtualHost Access Logs removal":
@@ -177,8 +178,9 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => "rm /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'CustomLog']",
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'CustomLog'] size > 0"],
-      require => [Package["${httpd_package_name}"],
-        Augeas["${server_name}.conf VirtualHost ServerName setup"],]
+      require => [Package["${httpd_package_name}"]],
+        # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   }
   if ($error_logs == true){
@@ -188,8 +190,9 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_error_logs_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ErrorLog']/arg[. = '${log_location}${server_name}-error.log'] size == 0"],
-      require => [Package["${httpd_package_name}"],
-        Augeas["${server_name}.conf VirtualHost ServerName setup"]]
+      require => [Package["${httpd_package_name}"]],
+        # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   } else {
     augeas { "${server_name}.conf VirtualHost Error Logs removal":
@@ -198,8 +201,9 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => "rm /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ErrorLog']",
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ErrorLog'] size > 0"],
-      require => [Package["${httpd_package_name}"],
-        Augeas["${server_name}.conf VirtualHost ServerName setup"]]
+      require => [Package["${httpd_package_name}"]],
+        # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   }
 
@@ -217,14 +221,14 @@ define httpd::virtual_host(
     }
   }
   #Add server name
-    augeas { "${server_name}.conf VirtualHost ServerName setup":
-      incl    => "${sites_available_location}${conf_file_name}.conf",
-      lens    => "Httpd.lns",
-      context => "/files${sites_available_location}${conf_file_name}.conf/",
-      changes => $virtual_host_server_name_changes,
-      onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
-      notify => Service["${httpd_package_name}"]
-    }
+  augeas { "${server_name}.conf VirtualHost ServerName setup":
+    incl    => "${sites_available_location}${conf_file_name}.conf",
+    lens    => "Httpd.lns",
+    context => "/files${sites_available_location}${conf_file_name}.conf/",
+    changes => $virtual_host_server_name_changes,
+    onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
+    notify => Service["${httpd_package_name}"]
+  }
 }
 
 define httpd::virtual_host::server_alias(

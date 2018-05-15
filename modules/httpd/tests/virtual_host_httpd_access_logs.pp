@@ -20,12 +20,11 @@ Package{
     server_name => "www.alexander.com",
     document_root => "/var/www/alexander/",
     server_alias => ["alexander.com","alexander.net"],
-    access_logs => false
+    access_logs => true
   }
   ->
   file {"/var/www/alexander/":
     ensure => directory,
-    #    require => Class["httpd"]
   }
   ->
   file {"/var/www/alexander/index.html":

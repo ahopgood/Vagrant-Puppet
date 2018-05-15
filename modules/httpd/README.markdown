@@ -339,15 +339,19 @@ call to the header module header_contents array.
 
 ## Virtual Hosts <a name="VirtualHosts"></a>
 Required parameters:  
-* server_name - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
-* document_root - the location of the web resources you will be serving via your virtual host
+* `server_name` - the domain name of the server you want a virtual host for e.g. www.google.co.uk, this will be used to match incoming requests and also to name the virtual host configuration file.
+* `document_root` - the location of the web resources you will be serving via your virtual host
 
 Optional parameters:  
-* server_alias - an array of strings that represent the server aliases
+* `server_alias` - an array of strings that represent the server aliases
+* `access_logs` - a boolean, indicates if you wish the virtual host to have its own access logs in `/var/logs/apache2/`, defaults to **false**
+* `error_logs` - a boolean, indicates if you wish the virtual host to have its own error logs in `/var/logs/apache2/`, defaults to **false**
 
 This definition allows for you to setup a virtual host linked to a domain (server_name) of your choice to web assets (document_root) hosted on your server.
 The document root / web page assets are not instantiated through this definition, you create those elsewhere however you want.
 A list of server aliases can be used to setup separate `ServerAlias` entries in the configuration file for a site.
+Error and access logs if enabled will be named after the virtualhost name with either `-access.log` or `-error.log` appended. 
+Custom error and access logs will be removed if set to false.  
 ### Usage
 ```
 class {"httpd::virtual_host::sites":}
@@ -370,6 +374,41 @@ httpd::virtual_host{"www.cv.alexanderhopgood.com":
 * Add support for custom log
 * SSL support
 
+## Proxy Gateway <a name="Gateway"></a>
+This definition allows setup of apache as a gateway by installing the `proxy` and `proxy_httpd` modules
+### Usage
+```
+httpd::proxy::gateway::install{"":}
+```
+### Dependencies
+* Requires the `module` module provided by the `httpd::module::install` definition which is used to install the `proxy` and `proxy_httpd` modules.
+
+### Support
+* Ubuntu 15.10
+
+#### Virtual Hosts
+A VirtualHost can be configured to be a gateway to another machines
+Required parameters:
+* `virtual_host` - the name of the virtual host, this is the `server_name` used when configuring the [VirtualHost](#VirtualHosts) module, this name is used to derive the VirtualHost configuration file.  
+* `host_address` - the host IP address (and port if required) that the gateway will forward traffic to from the VirtualHost.  
+* `require_origin_address` (Optional) - will restrict the gateway to only service requests come from a specific IP address or [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) representation subnet.
+#### Usage
+```
+  httpd::proxy::gateway::set_virtual{"":
+    virtual_host => undef,
+    host_address => undef,
+    required_origin_address => undef }
+```
+### ToDo
+* Try to use this as an `@httpd::proxy::gateway::install` realized resource.
+* Wire up virtual_host parameter to augeas definition
+* Wire up host_address parameter to augeas definition
+* Wire up require_origin_address parameter to augeas definition
+* Split augeas steps to make require_origin_address optional
+* Add onlyif clause to main virtual_host and host_address sections to ensure they update correctly
+
+
+
 ## ToDo
 * Increase supported Apache versions from the current least supported version of this module to the most current version released in the OS's repository:  
 	* CentOS6 current - 2.2.15 this is the latest in the CentOS6
@@ -385,5 +424,5 @@ httpd::virtual_host{"www.cv.alexanderhopgood.com":
 * Have all files saved to `/etc/puppet/installers/httpd/`
 * In the case of an upgrade from one version of apache to another, remove old package files from `/etc/puppet/installers/httpd` folder
 * Proxy pass
-* VirtualHost error log
-* VirtualHost cutom log
+* **done** VirtualHost error log
+* **done** VirtualHost custom log

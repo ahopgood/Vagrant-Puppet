@@ -20,7 +20,7 @@ Package{
     server_name => "www.alexander.com",
     document_root => "/var/www/alexander/",
     server_alias => ["alexander.com","alexander.net"],
-    error_logs => false
+    error_logs => true
   }
   ->
   file {"/var/www/alexander/":
