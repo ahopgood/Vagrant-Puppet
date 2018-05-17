@@ -67,7 +67,7 @@ define httpd::proxy::gateway::set_virtual(
       "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPassReverse']/arg[2] '\"${host_address}/\"'",
     ]
 
-    augeas { "add ${module_name} module to httpd config":
+    augeas { "add proxy_module module to ${virtual_host} config":
       incl     => "${conf_file_location}",
       lens     => "Httpd.lns",
       context  => "${context}",
@@ -75,25 +75,42 @@ define httpd::proxy::gateway::set_virtual(
       onlyif   => "match ${context}/VirtualHost/IfModule/arg[. = 'proxy_module']/directive[. = 'ProxyPass']/arg[2] != '\"${host_address}\"'",
     }
   } else {
-  #   remove
+    augeas { "remove proxy_module module from ${virtual_host} config":
+      incl     => "${conf_file_location}",
+      lens     => "Httpd.lns",
+      context  => "${context}",
+      changes  => [
+        "clear ${context}/VirtualHost/IfModule[arg = 'proxy_module']/",
+        "rm ${context}/VirtualHost/IfModule[arg = 'proxy_module']/"
+      ],
+    }
   }
-  if ($required_origin_address != undef){
+  if ( $required_origin_address != undef ){
     $location_contents = [
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/arg '\"/\"'",
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/directive Require",
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/directive[. = 'Require']/arg[1] ip",
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/directive[. = 'Require']/arg[2] ${required_origin_address}",
     ]
-    augeas { "adding required Id ${required_origin_address} to gateway":
+    augeas { "Adding Require Ip ${required_origin_address} to gateway":
       incl     => "${conf_file_location}",
       lens     => "Httpd.lns",
       context  => "${context}",
       changes  => $location_contents,
-      # onlyif   => "match ${context}/VirtualHost/IfModule/arg[. = 'proxy_module']/Location/directive[. = 'Require']/arg[. = 'ip'] size == 0",
+      onlyif   => "match ${context}/VirtualHost/IfModule/arg[. = 'proxy_module']/Location/directive[. = 'Require']/arg[2] != '${required_origin_address}'",
+      require =>  Augeas["add proxy_module module to ${virtual_host} config"]
     }
-
   } else {
     # remove the location required ip entry
+    augeas { "Removing Require Ip from gateway":
+      incl     => "${conf_file_location}",
+      lens     => "Httpd.lns",
+      context  => "${context}",
+      changes  => [
+        "clear ${context}/VirtualHost/IfModule[arg = 'proxy_module']/Location/",
+        "rm ${context}/VirtualHost/IfModule[arg = 'proxy_module']/Location/"
+      ],
+    }
   }
 
 }
