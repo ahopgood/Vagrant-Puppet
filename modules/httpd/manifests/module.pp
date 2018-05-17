@@ -12,6 +12,7 @@ define httpd::module::install(
     exec { "restart-apache2-to-install-${module_name}":
       path    => "/usr/sbin/:/bin/",
       command => "service apache2 restart",
+      unless  => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep ${module_name}",
     }
   } elsif (versioncmp("${operatingsystem}", "CentOS") == 0){
     if (

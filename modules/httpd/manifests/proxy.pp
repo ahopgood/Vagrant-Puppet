@@ -79,6 +79,7 @@ define httpd::proxy::gateway::set_virtual(
       incl     => "${conf_file_location}",
       lens     => "Httpd.lns",
       context  => "${context}",
+      before => Augeas["Removing Require Ip from gateway"],
       changes  => [
         "clear ${context}/VirtualHost/IfModule[arg = 'proxy_module']/",
         "rm ${context}/VirtualHost/IfModule[arg = 'proxy_module']/"

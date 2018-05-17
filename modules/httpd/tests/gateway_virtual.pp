@@ -38,6 +38,6 @@ httpd::proxy::gateway::install{"install-gateway-module":}
 ->
 httpd::proxy::gateway::set_virtual{"set virtual host gateway":
   virtual_host => $virtual_host_name,
-  # host_address => "http://192.168.4.5:8080",
-  # required_origin_address => "192.168.0.0/16"
+  host_address => "http://192.168.4.5:8080",
+  required_origin_address => "192.168.0.0/16"
 }
