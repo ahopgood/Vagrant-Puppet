@@ -74,12 +74,12 @@ define httpd::virtual_host(
       require => [Augeas["load httpd.conf for ${name} virtual host"], Class["httpd::virtual_host::sites"]]
     }
 
-    #Create the symbolic link form our *.conf in available to enabled.
+    #Create the symbolic link from our *.conf in available to enabled.
     file { "enable ${conf_file_name}.conf":
       ensure  => link,
       target  => "${sites_available_location}${conf_file_name}.conf",
       path    => "${sites_enabled_location}${conf_file_name}.conf",
-      before  => [Augeas["${server_name}.conf VirtualHost DocumentRoot setup"],
+      before  => [
         Augeas["${server_name}.conf VirtualHost ServerName setup"]],
       require => File["${conf_file_name}.conf"]
     }
