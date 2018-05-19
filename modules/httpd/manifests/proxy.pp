@@ -93,7 +93,7 @@ define httpd::proxy::gateway::set_virtual(
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/directive[. = 'Require']/arg[1] ip",
       "set VirtualHost/IfModule[arg = 'proxy_module']/Location/directive[. = 'Require']/arg[2] ${required_origin_address}",
     ]
-    augeas { "Adding Require Ip ${required_origin_address} to gateway":
+    augeas { "Adding Require Ip ${required_origin_address} to gateway ${virtual_host}":
       incl     => "${conf_file_location}",
       lens     => "Httpd.lns",
       context  => "${context}",
@@ -103,7 +103,7 @@ define httpd::proxy::gateway::set_virtual(
     }
   } else {
     # remove the location required ip entry
-    augeas { "Removing Require Ip from gateway":
+    augeas { "Removing Require Ip ${required_origin_address} from gateway ${virtual_host}":
       incl     => "${conf_file_location}",
       lens     => "Httpd.lns",
       context  => "${context}",
