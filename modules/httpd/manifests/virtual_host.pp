@@ -215,7 +215,7 @@ define httpd::virtual_host(
         sites_enabled_location => $sites_enabled_location,
         conf_file_name => $conf_file_name,
         server_name => $server_name,
-        require => Augeas["${server_name}.conf VirtualHost DocumentRoot setup"],
+        # require => Augeas["${server_name}.conf VirtualHost DocumentRoot setup"],
         before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
       }
     }
