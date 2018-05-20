@@ -21,7 +21,7 @@ class {"httpd::virtual_host::sites":}
 
 httpd::virtual_host{"test":
   server_name => "www.alexander.com",
-  document_root => "/var/www/alexander/",
+  # document_root => "/var/www/alexander/",
   server_alias => ["alexander.com","alexander.net"]
 }
 ->

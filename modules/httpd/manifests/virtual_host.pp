@@ -84,9 +84,11 @@ define httpd::virtual_host(
       require => File["${conf_file_name}.conf"]
     }
 
+    $virtual_host_port_changes = [
+      "set VirtualHost/arg *:80"
+    ]
     #Add Document Root
     $virtual_host_document_root_changes = [
-      "set VirtualHost/arg *:80",
       "set VirtualHost/directive[last()+1] DocumentRoot",
       "set VirtualHost/directive[last()]/arg ${document_root}",
     ]
@@ -109,9 +111,11 @@ define httpd::virtual_host(
     ]
 
   } elsif (versioncmp("${httpd_major_version}.${httpd_minor_version}", "2.2") == 0) {
+    $virtual_host_port_changes = [
+      "set VirtualHost[last()+1]/arg *:80"
+    ]
     #Add Document Root
     $virtual_host_document_root_changes = [
-      "set VirtualHost[last()+1]/arg *:80",
       "set VirtualHost[last()]/directive[last()+1] DocumentRoot",
       "set VirtualHost[last()]/directive[last()]/arg ${document_root}",
     ]
@@ -137,6 +141,15 @@ define httpd::virtual_host(
     fail("${operatingsystem} ${operatingsystemmajrelease} not currently supported")
   }
 
+  augeas { "${server_name}.conf VirtualHost port setup":
+    incl    => "${sites_available_location}${conf_file_name}.conf",
+    lens    => "Httpd.lns",
+    context => "/files${sites_available_location}${conf_file_name}.conf/",
+    changes => $virtual_host_port_changes,
+    onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost/arg[. = '*:80'] size == 0"],
+    require => Package["${httpd_package_name}"],
+    before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
+  }
   if ($document_root != undef){
     #Add Document Root
     augeas { "${server_name}.conf VirtualHost DocumentRoot setup":
@@ -167,8 +180,8 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_access_logs_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'CustomLog']/arg[. = '${log_location}${server_name}-access.log'] size == 0"],
-      require => [Package["${httpd_package_name}"]],
-        # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
+      require => [Package["${httpd_package_name}"],
+        Augeas["${server_name}.conf VirtualHost port setup"]],
       before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   } else {
@@ -215,8 +228,9 @@ define httpd::virtual_host(
         sites_enabled_location => $sites_enabled_location,
         conf_file_name => $conf_file_name,
         server_name => $server_name,
+        require => Augeas["${server_name}.conf VirtualHost ServerName setup"]
         # require => Augeas["${server_name}.conf VirtualHost DocumentRoot setup"],
-        before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
+        # before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
       }
     }
   }
@@ -227,6 +241,9 @@ define httpd::virtual_host(
     context => "/files${sites_available_location}${conf_file_name}.conf/",
     changes => $virtual_host_server_name_changes,
     onlyif  => "match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ServerName']/arg[. = '${server_name}'] size == 0",
+    require => [
+      Augeas["${server_name}.conf VirtualHost port setup"]
+      ],
     notify => Service["${httpd_package_name}"]
   }
 }
