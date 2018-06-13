@@ -111,13 +111,6 @@ an example would be:
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Apache
 
-## Raspberian
-### <a href="Raspberian_known_issues">Raspberian known issues</a>
-### <a href="Raspberian_file_naming_conventions">Rapberian File naming conventions</a>
-### Adding compatibility for other Raspberian versions
-### Adding new major versions of ddclient
-
-
 ## ToDo
 * Add support for CentOS 6
 * Add support for Ubuntu 15
@@ -125,9 +118,14 @@ an example would be:
 
 <a name="xmlstarlet"></a>
 ## augeas::xmlstarlet module
-This provides the [XmlStarlet]() package version 1.6.1  
+This provides the [XmlStarlet](http://xmlstar.sourceforge.net/) package version 1.6.1  
 Supports:
 * Ubuntu Wily 15.10 64-bit
+
+### Usage
+```
+class {"augeas::xmlstarlet":}
+```
 
 <a name="formatXML"></a>
 ### augeas::formatXML
@@ -135,3 +133,10 @@ This definition/module will pretty print XML with tabs since augeas is incapable
 * filepath - the path of the xml file to format.
   
 Requires [augeas::xmlstarlet](#xmlstarlet).  
+
+#### Usage
+```
+  augeas::formatXML { "somename":
+    filepath => "/var/lib/myfile.xml"
+  }
+```

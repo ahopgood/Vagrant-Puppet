@@ -22,7 +22,7 @@ class httpd::ubuntu (
     source => "puppet:///${puppet_file_dir}${liblua_file}"
   }
 
-  package{"liblua":
+  package{"liblua5.1-0":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${liblua_file}",
@@ -36,11 +36,11 @@ class httpd::ubuntu (
     source => "puppet:///${puppet_file_dir}${libaprutilsqlite3_file}"
   }
 
-  package{"libaprutilsqlite3":
+  package{"libaprutil1-dbd-sqlite3":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libaprutilsqlite3_file}",
-    require => [File["libaprutilsqlite3-file"], Package["libaprutil"]]
+    require => [File["libaprutilsqlite3-file"], Package["libaprutil1"]]
   }
 
   $libaprutilldap_file = "libaprutil1-ldap_1.5.4-1_${platform}.deb"
@@ -50,7 +50,7 @@ class httpd::ubuntu (
     source => "puppet:///${puppet_file_dir}${libaprutilldap_file}"
   }
 
-  package{"libaprutilldap":
+  package{"libaprutil1-ldap":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libaprutilldap_file}",
@@ -64,7 +64,7 @@ class httpd::ubuntu (
     source => "puppet:///${puppet_file_dir}${libaprutil_file}"
   }
 
-  package{"libaprutil":
+  package{"libaprutil1":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libaprutil_file}",
@@ -98,10 +98,10 @@ class httpd::ubuntu (
     source => "${local_install_dir}${apache_bin_file}",
     require => [File["apache2-bin-file"],
       Package["libapr1"],
-      Package["libaprutil"],
-      Package["libaprutilldap"],
-      Package["liblua"],
-      Package["libaprutilsqlite3"]]
+      Package["libaprutil1"],
+      Package["libaprutil1-ldap"],
+      Package["liblua5.1-0"],
+      Package["libaprutil1-dbd-sqlite3"]]
   }
 
   $apache2_utils_file = "apache2-utils_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb"
@@ -117,7 +117,7 @@ class httpd::ubuntu (
     source => "${local_install_dir}${apache2_utils_file}",
     require => [File["apache2-utils-file"],
       Package["libapr1"],
-      Package["libaprutil"]
+      Package["libaprutil1"]
     ]
   }
   

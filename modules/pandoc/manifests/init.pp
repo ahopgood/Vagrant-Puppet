@@ -98,7 +98,7 @@ class pandoc{
     ensure => present,
     provider => dpkg,
     source => "${local_install_dir}${luatex_file_name}",
-    require => [File["${luatex_file_name}"]]
+    require => [File["${luatex_file_name}"],Package["tex-common"]]
   }
 
   $texlive_binaries_file_name = "texlive-binaries_2013.20130729.30972-2build3_${architecture}.${package_type}"

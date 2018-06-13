@@ -270,7 +270,7 @@ define jenkins::seed_job(
     "set project/blockBuildWhenDownstreamBuilding/#text false",
     "set project/blockBuildWhenUpstreamBuilding/#text false",
     "set project/concurrentBuild/#text false",
-    "set project/triggers/hudson.triggers.SCMTrigger/spec/#text  H 4 * * *\n* * * * *",
+    "set project/triggers/hudson.triggers.SCMTrigger/spec/#text  \"H 4 * * *\n* * * * *\"",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/#attribute/plugin job-dsl@1.66",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/targets/#text **/*.groovy",
     "set project/builders/javaposse.jobdsl.plugin.ExecuteDslScripts/usingScriptText/#text false",
