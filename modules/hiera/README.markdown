@@ -8,6 +8,9 @@ Currently the module needs to be run twice when being used by another module to 
 2. The second run is when the manifest will be able to pull value from hiera
 `puppet apply --hiera-config=/etc/puppet/hiera.yaml` which our specified hiera.yaml configuration file.  
 
+### Command line
+`eyaml encrypt `
+
 ## Todo
 * Add eyaml support
     * gem installation
