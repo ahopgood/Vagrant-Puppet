@@ -120,4 +120,7 @@ jenkins::credentials::ssh{"jenkins-ssh":
   key_name => "jenkins",
   ssh_creds_name => "jenkins_ssh"
 }
--> class {"dos2unix":}
+->
+class {"dos2unix":}
+->
+jenkins::global::reload::config{"set labels":}

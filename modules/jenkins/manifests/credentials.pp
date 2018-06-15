@@ -59,7 +59,6 @@ define jenkins::credentials::gitCredentials(
   $token_name = undef,
 ) {
   include jenkins::credentials
-  # $credentials_file = "/var/lib/jenkins/credentials.xml"
   realize(File["${jenkins::credentials::credentials_file}"])
   realize(Augeas["jenkins_credentials_config"])
 
