@@ -18,6 +18,8 @@ Modules supported/available:
 * [Git credentials module](#gitCredentials)
 * [Java module](#java)
 * [Maven module](#maven)
+* [Jenkins Cli](#jenkins-cli)
+    * [Configuration reload](#conf-reload)
 
 ## Current Status / Support
 Supports:
@@ -121,8 +123,10 @@ Currently there is no enforced naming conventions beyond the following:
 * [git credentials module](#gitCredentials)
 * [java module](#java)
 * [maven module](#maven)
+* [Jenkins Cli](#jenkins-cli)
+    * [Configuration reload](#conf-reload)
 
-<a name=""></a>
+<a name="seedjob"></a>
 ### jenkins::seed_job module
 This module provides the ability to specify a seed job defined in the [Jenkins job DSL](https://github.com/jenkinsci/job-dsl-plugin) formerly known as the netflix jenkins dsl.  
 It takes two parameters:
@@ -166,7 +170,7 @@ Allows for global configuration of a specified Java Development Kit (JDK) in the
 
 This will generate a globally named JDK in the following format: `1.${major_version}.0_${update_version}` which can then be referenced by your jobs.    
 If adding multiple entries, the first should have `appendNewJdk = false` will all subsequent values being true.  
-### Support
+#### Support
 * Ubuntu 15.10
 #### Requirements
 Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.  
@@ -181,15 +185,49 @@ Allows for global configuration of a specified maven version in the `hudson.task
 
 Will generate a globally named maven entry in the following format: `Maven-${major_version}-${minor_version}-${patch_version}` allowing for reference by your jobs.  
 
-### Support
+#### Support
 * Ubuntu 15.10  
 * Only major versions of maven can be specified (e.g. maven2, maven3 etc), a restriction/limitation of the maven module requirement
 #### Requirements
 Requires the [augeas::formatXML](../augeas/README.markdown#formatXML) module for sane xml formatting.    
 Requires maven to be installed via the [maven module](../maven/README.markdown), assumes maven is installed to `/usr/share/maven*` where * is the major version.    
-### To do
+#### To do
 * Remove granularity on maven - that way jobs only require a major version, would increase longevity.
 * Granularity only required if asked for, e.g. can then create a specific version for a particular job
+
+<a name="jenkins-cli"></a>
+### Jenkins Cli 
+Currently the `jenkins::global::reload::config` definition makes use of the `jenkins-cli.jar`.  
+If other cli calls are required then the file resource for the jar could be turned into a virtual resource to prevent dependency conflicts.  
+The exec call to the cli jar can also be generalised within its own module `jenkins::cli` to template calls to the cli.  
+
+Supported calls:
+* [Configuration Reload](#config-reload)
+
+#### To Do
+* Move the cli jar file to a virtual resource so it doesn't clash with multiple declarations
+* Create a sub definition for calling the cli so that other calls can be supported via the cli.
+
+<a name="config-reload"></a>
+#### Configuration Reload
+Allows for the Jenkins configuration to be reloaded with having to restart jenkins, useful for configuration file changes 
+such as adding labels to a node.  
+
+```
+jenkins::global::reload::config{"set labels":}
+```
+or using a different account to trigger the reload:
+```
+jenkins::global::reload::config{"set labels":
+    username => "test",
+    password => "test"
+}
+```
+#### Support
+* Ubuntu 15.10  
+#### Requirements
+* Java needs to be present in the `/usr/bin/` location.
+* The admin username needs to be stored either in hiera under the key `jenkins::admin::password::plaintext` or passed as a parameter
 
 ## ToDo
 ### CentOS
