@@ -111,21 +111,14 @@ define jenkins::global::reload::config(
   $username = 'admin',
   $password = hiera('jenkins::admin::password::plaintext','test'),
 ){
-  file {"jenkins-cli.jar [${title}]":
-    ensure => present,
-    source => "/var/cache/jenkins/war/WEB-INF/jenkins-cli.jar",
-    path => "/usr/bin/jenkins-cli.jar",
-    # owner => "root",
-    # group => "root",
-    mode => "777",
-  }
-
+  include jenkins::cli
+  realize(File["jenkins-cli.jar"])
   exec{"reload-config [${title}]":
     path => "/usr/bin/",
     # user => "root",
-    tries => 5,
+    tries => 10,
     try_sleep => 5,
     command => "java -jar /usr/bin/jenkins-cli.jar -s http://127.0.0.1:8080 reload-configuration --username ${username} --password ${password}",
-    require => File["jenkins-cli.jar [${title}]"]
+    require => File["jenkins-cli.jar"]
   }
 }
