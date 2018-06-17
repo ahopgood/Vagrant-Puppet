@@ -122,6 +122,13 @@ class jenkins (
     path => "/usr/local/bin/${backup_script}",
     source => ["puppet:///${puppet_file_dir}${backup_script}"]
   }
+
+  file {"/var/lib/jenkins/logs/":
+    ensure => directory,
+    owner => "jenkins",
+    group => "jenkins",
+    mode => "0777"
+  }
   # iptables port exemption needed?
   if ($perform_manual_setup == true){
     cron {"schedule-backup":
