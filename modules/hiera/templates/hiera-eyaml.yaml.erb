@@ -6,7 +6,7 @@
   :datadir: '<%= @hiera_data%>'
 :hierarchy:
   - common
-  - osfamily/%{::osfamily}
+  - "osfamily/%{::osfamily}"
 :logger: console
 :merge_behaviour: native
 
