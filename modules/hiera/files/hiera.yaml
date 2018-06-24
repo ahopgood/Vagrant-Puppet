@@ -4,7 +4,7 @@
 :yaml:
   :datadir: '/etc/puppet/hieradata/'
 :hierarchy:
-  - common
   - "osfamily/%{::osfamily}"
+  - common
 :logger: console
 :merge_behaviour: native
