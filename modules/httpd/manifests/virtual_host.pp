@@ -107,7 +107,6 @@ define httpd::virtual_host(
     $virtual_host_error_logs_changes = [
       "set VirtualHost/directive[last()+1] ErrorLog",
       "set VirtualHost/directive[last()]/arg[1] ${log_location}${server_name}-error.log",
-      "set VirtualHost/directive[last()]/arg[2] combined",
     ]
 
   } elsif (versioncmp("${httpd_major_version}.${httpd_minor_version}", "2.2") == 0) {
@@ -134,7 +133,6 @@ define httpd::virtual_host(
     $virtual_host_error_logs_changes = [
       "set VirtualHost[last()]/directive[last()+1] ErrorLog",
       "set VirtualHost[last()]/directive[last()]/arg[1] ${log_location}${server_name}-error.log",
-      "set VirtualHost[last()]/directive[last()]/arg[2] combined",
     ]
 
   } else {
