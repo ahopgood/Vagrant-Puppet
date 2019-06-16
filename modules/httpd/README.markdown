@@ -58,7 +58,8 @@ class{httpd::centos":
 * Install on a fresh system
 	* CentOS6
 	* CentOS7
-	
+	* Ubuntu 15.10 - Apache 2.4.12
+	* Ubuntu 16.04 - Apache 2.4.39
 ## CentOS
 Installs apache to the following locations:
 * `/usr/sbin/httpd` executable file
@@ -165,8 +166,8 @@ For the **existing** dependencies if they are still applicable then you need to 
 You will also need to add these new file names/versions to the main **ubuntu.pp** manifest and include a new condition to resolve for your version of the OS.  
 ```
 	$apr_file = $os ? {
-    	'Ubuntu14.04' => "apr-1.4.8-3.el7.x86_64.rpm",
-    	'Ubuntu14.04' => "apr-1.3.9-5.el6_2.x86_64.rpm",
+    	'Ubuntu15.10' => "libapr1_1.5.2-3_amd64.deb",
+    	'Ubuntu16.04' => "libapr1_1.6.2-1+ubuntu16.04.1+deb.sury.org+2_amd64.deb",
     	default => undef,
 	}
 ```

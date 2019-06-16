@@ -64,7 +64,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
     ubuntu.vm.network "private_network", ip: "192.168.33.26"
     ubuntu.vm.box = "reclusive/xenial64-puppet"
-    ubuntu.vm.box_check_update = false
+    ubuntu.vm.box_check_update = true
   end
 
 end

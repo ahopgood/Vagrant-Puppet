@@ -34,11 +34,24 @@ class augeas {
     }
     $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
   } elsif (versioncmp("${operatingsystem}", "Ubuntu") == 0){
-    $major_version = "1"
-    $minor_version = "3"
-    $patch_version = "0"
+    if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
+    # if (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+      $major_version = "1"
+      $minor_version = "3"
+      $patch_version = "0"
+      $package = "-0ubuntu1"
+      $ensure = "present"
+    } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+      $major_version = "1"
+      $minor_version = "4"
+      $patch_version = "0"
+      $package = "-0ubuntu1.1"
+      # $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
+      $ensure = "present"
+    } else {
+      fail("Ubuntu ${operatingsystemmajrelease} is not supported")
+    }
 
-    $package = "-0ubuntu1"
     $platform = "${package}_${architecture}.deb"
     $provider = "dpkg"
 
@@ -50,8 +63,6 @@ class augeas {
 
     $augeas_lenses="augeas-lenses"
     $augeas_lenses_file = "${augeas_lenses}_${major_version}.${minor_version}.${patch_version}${package}_all.deb"
-
-    $ensure = "present"
 
     file {"${augeas_lenses_file}":
       ensure => present,
@@ -106,6 +117,10 @@ class augeas::xmlstarlet{
   if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
     if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0){
       $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-1_amd64.deb"
+      $provider = "dpkg"
+      $ensure = "present"
+    } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+      $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-1ubuntu1_amd64.deb"
       $provider = "dpkg"
       $ensure = "present"
     } else {
