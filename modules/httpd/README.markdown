@@ -4,7 +4,7 @@ This is the httpd module. It provides... [httpd / Apache2 functionality](https:/
 The module can be passed the following parameters as Strings:  
 * Major version number, e.g. "2"
 * Minor version number, e.g. "4"
-* Patch version number e.g. "14"
+* Patch version number e.g. "12"
 
 Supplementary Documentation:
 * [Virtual Hosts](#VirtualHosts)
@@ -15,7 +15,8 @@ Supplementary Documentation:
 Tested to work on the following operating systems:
 * CentOS 6 - Apache 2.2.15, **it is advisable to move on from CentOS 6 - these repositories are no longer being updated**
 * CentOS 7 - Apache 2.4.6
-* Ubuntu 15.10 - Apache 2.4.6
+* Ubuntu 15.10 - Apache 2.4.12 **it is advisable to move on from Ubuntu 15.10 - these repositories are no longer being updated**
+* Ubuntu 16.04 - Apache 2.4.39
 
 ### Known Issues  
 * **64-bit support only**  
@@ -159,8 +160,42 @@ an example would be:
 `apache2_2.4.12-Ubuntu_15.10_amd64.deb`
 -->
 ### Adding compatibility for other Ubuntu versions
-### Adding new major versions of Apache
+Ensure that a new directory is present in the /file/Ubuntu/* directory named after the new version of Ubuntu and ensure the apache installer is present.    
+For the **existing** dependencies if they are still applicable then you need to add them to the new version directory.   
+You will also need to add these new file names/versions to the main **ubuntu.pp** manifest and include a new condition to resolve for your version of the OS.  
+```
+	$apr_file = $os ? {
+    	'Ubuntu14.04' => "apr-1.4.8-3.el7.x86_64.rpm",
+    	'Ubuntu14.04' => "apr-1.3.9-5.el6_2.x86_64.rpm",
+    	default => undef,
+	}
+```
+If there are **new** dependencies then you'll need to add their installers to the **/files/CentOS/x/** folder where x is the CentOS version and you'll need to create a whole new conditional resolution for the library name, similar to the **apr** example above to ensure that name resolves correctly.  
+As well as name resolution you'll also need to add a conditional section based on the OS version to actually obtain the installer file and then install the package, an example for the apr installer is found below:  
+```
+	file{
+    	"${local_install_dir}${apr_file}":
+    	ensure => present,
+    	path => "${local_install_dir}${apr_file}",
+    	source => ["puppet:///${puppet_file_dir}${apr_file}"]
+	}
+	package {"apr":
+    	ensure => present,
+    	provider => 'rpm',
+    	source => "${local_install_dir}${apr_file}",
+    	require => File["${local_install_dir}${apr_file}"]
+	}
+```
+All dependencies and the actual Apache installer itself are best obtained by running `apt-get download <installername>` on the target Ubuntu version.  
 
+### Adding new major versions of Apache
+To get the latest version of apache2 from Ubuntu's default repositories use `apt-get update && apt-get download apache2`.  
+If you need the latest version of apache2 and it **isn't available** via the default repositories then you'll need to add a third party repository:
+```bash
+  sudo add-apt-repository ppa:ondrej/apache2
+  sudo apt-get update
+
+```
 ## Terry Pratchett x-clacks header <a name="Terry_Pratchett_x-clacks_header"></a>
 Support has been added for the following HTTP header:
 `X-Clacks-Overhead "GNU Terry Pratchett"`
@@ -309,7 +344,7 @@ header set Content-Security-Policy "default-src 'self'"
 </VirtualHost>
 
 ```
-### Depdendencies
+### Dependencies
 This will only work if the headers module is installed.
 The Augeas class is required.  
 **Note** Use of the x-clacks-overhead *after* this module call will overwrite your **global** CSP header currently, virtual host policies will not be impacted.

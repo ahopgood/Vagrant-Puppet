@@ -3,125 +3,332 @@ class httpd::ubuntu (
   $minor_version = undef,
   $patch_version = undef,
 ){
-  
-  $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"
   $local_install_dir = "${local_install_path}installers/"
-  
-  ufw{"open port 80": 
+
+  ufw{"open port 80":
     port => "80",
     isTCP => true 
   }
-  
+
+  $apache_version = "${major_version}.${minor_version}.${patch_version}"
+
+  notify{"${apache_version}":}
+
   $platform = "amd64"
-  $ubuntu_version = "-2ubuntu2.1_"
-  
-  $liblua_file = "liblua5.1-0_5.1.5-8_${platform}.deb"
+  if (versioncmp("${apache_version}","2.4.12") == 0) {
+    $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/"
+    $ubuntu_version = "-2ubuntu2.1_"
+
+  } elsif (versioncmp("${apache_version}","2.4.39") == 0) {
+    $puppet_file_dir = "modules/httpd/${operatingsystem}/${operatingsystemmajrelease}/${major_version}.${minor_version}.${patch_version}/"
+    $ubuntu_version = "+ubuntu16.04.1+deb.sury.org+"
+
+    $libbrotli_package = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "libbrotli1",
+    }
+    $libbrotli_version = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "1.0.5-1${ubuntu_version}2",
+    }
+    $libbrotli_file = "${libbrotli_package}_${libbrotli_version}_${platform}.deb"
+    file{"libbrotli-file":
+      ensure => present,
+      path => "${local_install_dir}${libbrotli_file}",
+      source => "puppet:///${puppet_file_dir}${libbrotli_file}"
+    }
+
+    package{"${libbrotli_package}":
+      provider => "dpkg",
+      ensure => installed,
+      source => "${local_install_dir}${libbrotli_file}",
+      require => File["libbrotli-file"]
+    }
+    # libcurl3
+    $libcurl3_package = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "libcurl3",
+    }
+    $libcurl3_version = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "7.47.0-1ubuntu2.13",
+    }
+    $libcurl3_file = "${libcurl3_package}_${libcurl3_version}_${platform}.deb"
+    file{"libcurl3-file":
+      ensure => present,
+      path => "${local_install_dir}${libcurl3_file}",
+      source => "puppet:///${puppet_file_dir}${libcurl3_file}"
+    }
+
+    package{"${libcurl3_package}":
+      provider => "dpkg",
+      ensure => installed,
+      source => "${local_install_dir}${libcurl3_file}",
+      require => File["libcurl3-file"]
+    }
+
+    $libjansson4_package = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "libjansson4",
+    }
+    $libjansson4_version = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "2.7-3ubuntu0.1",
+    }
+    $libjansson4_file = "${libjansson4_package}_${libjansson4_version}_${platform}.deb"
+    file{"libjansson4-file":
+      ensure => present,
+      path => "${local_install_dir}${libjansson4_file}",
+      source => "puppet:///${puppet_file_dir}${libjansson4_file}"
+    }
+
+    package{"${libjansson4_package}":
+      provider => "dpkg",
+      ensure => installed,
+      source => "${local_install_dir}${libjansson4_file}",
+      require => File["libjansson4-file"]
+    }
+
+    $libnghttp2_14_package = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "libnghttp2-14",
+    }
+    $libnghttp2_14_version = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "1.29.0-1${ubuntu_version}1",
+    }
+    $libnghttp2_14_file = "${libnghttp2_14_package}_${libnghttp2_14_version}_${platform}.deb"
+    file{"libnghttp2_14-file":
+      ensure => present,
+      path => "${local_install_dir}${libnghttp2_14_file}",
+      source => "puppet:///${puppet_file_dir}${libnghttp2_14_file}"
+    }
+
+    package{"${libnghttp2_14_package}":
+      provider => "dpkg",
+      ensure => installed,
+      source => "${local_install_dir}${libnghttp2_14_file}",
+      require => File["libnghttp2_14-file"]
+    }
+
+    $libssl1_1_package = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "libssl1.1",
+    }
+    $libssl1_1_version = $apache_version ? {
+      "2.4.12" => undef,
+      "2.4.39" => "1.1.1c-1${ubuntu_version}1",
+    }
+    $libssl1_1_file = "${libssl1_1_package}_${libssl1_1_version}_${platform}.deb"
+    file{"libssl1_1-file":
+      ensure => present,
+      path => "${local_install_dir}${libssl1_1_file}",
+      source => "puppet:///${puppet_file_dir}${libssl1_1_file}"
+    }
+
+    package{"${libssl1_1_package}":
+      provider => "dpkg",
+      ensure => installed,
+      source => "${local_install_dir}${libssl1_1_file}",
+      require => File["libssl1_1-file"]
+    }
+  }
+
+  $liblua_package = $apache_version ? {
+    "2.4.12" => "liblua5.1-0",
+    "2.4.39" => "liblua5.2-0",
+  }
+  $liblua_version = $apache_version ? {
+    "2.4.12" => "5.1.5-8",
+    "2.4.39" => "5.2.4-1ubuntu1",
+  }
+  $liblua_file = "${liblua_package}_${liblua_version}_${platform}.deb"
+
   file{"liblua-file":
     ensure => present,
     path => "${local_install_dir}${liblua_file}",
     source => "puppet:///${puppet_file_dir}${liblua_file}"
   }
 
-  package{"liblua5.1-0":
+  package{"${liblua_package}":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${liblua_file}",
     require => File["liblua-file"]
   }
 
-  $libaprutilsqlite3_file = "libaprutil1-dbd-sqlite3_1.5.4-1_${platform}.deb"
-  file{"libaprutilsqlite3-file":
-    ensure => present,
-    path => "${local_install_dir}${libaprutilsqlite3_file}",
-    source => "puppet:///${puppet_file_dir}${libaprutilsqlite3_file}"
+  $libaprutil_package = $apache_version ? {
+    "2.4.12" => "libaprutil1",
+    "2.4.39" => "libaprutil1",
   }
-
-  package{"libaprutil1-dbd-sqlite3":
-    provider => "dpkg",
-    ensure => installed,
-    source => "${local_install_dir}${libaprutilsqlite3_file}",
-    require => [File["libaprutilsqlite3-file"], Package["libaprutil1"]]
+  $libaprutil_version = $apache_version ? {
+    "2.4.12" => "1.5.4-1",
+    "2.4.39" => "1.6.0-2${ubuntu_version}2",
   }
-
-  $libaprutilldap_file = "libaprutil1-ldap_1.5.4-1_${platform}.deb"
-  file{"libaprutilldap-file":
-    ensure => present,
-    path => "${local_install_dir}${libaprutilldap_file}",
-    source => "puppet:///${puppet_file_dir}${libaprutilldap_file}"
-  }
-
-  package{"libaprutil1-ldap":
-    provider => "dpkg",
-    ensure => installed,
-    source => "${local_install_dir}${libaprutilldap_file}",
-    require => File["libaprutilldap-file"]
-  }
-
-  $libaprutil_file = "libaprutil1_1.5.4-1_${platform}.deb"
+  $libaprutil_file = "${libaprutil_package}_${libaprutil_version}_${platform}.deb"
   file{"libaprutil-file":
     ensure => present,
     path => "${local_install_dir}${libaprutil_file}",
     source => "puppet:///${puppet_file_dir}${libaprutil_file}"
   }
 
-  package{"libaprutil1":
-    provider => "dpkg",
-    ensure => installed,
-    source => "${local_install_dir}${libaprutil_file}",
-    require => File["libaprutil-file"]
+  $libapr1_package = $apache_version ? {
+    "2.4.12" => "libapr1",
+    "2.4.39" => "libapr1",
   }
-
-  $libapr1_file = "libapr1_1.5.2-3_${platform}.deb"
+  $libapr1_version = $apache_version ? {
+    "2.4.12" => "1.5.2-3",
+    "2.4.39" => "1.6.2-1${ubuntu_version}2",
+  }
+  $libapr1_file = "${libapr1_package}_${libapr1_version}_${platform}.deb"
   file{"libapr1-file":
     ensure => present,
     path => "${local_install_dir}${libapr1_file}",
     source => "puppet:///${puppet_file_dir}${libapr1_file}"
   }
 
-  package{"libapr1":
+  package{"${libapr1_package}":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libapr1_file}",
     require => File["libapr1-file"]
   }
-  
-  $apache_bin_file = "apache2-bin_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb"
+
+  $libaprutil_deps = $apache_version ? {
+    "2.4.13" => [
+      File["libaprutil-file"]
+    ],
+    "2.4.39" => [
+      File["libaprutil-file"],
+      Package["${libapr1_package}"],
+      Package["${libssl1_1_package}"]
+    ],
+  }
+  package{"${libaprutil_package}":
+    provider => "dpkg",
+    ensure => installed,
+    source => "${local_install_dir}${libaprutil_file}",
+    require => [
+      File["libaprutil-file"],
+      Package["${libapr1_package}"],
+      Package["${libssl1_1_package}"]
+    ]
+  }
+
+  $libaprutilsqllite3_package = $apache_version ? {
+    "2.4.12" => "libaprutil1-dbd-sqlite3",
+    "2.4.39" => "libaprutil1-dbd-sqlite3"
+  }
+  $libaprutilsqllite3_version = $apache_version ? {
+    "2.4.12" => "1.5.4-1_",
+    "2.4.39" => "1.6.0-2${ubuntu_version}2_"
+
+  }
+  $libaprutilsqlite3_file = "${libaprutilsqllite3_package}_${libaprutilsqllite3_version}${platform}.deb"
+  file{"libaprutilsqlite3-file":
+    ensure => present,
+    path => "${local_install_dir}${libaprutilsqlite3_file}",
+    source => "puppet:///${puppet_file_dir}${libaprutilsqlite3_file}"
+  }
+
+  package{"${libaprutilsqllite3_package}":
+    provider => "dpkg",
+    ensure => installed,
+    source => "${local_install_dir}${libaprutilsqlite3_file}",
+    require => [File["libaprutilsqlite3-file"], Package["${libaprutil_package}"]]
+  }
+
+  $libaprutilldap_package = "libaprutil1-ldap"
+  $libaprutilldap_version = $apache_version ? {
+    "2.4.12" => "1.5.4-1",
+    "2.4.39" => "1.6.0-2${ubuntu_version}2"
+  }
+  $libaprutilldap_file = "libaprutil1-ldap_${libaprutilldap_version}_${platform}.deb"
+  file{"libaprutilldap-file":
+    ensure => present,
+    path => "${local_install_dir}${libaprutilldap_file}",
+    source => "puppet:///${puppet_file_dir}${libaprutilldap_file}"
+  }
+
+  package { "${libaprutilldap_package}":
+    provider => "dpkg",
+    ensure   => installed,
+    source   => "${local_install_dir}${libaprutilldap_file}",
+    require  => [File["libaprutilldap-file"],
+      Package["${libaprutil_package}"]
+    ]
+  }
+
+  $apache_bin_file = $apache_version ? {
+    "2.4.12" => "apache2-bin_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb",
+    "2.4.39" => "apache2-bin_${major_version}.${minor_version}.${patch_version}-1${ubuntu_version}1_${platform}.deb",
+  }
   file{"apache2-bin-file":
     ensure => present,
     path => "${local_install_dir}${apache_bin_file}",
     source => "puppet:///${puppet_file_dir}${apache_bin_file}"
   }
 
+  $apache_bin_deps = $apache_version ? {
+    "2.4.12" => [File["apache2-bin-file"],
+      Package["${libapr1_package}"],
+      Package["${libaprutil_package}"],
+      Package["${libaprutilldap_package}"],
+      Package["${liblua_package}"],
+      Package["${libaprutilsqllite3_package}"]],
+    "2.4.39" => [File["apache2-bin-file"],
+      Package["${libapr1_package}"],
+      Package["${libaprutil_package}"],
+      Package["${liblua_package}"],
+      Package["${libaprutilsqllite3_package}"],
+      Package["${libaprutilldap_package}"],
+      Package["${libbrotli_package}"],
+      Package["${libcurl3_package}"],
+      Package["${libjansson4_package}"],
+      Package["${libnghttp2_14_package}"]
+    ]
+  }
+
   package{"apache2-bin":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${apache_bin_file}",
-    require => [File["apache2-bin-file"],
-      Package["libapr1"],
-      Package["libaprutil1"],
-      Package["libaprutil1-ldap"],
-      Package["liblua5.1-0"],
-      Package["libaprutil1-dbd-sqlite3"]]
+    require => $apache_bin_deps
   }
 
-  $apache2_utils_file = "apache2-utils_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb"
+  $apache2_utils_file = $apache_version ? {
+    "2.4.12" => "apache2-utils_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb",
+    "2.4.39" => "apache2-utils_${major_version}.${minor_version}.${patch_version}-1${ubuntu_version}1_${platform}.deb",
+  }
   file{"apache2-utils-file":
     ensure => present,
     path => "${local_install_dir}${apache2_utils_file}",
     source => "puppet:///${puppet_file_dir}${apache2_utils_file}"
   }
 
+  $apache2_utils_deps = $apache_version ? {
+    "2.4.12" => [File["apache2-utils-file"],
+      Package["${libapr1_package}"],
+      Package["${libaprutil_package}"]
+    ],
+    "2.4.39" => [File["apache2-utils-file"],
+      Package["${libapr1_package}"],
+      Package["${libaprutil_package}"],
+      Package["${libssl1_1_package}"]
+    ],
+  }
+
   package{"apache2-utils":
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${apache2_utils_file}",
-    require => [File["apache2-utils-file"],
-      Package["libapr1"],
-      Package["libaprutil1"]
-    ]
+    require => $apache2_utils_deps
   }
-  
-  $apache2_data_file = "apache2-data_${major_version}.${minor_version}.${patch_version}${ubuntu_version}all.deb"
+
+  $apache2_data_file = $apache_version ? {
+    "2.4.12" => "apache2-data_${major_version}.${minor_version}.${patch_version}${ubuntu_version}all.deb",
+    "2.4.39" => "apache2-data_${major_version}.${minor_version}.${patch_version}-1${ubuntu_version}1_all.deb",
+  }
   file{"apache2-data-file":
     ensure => present,
     path => "${local_install_dir}${apache2_data_file}",
@@ -135,7 +342,10 @@ class httpd::ubuntu (
     require => [File["apache2-data-file"],]
   }
 
-  $apache2_file = "apache2_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb"
+  $apache2_file = $apache_version ? {
+    "2.4.12" => "apache2_${major_version}.${minor_version}.${patch_version}${ubuntu_version}${platform}.deb",
+    "2.4.39" => "apache2_${major_version}.${minor_version}.${patch_version}-1${ubuntu_version}1_${platform}.deb",
+  }
   file{"apache2-file":
     ensure => present,
     path => "${local_install_dir}${apache2_file}",

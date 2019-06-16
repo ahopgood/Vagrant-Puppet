@@ -27,7 +27,10 @@ define httpd::virtual_host(
 
     $httpd_major_version = "2"
     $httpd_minor_version = "4"
-  } elsif (versioncmp("${operatingsystem}${operatingsystemmajrelease}", "Ubuntu15.10") == 0) {
+  } elsif (
+    (versioncmp("${operatingsystem}${operatingsystemmajrelease}", "Ubuntu15.10") == 0)
+    or
+    (versioncmp("${operatingsystem}${operatingsystemmajrelease}", "Ubuntu16.04") == 0)){
     $httpd_conf_location = "/etc/apache2/apache2.conf"
     $sites_available_location = "/etc/apache2/sites-available/"
     $sites_enabled_location = "/etc/apache2/sites-enabled/"
@@ -284,7 +287,9 @@ class httpd::virtual_host::sites(){
 
     $httpd_major_version = "2"
     $httpd_minor_version = "4"
-  } elsif (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu15.10") == 0) {
+  } elsif ((versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu15.10") == 0)
+    or
+    (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu16.04") == 0)){
     $httpd_conf_location = "/etc/apache2/apache2.conf"
     $sites_available_location = "/etc/apache2/sites-available/"
     $sites_enabled_location = "/etc/apache2/sites-enabled/"
