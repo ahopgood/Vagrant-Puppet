@@ -43,10 +43,14 @@ class httpd {
     contain 'httpd::centos'
   } elsif ("${operatingsystem}" == "Ubuntu") {
     notify{"Using ${operatingsystem}":}
+    $patch_version = "${operatingsystem}${operatingsystemmajrelease}" ? {
+      "Ubuntu15.10" => "12",
+      "Ubuntu16.04" => "39",
+    }
     class{"httpd::ubuntu":
       major_version => "2",
       minor_version => "4",
-      patch_version => "12"
+      patch_version => "${patch_version}"
     }
     contain "httpd::ubuntu"
   } else {

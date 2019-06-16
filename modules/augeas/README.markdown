@@ -6,7 +6,8 @@ This is the augeas module. It provides... [augeas functionality](http://augeas.n
 Tested to work on the following operating systems:
 * CentOS 6 - 
 * CentOS 7 - 1.4.0
-* Ubuntu 15 - 
+* Ubuntu 15.10 - 1.4.0
+* Ubuntu 16.04 - 1.4.0
 * Raspberian - 
 
 ### Known Issues  
