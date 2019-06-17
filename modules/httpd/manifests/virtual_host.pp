@@ -6,8 +6,6 @@ define httpd::virtual_host(
   $access_logs = false,
 ) {
 
-  #Add error logs
-  #Add custom logs
   contain 'httpd'
 
   if ($server_name == undef) {
@@ -159,7 +157,8 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_document_root_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'DocumentRoot']/arg[. = '${document_root}'] size == 0"],
-      require => Package["${httpd_package_name}"],
+      require => [Package["${httpd_package_name}"],
+        Augeas["${server_name}.conf VirtualHost port setup"]],
       before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }
   } else {
@@ -204,7 +203,8 @@ define httpd::virtual_host(
       context => "/files${sites_available_location}${conf_file_name}.conf/",
       changes => $virtual_host_error_logs_changes,
       onlyif  => ["match /files${sites_available_location}${conf_file_name}.conf/VirtualHost[.]/directive[. = 'ErrorLog']/arg[. = '${log_location}${server_name}-error.log'] size == 0"],
-      require => [Package["${httpd_package_name}"]],
+      require => [Package["${httpd_package_name}"],
+        Augeas["${server_name}.conf VirtualHost port setup"]],
         # Augeas["${server_name}.conf VirtualHost ServerName setup"]],
       before => Augeas["${server_name}.conf VirtualHost ServerName setup"]
     }

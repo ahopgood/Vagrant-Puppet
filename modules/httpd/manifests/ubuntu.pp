@@ -195,7 +195,7 @@ class httpd::ubuntu (
   }
 
   $libaprutil_deps = $apache_version ? {
-    "2.4.13" => [
+    "2.4.12" => [
       File["libaprutil-file"]
     ],
     "2.4.39" => [
@@ -208,11 +208,7 @@ class httpd::ubuntu (
     provider => "dpkg",
     ensure => installed,
     source => "${local_install_dir}${libaprutil_file}",
-    require => [
-      File["libaprutil-file"],
-      Package["${libapr1_package}"],
-      Package["${libssl1_1_package}"]
-    ]
+    require => $libaprutil_deps
   }
 
   $libaprutilsqllite3_package = $apache_version ? {
