@@ -23,6 +23,9 @@ class iptables (
   #sudo yum install iptables-services
   #or download the rpm and install manually
   #systemctl enable iptables
+  if (versioncmp("$operatingsystem", "Ubuntu") == 0) {
+    fail("${operatingsystem} currently does not support iptables as its main firewall, try ufw instead")
+  }
 
   $os = "$operatingsystem$operatingsystemmajrelease"
   if "${os}" == "CentOS7"{
