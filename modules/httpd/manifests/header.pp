@@ -386,3 +386,26 @@ define httpd::header::set_global(
     }
   }# end version check
 }
+
+define httpd::header::add(
+  $virtual_host = "global",
+  $header_name = undef,
+  $header_value = undef,
+) {
+  httpd::header::install{"${name}":}
+
+  if (versioncmp("$virtual_host", "global") == 0){
+    httpd::header::set_global{
+      "${name}":
+        header_name => $header_name,
+        header_value => $header_value,
+    }
+  } else {
+    httpd::header::set_virtual{
+      "${name}":
+        virtual_host => $virtual_host,
+        header_name => $header_name,
+        header_value => $header_value,
+    }
+  }
+}
