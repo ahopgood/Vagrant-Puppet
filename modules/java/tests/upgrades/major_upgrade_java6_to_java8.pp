@@ -2,17 +2,26 @@ Package{
   allow_virtual => false,
 }
 
-java{"java-6-45":
-  major_version => "6",
-  update_version => "45",
-  multiTenancy => true,
-  isDefault => true,
+$local_install_path = "/etc/puppet/"
+$local_install_dir = "${local_install_path}installers/"
+
+file {
+  "${local_install_dir}":
+    path       =>  "${local_install_dir}",
+    ensure     =>  directory,
 }
 
-#java{"java-8-112":
-#  major_version => "8",
-#  update_version => "112",
-#  isDefault => true,
-#  multiTenancy => true,
-#}
+# java{"java-6-45":
+#   major_version => "6",
+#   update_version => "45",
+#   multiTenancy => true,
+#   isDefault => true,
+# }
+
+java{"java-8-112":
+ major_version => "8",
+ update_version => "112",
+ isDefault => true,
+ multiTenancy => true,
+}
 

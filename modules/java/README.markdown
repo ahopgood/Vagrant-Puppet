@@ -175,9 +175,14 @@ Installation of a Java JDK from a .deb file.
 
 ### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
-These deb files should be created using the **java-package** utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
+These deb files should be created using the [java-package](https://wiki.debian.org/JavaPackage) utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
+```
+sudo apt-get install java-package
+make-jpkg jdk-7u80-linux-x64.tar.gz
+```
+
 The naming of these *.deb* files should follow the following convention in order for the correct version to be selected:  
-**oracle-java&ltmajor_version$gt-jdk_&ltmajor_version$gtu&ltupdate_version$gt_amd64-Ubuntu_&ltubuntu_version$gt.deb**  
+**oracle-java<major_version>-jdk_<major_version>u<update_version>_amd64-Ubuntu_<ubuntu_version>.deb**  
 an example would be:  
 `oracle-java8-jdk_8u31_amd64-Ubuntu_15.10.deb`
 The binary files can be found on the [Oracle download page](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html) and the [archive page](http://www.oracle.com/technetwork/java/javase/archive-139210.html) for older versions
@@ -204,7 +209,7 @@ Also add your new version to the hashes for every other version, e.g. oracle-jav
 	* Could define test manifests for conditions
 	* Could use a snapshot of the VMs to ensure quick run time
 	* Needs to be platform agnostic as ssh will not work on windows, or will it?
-
+* Add installation support for new Java versions modelled on [install-java.sh](https://github.com/chrishantha/install-java)
 ### CentOS
 * Update CentOS documentation with more information on usage and file naming strategy - done
 * Multi tenancy - done

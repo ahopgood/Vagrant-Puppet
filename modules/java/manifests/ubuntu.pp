@@ -23,85 +23,90 @@ define java::ubuntu(
     #create name of java deb file
     $jdk = "oracle-java${major_version}-jdk_${major_version}u${update_version}_${platform}-${::operatingsystem}_${::operatingsystemmajrelease}.deb"
     #Java deb format example oracle_java8-jdk_8u112_amd64-Ubuntu_15.10.deb
-    
-    if $::operatingsystemmajrelease == "15.10" {
-      notify{"We're on Ubuntu wiley trying to use Java package ${jdk}":}
- 
-      if ($multiTenancy){
-        notify{"Java ${major_version}":
-          message => "Multi tenancy JVMs allowed"
-        }
-      } else {
-        notify{"Java ${major_version}":
-          message => "Multi tenancy JVMs not supported"
-        }
-      
-        $versionsToRemove = {
-          "6" => ["oracle-java7-jdk","oracle-java8-jdk"],
-          "7" => ["oracle-java6-jdk","oracle-java8-jdk"],
-          "8" => ["oracle-java6-jdk","oracle-java7-jdk"],
-        }   
-      
-        package {
-          $versionsToRemove["${major_version}"]:
-          ensure      => "purged",
-          provider    =>  'dpkg',
-        }
-      }#end multi-tenancy else
- 
-      include java::ubuntu::wily
-      
-      file {
-        "${jdk}":
+  if ($multiTenancy){
+    notify{"Java ${major_version}":
+      message => "Multi tenancy JVMs allowed"
+    }
+  } else {
+    notify{"Java ${major_version}":
+      message => "Multi tenancy JVMs not supported"
+    }
+
+    $versionsToRemove = {
+      "6" => ["oracle-java7-jdk","oracle-java8-jdk"],
+      "7" => ["oracle-java6-jdk","oracle-java8-jdk"],
+      "8" => ["oracle-java6-jdk","oracle-java7-jdk"],
+    }
+
+    package {
+      $versionsToRemove["${major_version}"]:
+      ensure      => "purged",
+      provider    =>  'dpkg',
+    }
+  }#end multi-tenancy else
+
+  $package_name = "oracle-java${major_version}-jdk"
+  if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
+    notify{"We're on Ubuntu Wily trying to use Java package ${jdk}":}
+    java::ubuntu::wily {"Wily ${package_name}u${update_version}":
+      package_name   => "${package_name}",
+      update_version => "${update_version}"
+    }
+    file {
+      "${jdk}":
         require    =>  File["${local_install_dir}"],
         path       =>  "${local_install_dir}${jdk}",
         ensure     =>  present,
         source     =>  ["puppet:///${puppet_file_dir}${::operatingsystem}/${::operatingsystemmajrelease}/${jdk}"]
-      }            
-      
-      #Oracle JDK packages according to puppet;
-      #package { 'java-package':
-      #package { 'oracle-java6-jdk':
-      #package { 'oracle-java7-jdk':
-      #package { 'oracle-java8-jdk':
-      
+    }
 
-      #Clear any previous update versions
-#      package {
-#      "remove orcale-java${major_version}-jdk":
-#        name        => "oracle-java${major_version}-jdk",
-#        ensure      => "purged",
-#        provider    =>  'dpkg',
-#        #onlyif      => "${major_version} ${update_version} aren't equal
-#      }
-      
-      $package_name = "oracle-java${major_version}-jdk"
-      package {
+    #Oracle JDK packages according to puppet;
+    #package { 'java-package':
+    #package { 'oracle-java6-jdk':
+    #package { 'oracle-java7-jdk':
+    #package { 'oracle-java8-jdk':
+
+    #Clear any previous update versions
+    #      package {
+    #      "remove orcale-java${major_version}-jdk":
+    #        name        => "oracle-java${major_version}-jdk",
+    #        ensure      => "purged",
+    #        provider    =>  'dpkg',
+    #        #onlyif      => "${major_version} ${update_version} aren't equal
+    #      }
+
+    package {
       "${package_name}u${update_version}":
-#        name        => "${package_name}",
+        #        name        => "${package_name}",
         provider    =>  'dpkg',
         source      =>  "${local_install_dir}${jdk}",
         require     =>  [
           File["${jdk}"],
-#          Package["remove oracle-java${major_version}-jdk"]
+          #          Package["remove oracle-java${major_version}-jdk"]
         ]
-      }
     }
+  } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+    notify{"We're on Ubuntu Xenial trying to use Java package ${jdk}":}
+    java::ubuntu::xenial{"xenial ${package_name}u${update_version}":
+      java_package => "${package_name}u${update_version}",
+      major_version => "${major_version}",
+      update_version => "${update_version}"
+    }
+  } else {
+    fail("${operatingsystemmajrelease} not supported for Java package ${jdk}")
+  } #End OS Check
 }
 
-class java::ubuntu::wily(){
+define java::ubuntu::wily(
+  $package_name = undef,
+  $update_version = undef
+){
   $local_install_path = "/etc/puppet/"
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/java/"
 
-  # If required add into manifest at sites.pp
-  # file {"${local_install_dir}":
-  #   ensure => directory,
-  #   path       =>  "${local_install_dir}",
-  # }
-
       $libasound_data = "libasound2-data_1.0.29-0ubuntu1_all.deb"
-      file {"${libasound_data }":
+      file {"${libasound_data}":
         require    =>  File["${local_install_dir}"],
         path       =>  "${local_install_dir}${libasound_data}",
         ensure     =>  present,
@@ -130,7 +135,8 @@ class java::ubuntu::wily(){
         require     =>  [File["${libasound}"],
 #          Package["${libasound_data}"],
           Package["libasound2-data"],
-        ]
+        ],
+        before      =>  Package["${package_name}u${update_version}"]
       }
 
       $libgtk_common = "libgtk2.0-common_2.24.28-1ubuntu1.1_all.deb"

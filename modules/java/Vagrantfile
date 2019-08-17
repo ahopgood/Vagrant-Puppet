@@ -32,11 +32,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     centos.vm.network "private_network", ip: "192.168.33.17"
   end
 
-  config.vm.define "Ubuntu_15_test" do |ubuntu|
-    ubuntu.vm.hostname = "java-dev-ubuntu"
-    ubuntu.vm.network "private_network", ip: "192.168.33.15"
-    ubuntu.vm.box = "ubuntu/wily64"
-    ubuntu.vm.box_version = "20160329.0.0"
-	ubuntu.vm.synced_folder "files", "/vagrant/debs"
-  end
+    config.vm.define "Ubuntu_15_test" do |ubuntu|
+        ubuntu.vm.hostname = "java-dev-ubuntu"
+        ubuntu.vm.network "private_network", ip: "192.168.33.15"
+        ubuntu.vm.box = "ubuntu/wily64"
+        ubuntu.vm.box_version = "20160329.0.0"
+    end
+
+    config.vm.define "Ubuntu_16_test" do |ubuntu|
+        ubuntu.vm.box_check_update = true
+        ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+        ubuntu.vm.box = "reclusive/xenial64-puppet"
+        ubuntu.vm.network "private_network", ip: "192.168.33.26"
+        ubuntu.vm.hostname = "java.ubuntu.vm"
+    end
 end
