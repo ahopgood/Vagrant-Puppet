@@ -1,6 +1,6 @@
 define httpd::headers::x_frame_options (
   $virtual_host = "global",
-  $header_value = "sameorigin"
+  $header_value = "deny"
 ) {
   $header_name = "X-Frame-Options"
   httpd::header::add {

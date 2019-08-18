@@ -1,8 +1,8 @@
 define httpd::headers::x_xss_protection (
   $virtual_host = "global",
-  $header_value = "1"
+  $header_value = "1; mode=block"
 ) {
-  $header_name = "X-Xss-Protection"
+  $header_name = "X-XSS-Protection"
   httpd::header::add {
     "${header_name} ${virtual_host}":
       virtual_host => $virtual_host,

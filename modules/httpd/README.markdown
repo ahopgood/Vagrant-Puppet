@@ -10,6 +10,9 @@ Supplementary Documentation:
 * [Virtual Hosts](#VirtualHosts)
 * [Terry Pratchett x-clacks header](#Terry_Pratchett_x-clacks_header)
 * [Content Security Policy header](#Content_Security_Policy_header)
+* [X-Content-Type-Options header](#x-content-type-options)
+* [X-Frame-Options header](#x-frame-options)
+* [X-Xss-Protection header](#x-xss-protection)
   
 ## Current Status / Support
 Tested to work on the following operating systems:
@@ -245,9 +248,9 @@ header set X-Clacks-Overhead "GNU Terry Pratchett"
 ```
 And like this on CentOS (7 in `/etc/httpd/sites-enabled/www.alexander.com.conf` and 6 in `/etc/httpd/conf/conf.d`
 
-### Depdendencies
-This will only work if the headers module is installed on apache which is done by this module.
-This module requires virtual host sites support:
+### Dependencies
+This will only work if the headers module is installed on apache which is done by the `httpd::header::install` module.
+This module requires virtual host sites support if it is to be set on a VirtualHost:
 `class {"httpd::virtual_host::sites":}`
 
 ## Content Security Policy header <a name="Content_Security_Policy_header"></a>
@@ -256,6 +259,27 @@ I had to roll my own augeas header solution due to conflicts with string escapin
 
 ### Usage
 When using the CSP module the `--parser=future` parameter is required on puppet 3.7.x up to 4.0.0 to make use of some of the more advanced parser features to manipulate parameters.
+```puppet
+$virtual_host="foo.bar.com"
+httpd::headers::content_security_policy{"${virtual_host}":
+	virtual_host => "${virtual_host}",
+	csp_rule => "\"\\\"default-src \'none'\'\\\"\""
+}
+```
+The above usage will set the following header on the `foo.bar.com` virtual host:  
+```
+<VirtualHost *:80>
+    DocumentRoot /var/www/foo/bar/
+    ServerName www.foo.bar.com
+    ...
+    <IfModule headers_module>
+        ...
+        header set Content-Security-Policy "default-src 'none''"
+    </IfModule>
+</VirtualHost>
+```
+
+There are a huge number of possible CSP values/rules you can configure see []() for a good write up.  
 
 #### Notes on CSP rules
 A csp rule takes the form of a series of semi-colon separated entries encapsulated within double quotation marks ("something").  
@@ -293,60 +317,12 @@ And finally as this is a puppet string itself the whole lot is encapsulated agai
 "\"\\\"script-src \'self\' mydomain.com; style-src \'none\';\\\"\""
 ```
 
-#### Global
-To set a global content security policy:
-```
-  class { "httpd": }
-  ->
-  httpd::content_security_policy{"CSP":
-    csp_rule => "\"\\\"default-src \'self\'\\\"\"" 
-  }
-```
-This will add a directive on the `/var/www/` directory .
-The directive looks like this on Ubuntu:
-```
-<Directory "/var/www/">
-<IfModule headers_module>
-header set Security-Content-Policy "default-src 'self';"
-</IfModule>
-</Directory>
-```
-And this on CentOS:
-```
-<IfModule mod_headers.c>
-<Directory "/var/www/">
-header set Security-Content-Policy "default-src 'self';"
-</Directory>
-</IfModule>
-```
-#### Virtual Host
-To set a content security policy on a virtual host:
-```
-  class { "httpd": }
-  ->
-  httpd::content_security_policy{"CSP":
-    virtual_host => "www.alexander.com"
-    csp_rule => "\"\\\"default-src \'self\'\\\"\""
-  }
-```
-This will add a directive on:
-* CentOS in the `/etc/httpd/sites-available/www.virtualhost.com.conf` file.
-* Ubuntu in the `/etc/apache2/sites-available/www.virtualhost.com.conf` file.
-The directive looks like this:
-```
-<VirtualHost *:80>
-DocumentRoot /var/www/virtualhost/
-ServerAlias virtualhost.com
-ServerAlias virtualhost.net
-ServerName www.virtualhost.com
-<IfModule headers_module>
-header set Content-Security-Policy "default-src 'self'"
-</IfModule>
-</VirtualHost>
+### Defaults
+If **no** `virtual_host` parameter is set then the header is assumed to be set to a `global` scope.  
+The default value of `"default-src 'none'"` is used for the Content-Security-Policy value, being secure by default unless overridden by a more specific rule.   
 
-```
 ### Dependencies
-This will only work if the headers module is installed.
+This will only work if the headers `httpd::header::install`  module is installed .
 The Augeas class is required.  
 **Note** Use of the x-clacks-overhead *after* this module call will overwrite your **global** CSP header currently, virtual host policies will not be impacted.
 It is advisable to run the x-clacks first and then CSP as the CSP module has finer grained onlyif statements for detecting duplication, existing and/or modified values.
@@ -354,6 +330,125 @@ It is advisable to run the x-clacks first and then CSP as the CSP module has fin
   httpd::xclacks{"x-clacks":}
   httpd::content_security_policy{"CSP": }
 ```
+
+<a name="x-content-type-options"></a>
+## X-Content-Type-Options header
+This definition will set the [X-Content-Type-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) header.  
+   
+### Usage
+```puppet
+$virtual_host="foo.bar.com"
+httpd::headers::x_content_type_options{"${virtual_host}":
+	virtual_host => "${virtual_host}",
+	header_value => "nosniff"
+}
+```
+The above usage will set the following header on the `foo.bar.com` virtual host:  
+```
+<VirtualHost *:80>
+    DocumentRoot /var/www/foo/bar/
+    ServerName www.foo.bar.com
+    ...
+    <IfModule headers_module>
+        ...
+        header set X-Content-Type-Options nosniff
+    </IfModule>
+</VirtualHost>
+```
+
+Possible values for the header are:
+* `nosniff` - will block any `script` or `style` resource request that does not have the correct MIME type of `text/css` for style or the [JavaScript MIME types](https://mimesniff.spec.whatwg.org/#javascript-mime-type)
+
+### Defaults
+If **no** `virtual_host` parameter is set then the header is assumed to be set to a `global` scope.  
+The default value of `nosniff` is used for the X-Content-Type-Options value to ensure correct MIME types are used.     
+
+### Dependencies
+This will only work if the headers module is installed on apache which is done by the `httpd::header::install` module.
+This module requires virtual host sites support if the header is to be set on a VirtualHost:
+`class {"httpd::virtual_host::sites":}`
+
+<a name="x-frame-options"></a>
+## X-Frame-Options header
+This definition will set the [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) header.
+This header is used to prevent [clickjacking](https://en.wikipedia.org/wiki/Clickjacking) attempts by indicating if a browser is allowed to render a page in an <frame>, <iframe>, <embed> or <object>.
+### Usage
+```puppet
+$virtual_host="foo.bar.com"
+httpd::headers::x_frame_options{"${virtual_host}":
+	virtual_host => "${virtual_host}"
+}
+```
+The above usage will set the following header on the `foo.bar.com` virtual host:  
+```
+<VirtualHost *:80>
+    DocumentRoot /var/www/foo/bar/
+    ServerName www.foo.bar.com
+    ...
+    <IfModule headers_module>
+        ...
+        header set X-Frame-Options deny
+    </IfModule>
+</VirtualHost>
+```
+
+Possible values for the header are:
+* `deny` - the page is not allowed to be rendered in a frame, regardless of origin
+* `sameorigin` - the page can **only** be rendered in a frame if it has the **same origin** as the page itself 
+* `allow-from <origin_uri>` the page can be rendered within a frame provided the request comes from a specified origin e.g. allow-from https://example.com/ 
+
+### Defaults
+If **no** `virtual_host` parameter is set then the header is assumed to be set to a `global` scope.  
+The default value of `deny` is used for the X-Frame-Options value to ensure no click jacking can occur out of the box, if you want to relax these settings you need to knowingly do so.  
+   
+### Dependencies
+This will only work if the headers module is installed on apache which is done by the `httpd::header::install` module.
+This module requires virtual host sites support if the header is to be set on a VirtualHost:
+`class {"httpd::virtual_host::sites":}`
+
+<a name="x-xss-protection"></a>
+## X-XSS-Protection header
+This definition will set the [X-XSS-Protection](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection) header.  
+This informs older browsers how the site wants Cross Site Scripting (XSS) protections to be enforced (if any).  
+This header is superseeded by the [Content-Security-Policy](#Content_Security_Policy_header) header in newer browsers.  
+
+### Usage
+```puppet
+$virtual_host="foo.bar.com"
+httpd::headers::x_xss_protection{"${virtual_host}":
+	virtual_host => "${virtual_host}",
+	header_value => "1"
+}
+
+```
+The above usage will set the following header on the `foo.bar.com` virtual host:  
+```
+<VirtualHost *:80>
+    DocumentRoot /var/www/foo/bar/
+    ServerName www.foo.bar.com
+    ...
+    <IfModule headers_module>
+        ...
+        header set X-XSS-Protection 1;
+    </IfModule>
+</VirtualHost>
+```
+
+Possible values for the header are:
+* `0` - **disables** XSS filtering
+* `1` - **enables** XSS filtering, the browser will sanitise any parts of the page used in a cross-site scripting attack.
+* `1; mode=block` - **enables** XSS filtering and **blocks** rendering of the page if an attack is detected. 
+* `1; report=<reporting-uri>` - **enables**  XSS filtering, sanitises the page and reports the violation to the specified URI.  
+
+### Defaults
+If **no** `virtual_host` parameter is set then the header is assumed to be set to a `global` scope.  
+The default value of `1; mode=block` is used for the X-XSS-Protection value so you will know that a Cross Site Scripting has occurred as your page will fail to load.   
+
+### Dependencies
+This will only work if the headers module is installed on apache which is done by the `httpd::header::install` module.
+This module requires virtual host sites support if the header is to be set on a VirtualHost:
+`class {"httpd::virtual_host::sites":}`
+
 ### ToDo
 * Move testfile.txt into a variable
 * Delete testfile.txt as part of the module tidyup
