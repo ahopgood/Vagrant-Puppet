@@ -205,10 +205,11 @@ Support has been added for the following HTTP header:
 `X-Clacks-Overhead "GNU Terry Pratchett"`
 An explanation can be found [here](http://www.gnuterrypratchett.com/).
 ### Usage
-```
+```puppet
+  $virtual_host="foo.bar.com"
   class { "httpd": }
   ->
-  httpd::xclacks{"x-clacks":}
+  httpd::headers::xclacks{"${$virtual_host}":}
 ```
 This will add a directive on the `/var/www/html` directory.
 The directive looks like this on Ubuntu:
