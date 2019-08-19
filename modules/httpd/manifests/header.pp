@@ -45,12 +45,14 @@ define httpd::header::install{
       path    => "/usr/sbin/:/usr/bin/",
       command => "/usr/sbin/a2enmod headers",
       unless  => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
-      require => [Package["apache2"],Class["httpd"]]
+      require => [Package["apache2"],Class["httpd"]],
     }
-    ->
+
     exec { "restart-apache2-to-install-headers [${name}]":
       path    => "/usr/sbin/:/bin/",
       command => "service apache2 restart",
+      unless  => "/bin/ls -l /etc/apache2/mods-enabled/ | /bin/grep headers",
+      require => Exec["enable headers plugin [${name}]"],
     }
   } elsif (versioncmp("${operatingsystem}", "CentOS") == 0){
     if (
@@ -87,6 +89,7 @@ define httpd::header::install{
         path    => "/sbin/:/bin/",
         command => "service httpd reload",
         unless  => "/usr/sbin/apachectl -t -D DUMP_MODULES | /bin/grep headers",
+        require => Augeas["add header module to httpd config [${name}]"]
       }
     } else {
       fail("${operatingsystem} ${operatingsystemmajrelease} is not currently supported")
