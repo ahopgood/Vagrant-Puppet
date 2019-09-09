@@ -74,7 +74,7 @@ define java (
     }
 
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
-      file { "create default link":
+      file { "create default link ${major_version}":
         ensure => link,
         path => "/usr/lib/jvm/default",
         target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",

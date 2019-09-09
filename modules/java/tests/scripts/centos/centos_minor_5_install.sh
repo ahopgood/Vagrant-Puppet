@@ -3,5 +3,5 @@
 version=5
 update_version=22
 
-centos_minor_install.sh $version $minorVersion
+../java-test.sh $version $minorVersion
 return=$?;

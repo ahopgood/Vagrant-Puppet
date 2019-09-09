@@ -31,6 +31,8 @@ Supports:
 [CentOS Known Issues](#CentOS_known_issues)  
 [Ubuntu Known Issues](#Ubuntu_known_issues)  
 
+`isDefault` cannot currently be set for more than **one** JDK in a multi-tenancy environment.  
+
 ## Usage
 ### Single JVM usage 
 Can be declared via the *java* definition:
