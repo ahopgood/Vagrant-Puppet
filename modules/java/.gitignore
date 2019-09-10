@@ -8,3 +8,4 @@
 /files/CentOS/*/*.rpm
 /.project
 /.settings
+/tests/scripts/ubuntu/*results.txt

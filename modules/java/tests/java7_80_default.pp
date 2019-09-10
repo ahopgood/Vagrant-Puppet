@@ -9,8 +9,8 @@ file {
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
 }
-java{"java-6":
-  major_version => "6",
-  update_version => "45",
+java{"java-7":
+  major_version => '7',
+  update_version => '80',
   isDefault => true,
 }

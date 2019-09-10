@@ -11,6 +11,7 @@ file {
 }
 java{"java-6":
   major_version => "6",
-  update_version => "45",
+  update_version => "34",
   isDefault => true,
+  multiTenancy => true,
 }
