@@ -18,13 +18,17 @@ Supports:
 * Ubuntu 15.10 (Wily)
 	* Major Java version 6,
 	* Major Java version 7,
-	* Major Java version 8.  
+	* Major Java version 8 up to 8u112.  
 * CentOS 6
 	* Major Java version 5,
 	* Major Java version 6,
 	* Major Java version 7,
-	* Major Java version 8.
-
+	* Major Java version 8 up to 8u112.
+* Ubuntu 16.04 (Xenial)
+    * Major Java version 6,
+    * Major Java version 7,
+    * Major Java version 8 up to 8u212 (Now End of Life - EOL)
+    
 ### Known Issues  
 
 **64-bit support only**  
@@ -40,20 +44,8 @@ Can be declared via the *java* definition:
 	java{"java-7":
 		version => '7',
 		update_version => '76'
-	}
-	
-or directly via the *java::ubuntu* definition:
+	}	
 
-	java::ubuntu{"java-6":
-	  version => "6",
-	  update_version => "45"
-	}
-or directly via the *java::centos* definition:
-	
-	java::centos{"java-6":
-	  version => "6",
-	  update_version => "45"
-	}
 ### Multi Tenancy JVM Usage
 Set Java 7 to be the default manually JVM by overriding the alternatives priority ordering that would *usually* favour Java 8: 
 
@@ -93,7 +85,17 @@ You can only use the `java`, `java::ubuntu`, `java::centos` defined resources **
 If the `multiTenancy => true` value is set then the `java` or `java::ubuntu` defined resources can be declared multiple times, once per major version number you wish to be deployed.  
 This will result in your java installations all living side by side in the `/usr/lib/jvm` directory.  
 
-## Testing performed:
+## Testing
+There are test scripts that can be used to test the most efficient upgrade/downgrade paths for different tenancy types:
+* `/tests/scripts/ubuntu/multi-tenancy.sh`
+* `/tests/scripts/ubuntu/multi-tenancy-minor-upgrade.sh`
+* `/tests/scripts/ubuntu/single-tenancy.sh`
+* `/tests/scripts/ubuntu/single-tenancy-minor-upgrade.sh`
+
+The `/test/scripts/java-test.sh` script is a utility script that allows you to test if a desire major-minor version of Java is installed and how many other multi-tenancy installations are present.  
+For facilitate testing the `/tests/` folder contains puppet manifests for calling different versions of Java with varying default or multi-tenancy options.
+ 
+Testing performed:
 * Install single JDK on fresh system
 * Multi tenancy JVMs, i.e. 7 running alongside 8
 	* Currently installs major versions alongside each other
