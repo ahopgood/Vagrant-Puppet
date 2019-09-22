@@ -7,25 +7,27 @@ define sudo (
   }
   if (versioncmp($operatingsystem, "CentOS") == 0){
     if (versioncmp($operatingsystemmajrelease, "6") == 0){
-      
+
     } elsif (versioncmp($operatingsystemmajrelease, "7") == 0){
- 
+
     } else {
-      fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+      fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
     }
   } elsif (versioncmp($operatingsystem, "Ubuntu") == 0){
-    if (versioncmp($operatingsystemmajrelease, "15.10") == 0){
-      
+    if (versioncmp($operatingsystemmajrelease, "15.10") == 0) {
+
+    } elsif (versioncmp($operatingsystemmajrelease, "16.04") == 0){
+
     } else {
-      fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+      fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
     }
   } else {
-    fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+    fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
   }
 
   file {"/etc/sudoers.d/${title}":
     ensure => present,
-    content => "alexander ALL=(ALL) NOPASSWD:ALL",
+    content => "${title} ALL=(ALL) NOPASSWD:ALL",
     require => User["${title}"]
   }
 }
@@ -40,16 +42,18 @@ define sudo::remove(){
     } elsif (versioncmp($operatingsystemmajrelease, "7") == 0){
 
     } else {
-      fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+      fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
     }
   } elsif (versioncmp($operatingsystem, "Ubuntu") == 0){
     if (versioncmp($operatingsystemmajrelease, "15.10") == 0){
 
+    } elsif (versioncmp($operatingsystemmajrelease, "16.04") == 0){
+
     } else {
-      fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+      fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
     }
   } else {
-    fail("sudo is currently not supported on $operatingsystemmajrelease $operatingsystemmajrelease")
+    fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
   }
   
 #  file {"/etc/sudoers.d/${title}":
