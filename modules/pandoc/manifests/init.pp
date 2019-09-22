@@ -368,56 +368,62 @@ define pandoc::texlive_latex_extra {
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/pandoc/"
   $package_type = "deb"
-  $texlive_latex_extra = "texlive-latex-extra_2013.20140215-2_all.${package_type}"
-  file {"${texlive_latex_extra}":
-    ensure => present,
-    path => "${local_install_dir}${texlive_latex_extra}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra}",
-  }
-  package{"texlive-latex-extra":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${texlive_latex_extra}",
-    require => [File["${texlive_latex_extra}"], Package["texlive-binaries"], Package["texlive-base"]]
-  }
+  if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
+    $texlive_latex_extra = "texlive-latex-extra_2013.20140215-2_all.${package_type}"
+    file {"${texlive_latex_extra}":
+      ensure => present,
+      path => "${local_install_dir}${texlive_latex_extra}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra}",
+    }
+    package{"texlive-latex-extra":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${texlive_latex_extra}",
+      require => [File["${texlive_latex_extra}"], Package["texlive-binaries"], Package["texlive-base"]]
+    }
 
-  $preview_latex_style = "preview-latex-style_11.87-1ubuntu2_all.${package_type}"
-  file {"${preview_latex_style}":
-    ensure => present,
-    path => "${local_install_dir}${preview_latex_style}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style}",
-  }
-  package{"preview-latex-style":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${preview_latex_style}",
-    require => [File["${preview_latex_style}"], ]
-  }
+    $preview_latex_style = "preview-latex-style_11.87-1ubuntu2_all.${package_type}"
+    file {"${preview_latex_style}":
+      ensure => present,
+      path => "${local_install_dir}${preview_latex_style}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style}",
+    }
+    package{"preview-latex-style":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${preview_latex_style}",
+      require => [File["${preview_latex_style}"], ]
+    }
 
-  $texlive_latex_recommended = "texlive-latex-recommended_2013.20140215-1ubuntu0.1_all.${package_type}"
-  file {"${texlive_latex_recommended}":
-    ensure => present,
-    path => "${local_install_dir}${texlive_latex_recommended}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended}",
-  }
-  package{"texlive-latex-recommended":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${texlive_latex_recommended}",
-    require => [File["${texlive_latex_recommended}"], Package["texlive-base"], Package["texlive-binaries"]]
-  }
+    $texlive_latex_recommended = "texlive-latex-recommended_2013.20140215-1ubuntu0.1_all.${package_type}"
+    file {"${texlive_latex_recommended}":
+      ensure => present,
+      path => "${local_install_dir}${texlive_latex_recommended}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended}",
+    }
+    package{"texlive-latex-recommended":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${texlive_latex_recommended}",
+      require => [File["${texlive_latex_recommended}"], Package["texlive-base"], Package["texlive-binaries"]]
+    }
 
-  $texlive_pictures_file_name = "texlive-pictures_2013.20140215-1ubuntu0.1_all.${package_type}"
-  file {"${texlive_pictures_file_name}":
-    ensure => present,
-    path => "${local_install_dir}${texlive_pictures_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
-  }
-  package{"texlive-pictures":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${texlive_pictures_file_name}",
-    require => [File["${texlive_pictures_file_name}"], Package["texlive-base"], Package["texlive-binaries"] ]
+    $texlive_pictures_file_name = "texlive-pictures_2013.20140215-1ubuntu0.1_all.${package_type}"
+    file {"${texlive_pictures_file_name}":
+      ensure => present,
+      path => "${local_install_dir}${texlive_pictures_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
+    }
+    package{"texlive-pictures":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${texlive_pictures_file_name}",
+      require => [File["${texlive_pictures_file_name}"], Package["texlive-base"], Package["texlive-binaries"] ]
+    }
+  } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+    pandoc::ubuntu::xenial::texlive_latex_extra{"xenial dependencies":}
+  } else {
+    fail("${operatingsystemmajrelease} is not supported")
   }
 }
 
@@ -427,28 +433,34 @@ define pandoc::lmodern {
   $puppet_file_dir    = "modules/pandoc/"
   $package_type = "deb"
   $lmodern_file_name = "lmodern_2.004.4-3_all.${package_type}"
-  file {"${lmodern_file_name}":
-    ensure => present,
-    path => "${local_install_dir}${lmodern_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${lmodern_file_name}",
-  }
-  package{"lmodern":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${lmodern_file_name}",
-    require => [File["${lmodern_file_name}"], Package["fonts-lmodern"] ]
-  }
+  if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
+    file {"${lmodern_file_name}":
+      ensure => present,
+      path => "${local_install_dir}${lmodern_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${lmodern_file_name}",
+    }
+    package{"lmodern":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${lmodern_file_name}",
+      require => [File["${lmodern_file_name}"], Package["fonts-lmodern"] ]
+    }
 
-  $fonts_lmodern_file_name = "fonts-lmodern_2.004.4-3_all.deb"
-  file {"${fonts_lmodern_file_name}":
-    ensure => present,
-    path => "${local_install_dir}${fonts_lmodern_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_lmodern_file_name}",
-  }
-  package{"fonts-lmodern":
-    ensure => installed,
-    provider => dpkg,
-    source => "${local_install_dir}${fonts_lmodern_file_name}",
-    require => [File["${fonts_lmodern_file_name}"] ]
+    $fonts_lmodern_file_name = "fonts-lmodern_2.004.4-3_all.deb"
+    file {"${fonts_lmodern_file_name}":
+      ensure => present,
+      path => "${local_install_dir}${fonts_lmodern_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_lmodern_file_name}",
+    }
+    package{"fonts-lmodern":
+      ensure => installed,
+      provider => dpkg,
+      source => "${local_install_dir}${fonts_lmodern_file_name}",
+      require => [File["${fonts_lmodern_file_name}"] ]
+    }
+  } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+    pandoc::ubuntu::xenial::lmodern{"xenial dependencies":}
+  } else {
+    fail("${operatingsystemmajrelease} is not supported")
   }
 }

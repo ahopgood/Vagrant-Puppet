@@ -13,5 +13,7 @@ class{"pandoc":
 }
 ->
 pandoc::texlive_fonts_recommended{"texlive_fonts_recommended":}
-# ->
-# pandoc::texlive_latex_extra{"texlive_latex_extra":}
+->
+pandoc::texlive_latex_extra{"texlive_latex_extra":}
+->
+pandoc::lmodern{"lmodern":}

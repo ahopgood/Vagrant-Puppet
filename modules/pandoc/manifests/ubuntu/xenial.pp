@@ -1,62 +1,62 @@
-define pandoc::ubuntu::xenial::texlive_fonts_recommended {
+class pandoc::ubuntu::xenial {
   $package_type=$pandoc::package_type
   $puppet_file_dir=$pandoc::puppet_file_dir
 
+  $tex_common_file_name = "tex-common_6.04ubuntu1_all.deb"
+  @file { "${tex_common_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${tex_common_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${tex_common_file_name}",
+  }
+  @package { "tex-common":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${tex_common_file_name}",
+    require  => [
+      File["${tex_common_file_name}"],
+    ]
+  }
+
   $texlive_base_file_name = "texlive-base_2015.20160320-1ubuntu0.1_all.${package_type}"
-  file { "${texlive_base_file_name}":
+  @file { "${texlive_base_file_name}":
     ensure => present,
     path   => "${local_install_dir}${texlive_base_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_base_file_name}",
   }
-  package { "texlive-base":
+
+  @package { "texlive-base":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${texlive_base_file_name}",
     require  => [File["${texlive_base_file_name}"],
       Package["texlive-binaries"],
       Package["xdg-utils"],
-      # Package["luatex"],
       Package["libpaper-utils"]
     ]
   }
 
-  $libpaper_utils_file_name = "libpaper-utils_1.1.24+nmu4ubuntu1_${architecture}.${package_type}"
-  file { "${libpaper_utils_file_name}":
+  $libpixman_1_0_file_name = "libpixman-1-0_0.33.6-1_amd64.deb"
+  file { "${libpixman_1_0_file_name}":
     ensure => present,
-    path   => "${local_install_dir}${libpaper_utils_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpaper_utils_file_name}",
+    path   => "${local_install_dir}${libpixman_1_0_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpixman_1_0_file_name}",
   }
-  package { "libpaper-utils":
+  package { "libpixman-1-0":
     ensure   => present,
     provider => dpkg,
-    source   => "${local_install_dir}${libpaper_utils_file_name}",
+    source   => "${local_install_dir}${libpixman_1_0_file_name}",
     require  => [
-      File["${libpaper_utils_file_name}"],
-      Package["libpaper1"]
+      File["${libpixman_1_0_file_name}"],
     ]
   }
 
-  $libpaper1_file_name = "libpaper1_1.1.24+nmu4ubuntu1_${architecture}.${package_type}"
-  file { "${libpaper1_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${libpaper1_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpaper1_file_name}",
-  }
-  package { "libpaper1":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libpaper1_file_name}",
-    require  => [File["${libpaper1_file_name}"]]
-  }
-
   $texlive_binaries_file_name = "texlive-binaries_2015.20160222.37495-1ubuntu0.1_${architecture}.${package_type}"
-  file { "${texlive_binaries_file_name}":
+  @file { "${texlive_binaries_file_name}":
     ensure => present,
     path   => "${local_install_dir}${texlive_binaries_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${
-      texlive_binaries_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_binaries_file_name}",
   }
-  package { "texlive-binaries":
+  @package { "texlive-binaries":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${texlive_binaries_file_name}",
@@ -76,20 +76,9 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
       Package["libxi6"],
       Package["libxmu6"],
       Package["libzzip-0-13"],
+      Package["libpixman-1-0"],
+      Package["tex-common"],
     ]
-  }
-
-  $xdg_utils_file_name = "xdg-utils_1.1.0~rc1-2ubuntu7.1_all.${package_type}"
-  file { "${xdg_utils_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${xdg_utils_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${xdg_utils_file_name}",
-  }
-  package { "xdg-utils":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${xdg_utils_file_name}",
-    require  => [File["${xdg_utils_file_name}"]]
   }
 
   $libptexenc1_file_name = "libptexenc1_2015.20160222.37495-1ubuntu0.1_amd64.deb"
@@ -102,7 +91,25 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libptexenc1_file_name}",
-    require  => [File["${libptexenc1_file_name}"]]
+    require  => [
+      File["${libptexenc1_file_name}"],
+      Package["libkpathsea6"],
+    ]
+  }
+
+  $libkpathsea6_file_name = "libkpathsea6_2015.20160222.37495-1ubuntu0.1_amd64.deb"
+  file { "${libkpathsea6_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libkpathsea6_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libkpathsea6_file_name}",
+  }
+  package { "libkpathsea6":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libkpathsea6_file_name}",
+    require  => [
+      File["${libkpathsea6_file_name}"],
+    ]
   }
 
   $libsynctex1_file_name = "libsynctex1_2015.20160222.37495-1ubuntu0.1_amd64.deb"
@@ -128,7 +135,9 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libtexlua52_file_name}",
-    require  => [File["${libtexlua52_file_name}"]]
+    require  => [
+      File["${libtexlua52_file_name}"],
+    ]
   }
 
   $libtexluajit2_file_name = "libtexluajit2_2015.20160222.37495-1ubuntu0.1_amd64.deb"
@@ -141,22 +150,10 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libtexluajit2_file_name}",
-    require  => [File["${libtexluajit2_file_name}"]]
+    require  => [
+      File["${libtexluajit2_file_name}"],
+    ]
   }
-
-  $libzzip_0_13_file_name = "libzzip-0-13_0.13.62-3ubuntu0.16.04.2_amd64.deb"
-  file {"${libzzip_0_13_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libzzip_0_13_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libzzip_0_13_file_name}"
-  }
-  package { "libzzip-0-13":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libzzip_0_13_file_name}",
-    require  => [File["${libzzip_0_13_file_name}"]]
-  }
-
 
   $t1utils_file_name = "t1utils_1.39-2_amd64.deb"
   file {"${t1utils_file_name}":
@@ -168,7 +165,9 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${t1utils_file_name}",
-    require  => [File["${t1utils_file_name}"]]
+    require  => [
+      File["${t1utils_file_name}"],
+    ]
   }
 
   $libgraphite2_3_file_name = "libgraphite2-3_1.3.10-0ubuntu0.16.04.1_amd64.deb"
@@ -181,7 +180,9 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libgraphite2_3_file_name}",
-    require  => [File["${libgraphite2_3_file_name}"]]
+    require  => [
+      File["${libgraphite2_3_file_name}"],
+    ]
   }
 
   $libgs9_3_file_name = "libgs9_9.26~dfsg+0-0ubuntu0.16.04.11_amd64.deb"
@@ -202,97 +203,6 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
       Package["libijs-0.35"],
       Package["libjbig2dec0"],
       Package["poppler-data"],
-    ]
-  }
-
-  $poppler_data_file_name = "poppler-data_0.4.7-7_all.deb"
-  file {"${poppler_data_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${poppler_data_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${poppler_data_file_name}"
-  }
-  package { "poppler-data":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${poppler_data_file_name}",
-    require  => [
-      File["${poppler_data_file_name}"],
-    ]
-  }
-
-  $libjbig2dec0_file_name = "libjbig2dec0_0.12+20150918-1ubuntu0.1_amd64.deb"
-  file {"${libjbig2dec0_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libjbig2dec0_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libjbig2dec0_file_name}"
-  }
-  package { "libjbig2dec0":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libjbig2dec0_file_name}",
-    require  => [
-      File["${libjbig2dec0_file_name}"],
-    ]
-  }
-
-  $libijs_0_35_file_name = "libijs-0.35_0.35-12_amd64.deb"
-  file {"${libijs_0_35_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libijs_0_35_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libijs_0_35_file_name}"
-  }
-  package { "libijs-0.35":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libijs_0_35_file_name}",
-    require  => [
-      File["${libijs_0_35_file_name}"],
-    ]
-  }
-
-  $libcupsimage2_file_name = "libcupsimage2_2.1.3-4ubuntu0.10_amd64.deb"
-  file {"${libcupsimage2_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libcupsimage2_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libcupsimage2_file_name}"
-  }
-  package { "libcupsimage2":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libcupsimage2_file_name}",
-    require  => [
-      File["${libcupsimage2_file_name}"],
-      Package["libcupsfilters1"],
-    ]
-  }
-
-  $libcupsfilters12_file_name = "libcupsfilters1_1.8.3-2ubuntu3.5_amd64.deb"
-  file {"${libcupsfilters12_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libcupsfilters12_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libcupsfilters12_file_name}"
-  }
-  package { "libcupsfilters1":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libcupsfilters12_file_name}",
-    require  => [
-      File["${libcupsfilters12_file_name}"],
-    ]
-  }
-
-  $libgs9_common_file_name = "libgs9-common_9.26~dfsg+0-0ubuntu0.16.04.11_all.deb"
-  file {"${libgs9_common_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libgs9_common_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libgs9_common_file_name}"
-  }
-  package { "libgs9-common":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libgs9_common_file_name}",
-    require  => [
-      File["${libgs9_common_file_name}"],
     ]
   }
 
@@ -355,7 +265,101 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libavahi_common_data_file_name}",
-    require  => [File["${libavahi_common_data_file_name}"]]
+    require  => [
+      File["${libavahi_common_data_file_name}"],
+    ]
+  }
+
+  $libgs9_common_file_name = "libgs9-common_9.26~dfsg+0-0ubuntu0.16.04.11_all.deb"
+  file {"${libgs9_common_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libgs9_common_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libgs9_common_file_name}"
+  }
+  package { "libgs9-common":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libgs9_common_file_name}",
+    require  => [
+      File["${libgs9_common_file_name}"],
+    ]
+  }
+
+  $libcupsimage2_file_name = "libcupsimage2_2.1.3-4ubuntu0.10_amd64.deb"
+  file {"${libcupsimage2_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libcupsimage2_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libcupsimage2_file_name}"
+  }
+  package { "libcupsimage2":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libcupsimage2_file_name}",
+    require  => [
+      File["${libcupsimage2_file_name}"],
+      Package["libcupsfilters1"],
+    ]
+  }
+
+  $libcupsfilters1_file_name = "libcupsfilters1_1.8.3-2ubuntu3.5_amd64.deb"
+  file {"${libcupsfilters1_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libcupsfilters1_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libcupsfilters1_file_name}"
+  }
+  package { "libcupsfilters1":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libcupsfilters1_file_name}",
+    require  => [
+      File["${libcupsfilters1_file_name}"],
+      Package["libcups2"],
+    ]
+  }
+
+  $libijs_0_35_file_name = "libijs-0.35_0.35-12_amd64.deb"
+  file {"${libijs_0_35_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libijs_0_35_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libijs_0_35_file_name}"
+  }
+  package { "libijs-0.35":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libijs_0_35_file_name}",
+    require  => [
+      File["${libijs_0_35_file_name}"],
+    ]
+  }
+
+  $libjbig2dec0_file_name = "libjbig2dec0_0.12+20150918-1ubuntu0.1_amd64.deb"
+  file {"${libjbig2dec0_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libjbig2dec0_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libjbig2dec0_file_name}"
+  }
+  package { "libjbig2dec0":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libjbig2dec0_file_name}",
+    require  => [
+      File["${libjbig2dec0_file_name}"],
+    ]
+  }
+
+  $poppler_data_file_name = "poppler-data_0.4.7-7_all.deb"
+  file {"${poppler_data_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${poppler_data_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${poppler_data_file_name}"
+  }
+  package { "poppler-data":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${poppler_data_file_name}",
+    require  => [
+      File["${poppler_data_file_name}"],
+    ]
   }
 
   $libharfbuzz_icu0_file_name = "libharfbuzz-icu0_1.0.1-1ubuntu0.1_amd64.deb"
@@ -387,62 +391,6 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     require  => [File["${libharfbuzz0b_file_name}"]]
   }
 
-  $libpotrace0_file_name = "libpotrace0_1.13-2_amd64.deb"
-  file {"${libpotrace0_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libpotrace0_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpotrace0_file_name}"
-  }
-  package { "libpotrace0":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libpotrace0_file_name}",
-    require  => [File["${libpotrace0_file_name}"]]
-  }
-
-  $libxaw7_file_name = "libxaw7_2%3a1.0.13-1_amd64.deb"
-  file {"${libxaw7_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libxaw7_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxaw7_file_name}"
-  }
-  package { "libxaw7":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxaw7_file_name}",
-    require  => [
-      File["${libxaw7_file_name}"],
-      Package["libxt6"],
-      Package["libxmu6"],
-    ]
-  }
-
-  $libxi6_file_name = "libxi6_2%3a1.7.6-1_amd64.deb"
-  file {"${libxi6_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libxi6_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}"
-  }
-  package { "libxi6":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxi6_file_name}",
-    require  => [File["${libxi6_file_name}"]]
-  }
-
-  $libxpm4_file_name = "libxpm4_1%3a3.5.11-1ubuntu0.16.04.1_amd64.deb"
-  file {"${libxpm4_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libxpm4_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxpm4_file_name}"
-  }
-  package { "libxpm4":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxpm4_file_name}",
-    require  => [File["${libxpm4_file_name}"]]
-  }
-
   $libpoppler58_file_name = "libpoppler58_0.41.0-0ubuntu1.14_amd64.deb"
   file {"${libpoppler58_file_name}":
     ensure  => present,
@@ -458,52 +406,7 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
       Package["libjpeg8"],
       Package["liblcms2-2"],
       Package["libtiff5"],
-    ]
-  }
-
-  $liblcms2_2_file_name = "liblcms2-2_2.6-3ubuntu2.1_amd64.deb"
-  file {"${liblcms2_2_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${liblcms2_2_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${liblcms2_2_file_name}"
-  }
-  package { "liblcms2-2":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${liblcms2_2_file_name}",
-    require  => [File["${liblcms2_2_file_name}"]]
-  }
-
-  $libtiff5_file_name = "libtiff5_4.0.6-1ubuntu0.6_amd64.deb"
-  file {"${libtiff5_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libtiff5_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libtiff5_file_name}"
-  }
-  package { "libtiff5":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libtiff5_file_name}",
-    require  => [
-      File["${libtiff5_file_name}"],
-      Package["libjpeg8"],
-      Package["libjbig0"],
-    ]
-  }
-
-
-  $libjbig0_file_name = "libjbig0_2.1-3.1_amd64.deb"
-  file {"${libjbig0_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libjbig0_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libjbig0_file_name}"
-  }
-  package { "libjbig0":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libjbig0_file_name}",
-    require  => [
-      File["${libjbig0_file_name}"],
+      Package["libfontconfig1"],
     ]
   }
 
@@ -538,20 +441,132 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
     ]
   }
 
-  $libxmu6_file_name = "libxmu6_2%3a1.1.2-2_amd64.deb"
-  file {"${libxmu6_file_name}":
+  $liblcms2_2_file_name = "liblcms2-2_2.6-3ubuntu2.1_amd64.deb"
+  file {"${liblcms2_2_file_name}":
     ensure  => present,
-    path    => "${local_install_dir}${libxmu6_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxmu6_file_name}"
+    path    => "${local_install_dir}${liblcms2_2_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${liblcms2_2_file_name}"
   }
-  package { "libxmu6":
+  package { "liblcms2-2":
     ensure   => present,
     provider => dpkg,
-    source   => "${local_install_dir}${libxmu6_file_name}",
+    source   => "${local_install_dir}${liblcms2_2_file_name}",
     require  => [
-      File["${libxmu6_file_name}"],
+      File["${liblcms2_2_file_name}"],
+    ]
+  }
+
+  $libtiff5_file_name = "libtiff5_4.0.6-1ubuntu0.6_amd64.deb"
+  file {"${libtiff5_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libtiff5_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libtiff5_file_name}"
+  }
+  package { "libtiff5":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libtiff5_file_name}",
+    require  => [
+      File["${libtiff5_file_name}"],
+      Package["libjpeg8"],
+      Package["libjbig0"],
+    ]
+  }
+
+  $libjbig0_file_name = "libjbig0_2.1-3.1_amd64.deb"
+  file {"${libjbig0_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libjbig0_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libjbig0_file_name}"
+  }
+  package { "libjbig0":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libjbig0_file_name}",
+    require  => [
+      File["${libjbig0_file_name}"],
+    ]
+  }
+
+
+  $libfontconfig1_file_name = "libfontconfig1_2.11.94-0ubuntu1.1_amd64.deb"
+  file { "${libfontconfig1_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libfontconfig1_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libfontconfig1_file_name}",
+  }
+  package { "libfontconfig1":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libfontconfig1_file_name}",
+    require  => [
+      File["${libfontconfig1_file_name}"],
+      Package["fontconfig-config"],
+    ]
+  }
+
+  $fontconfig_config_file_name = "fontconfig-config_2.11.94-0ubuntu1.1_all.deb"
+  file { "${fontconfig_config_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fontconfig_config_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fontconfig_config_file_name}",
+  }
+  package { "fontconfig-config":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fontconfig_config_file_name}",
+    require  => [
+      File["${fontconfig_config_file_name}"],
+      Package["fonts-dejavu-core"],
+    ]
+  }
+
+  $fonts_dejavu_core_file_name = "fonts-dejavu-core_2.35-1_all.deb"
+  file { "${fonts_dejavu_core_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fonts_dejavu_core_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_dejavu_core_file_name}",
+  }
+  package { "fonts-dejavu-core":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fonts_dejavu_core_file_name}",
+    require  => [
+      File["${fonts_dejavu_core_file_name}"],
+    ]
+  }
+
+  $libpotrace0_file_name = "libpotrace0_1.13-2_amd64.deb"
+  file {"${libpotrace0_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libpotrace0_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpotrace0_file_name}"
+  }
+  package { "libpotrace0":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libpotrace0_file_name}",
+    require  => [
+      File["${libpotrace0_file_name}"],
+    ]
+  }
+
+  $libxaw7_file_name = "libxaw7_2%3a1.0.13-1_amd64.deb"
+  file {"${libxaw7_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libxaw7_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxaw7_file_name}"
+  }
+  package { "libxaw7":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libxaw7_file_name}",
+    require  => [
+      File["${libxaw7_file_name}"],
       Package["libxt6"],
-      ]
+      Package["libxmu6"],
+      Package["libxpm4"],
+    ]
   }
 
   $libxt6_file_name = "libxt6_1%3a1.1.5-0ubuntu1_amd64.deb"
@@ -617,4 +632,302 @@ define pandoc::ubuntu::xenial::texlive_fonts_recommended {
       File["${x11_common_file_name}"],
     ]
   }
+
+  $libxmu6_file_name = "libxmu6_2%3a1.1.2-2_amd64.deb"
+  file {"${libxmu6_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libxmu6_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxmu6_file_name}"
+  }
+  package { "libxmu6":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libxmu6_file_name}",
+    require  => [
+      File["${libxmu6_file_name}"],
+      Package["libxt6"],
+    ]
+  }
+
+  $libxpm4_file_name = "libxpm4_1%3a3.5.11-1ubuntu0.16.04.1_amd64.deb"
+  file {"${libxpm4_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libxpm4_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxpm4_file_name}"
+  }
+  package { "libxpm4":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libxpm4_file_name}",
+    require  => [
+      File["${libxpm4_file_name}"],
+    ]
+  }
+
+  $libxi6_file_name = "libxi6_2%3a1.7.6-1_amd64.deb"
+  file {"${libxi6_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libxi6_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}"
+  }
+  package { "libxi6":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libxi6_file_name}",
+    require  => [
+      File["${libxi6_file_name}"],
+    ]
+  }
+
+  $libzzip_0_13_file_name = "libzzip-0-13_0.13.62-3ubuntu0.16.04.2_amd64.deb"
+  file {"${libzzip_0_13_file_name}":
+    ensure  => present,
+    path    => "${local_install_dir}${libzzip_0_13_file_name}",
+    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libzzip_0_13_file_name}"
+  }
+  package { "libzzip-0-13":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libzzip_0_13_file_name}",
+    require  => [
+      File["${libzzip_0_13_file_name}"],
+    ]
+  }
+
+  $xdg_utils_file_name = "xdg-utils_1.1.0~rc1-2ubuntu7.1_all.${package_type}"
+  file { "${xdg_utils_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${xdg_utils_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${xdg_utils_file_name}",
+  }
+  package { "xdg-utils":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${xdg_utils_file_name}",
+    require  => [
+      File["${xdg_utils_file_name}"],
+    ]
+  }
+
+  $libpaper_utils_file_name = "libpaper-utils_1.1.24+nmu4ubuntu1_${architecture}.${package_type}"
+  file { "${libpaper_utils_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libpaper_utils_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpaper_utils_file_name}",
+  }
+  package { "libpaper-utils":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libpaper_utils_file_name}",
+    require  => [
+      File["${libpaper_utils_file_name}"],
+      Package["libpaper1"]
+    ]
+  }
+
+  $libpaper1_file_name = "libpaper1_1.1.24+nmu4ubuntu1_${architecture}.${package_type}"
+  file { "${libpaper1_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libpaper1_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libpaper1_file_name}",
+  }
+  package { "libpaper1":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libpaper1_file_name}",
+    require  => [
+      File["${libpaper1_file_name}"],
+    ]
+  }
+}
+
+
+define pandoc::ubuntu::xenial::texlive_fonts_recommended {
+  $package_type=$pandoc::package_type
+  $puppet_file_dir=$pandoc::puppet_file_dir
+
+  include pandoc::ubuntu::xenial
+
+  realize(File["${pandoc::ubuntu::xenial::texlive_binaries_file_name}"])
+  realize(Package["texlive-binaries"])
+
+  realize(File["$pandoc::ubuntu::xenial::texlive_base_file_name"])
+  realize(Package["texlive-base"])
+
+  realize(File["${pandoc::ubuntu::xenial::tex_common_file_name}"])
+  realize(Package["tex-common"])
+
+  $texlive_fonts_recommended_file_name = "texlive-fonts-recommended_2015.20160320-1ubuntu0.1_all.deb"
+  file { "${texlive_fonts_recommended_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${texlive_fonts_recommended_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_fonts_recommended_file_name}",
+  }
+  package { "texlive-fonts-recommended":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${texlive_fonts_recommended_file_name}",
+    require  => [
+      File["${texlive_fonts_recommended_file_name}"],
+      Package["tex-common"],
+      Package["texlive-base"],
+    ]
+  }
+
+}
+
+define pandoc::ubuntu::xenial::texlive_latex_extra {
+  $package_type=$pandoc::package_type
+  $puppet_file_dir=$pandoc::puppet_file_dir
+  include pandoc::ubuntu::xenial
+  include python
+
+  realize(File["${pandoc::ubuntu::xenial::tex_common_file_name}"])
+  realize(Package["tex-common"])
+
+  realize(File["${pandoc::ubuntu::xenial::texlive_binaries_file_name}"])
+  realize(Package["texlive-binaries"])
+
+  realize(File["${pandoc::ubuntu::xenial::texlive_base_file_name}"])
+  realize(Package["texlive-base"])
+
+  realize(Python::Ubuntu::Xenial["virtual"])
+
+  $texlive_latex_extra_file_name = "texlive-latex-extra_2015.20160320-1_all.deb"
+  file { "${texlive_latex_extra_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${texlive_latex_extra_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_extra_file_name}",
+  }
+  package { "texlive-latex-extra":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${texlive_latex_extra_file_name}",
+    require  => [
+      File["${texlive_latex_extra_file_name}"],
+      Package["tex-common"],
+      Package["texlive-base"],
+      Package["texlive-latex-recommended"],
+      Package["texlive-binaries"],
+      Package["texlive-pictures"],
+      Package["preview-latex-style"],
+    ]
+  }
+
+  $preview_latex_style_file_name = "preview-latex-style_11.88-1.1ubuntu1_all.deb"
+  file { "${preview_latex_style_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${preview_latex_style_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${preview_latex_style_file_name}",
+  }
+  package { "preview-latex-style":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${preview_latex_style_file_name}",
+    require  => [
+      File["${preview_latex_style_file_name}"],
+      Package["tex-common"],
+    ]
+  }
+
+  $texlive_pictures_file_name = "texlive-pictures_2015.20160320-1ubuntu0.1_all.deb"
+  file { "${texlive_pictures_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${texlive_pictures_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_pictures_file_name}",
+  }
+  package { "texlive-pictures":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${texlive_pictures_file_name}",
+    require  => [
+      File["${texlive_pictures_file_name}"],
+      Package["tex-common"],
+      Package["texlive-base"],
+      Package["texlive-latex-recommended"],
+      Package["texlive-binaries"],
+      Package["python"],
+    ]
+  }
+
+  $texlive_latex_recommended_file_name = "texlive-latex-recommended_2015.20160320-1ubuntu0.1_all.deb"
+  file { "${texlive_latex_recommended_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${texlive_latex_recommended_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_recommended_file_name}",
+  }
+  package { "texlive-latex-recommended":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${texlive_latex_recommended_file_name}",
+    require  => [
+      File["${texlive_latex_recommended_file_name}"],
+      Package["texlive-base"],
+      Package["texlive-binaries"],
+      Package["texlive-latex-base"],
+    ]
+  }
+
+
+  $texlive_latex_base_file_name = "texlive-latex-base_2015.20160320-1ubuntu0.1_all.deb"
+  file { "${texlive_latex_base_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${texlive_latex_base_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${texlive_latex_base_file_name}",
+  }
+  package { "texlive-latex-base":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${texlive_latex_base_file_name}",
+    require  => [
+      File["${texlive_latex_base_file_name}"],
+      Package["texlive-binaries"],
+      Package["texlive-base"],
+      Package["tex-common"],
+    ]
+  }
+
+}
+
+define pandoc::ubuntu::xenial::lmodern {
+  $package_type=$pandoc::package_type
+  $puppet_file_dir=$pandoc::puppet_file_dir
+  include pandoc::ubuntu::xenial
+
+  realize(File["${pandoc::ubuntu::xenial::tex_common_file_name}"])
+  realize(Package["tex-common"])
+
+  $lmodern_file_name = "lmodern_2.004.5-1_all.deb"
+  file { "${lmodern_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${lmodern_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${lmodern_file_name}",
+  }
+  package { "lmodern":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${lmodern_file_name}",
+    require  => [
+      File["${lmodern_file_name}"],
+      Package["tex-common"],
+      Package["fonts-lmodern"],
+    ]
+  }
+
+  $fonts_lmodern_file_name = "fonts-lmodern_2.004.5-1_all.deb"
+  file { "${fonts_lmodern_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fonts_lmodern_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_lmodern_file_name}",
+  }
+  package { "fonts-lmodern":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fonts_lmodern_file_name}",
+    require  => [
+      File["${fonts_lmodern_file_name}"],
+    ]
+  }
+
+
 }
