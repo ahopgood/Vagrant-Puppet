@@ -44,7 +44,7 @@ define java (
     Java::Centos["test-java-${major_version}"] -> Java::Default::Install["install-default-to-java-${major_version}"]
 #    Java::Centos["test-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
   } elsif $::operatingsystem == 'Ubuntu'{
-    include java::ubuntu::wily
+    # include java::ubuntu::wily
 
     java::ubuntu{ "test-java-${major_version}":
       major_version  => $major_version,
@@ -74,7 +74,7 @@ define java (
     }
 
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
-      file { "create default link":
+      file { "create default link ${major_version}":
         ensure => link,
         path => "/usr/lib/jvm/default",
         target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",
@@ -93,8 +93,8 @@ define java::default::install(
   $update_version = undef,
 ){
   #JDK location changes based on OS
-  if ($::operatingsystem == "Ubuntu"){
-    $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+  if ($::operatingsystem == "Ubuntu") {
+    $jdkLocation = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
   } elsif ($::operatingsystem == "CentOS"){
     if ($update_version == undef){
       fail("CentOS Java default is missing an updateVersion")
@@ -107,7 +107,7 @@ define java::default::install(
   $jdkBinLocation = "${jdkLocation}bin/"
   $jreBinLocation = "${jdkLocation}jre/bin/"
   $pluginLocation = "${jdkLocation}jre/lib/amd64/"
-  $manLocation     = "${jdkLocation}man/man1/"
+  $manLocation    = "${jdkLocation}man/man1/"
   $priority = 100000  + (1000 * "${major_version}") + "${update_version}"
   #e.g. java 8u112 and 7u80 respectively:
   #100000 + 8000 = 180000 + 112 = 180112
@@ -116,13 +116,13 @@ define java::default::install(
   $manExt = ".1"
   # Common binaries that are slaved to the java command
   $javaSlaveCommonHash = {
-    "ControlPanel" => "${jreBinLocation}",
+    # "ControlPanel" => "${jreBinLocation}",
     "javaws"       => "${jreBinLocation}",
-    "jcontrol"     => "${jreBinLocation}",
+    # "jcontrol"     => "${jreBinLocation}",
     "keytool"      => "${jreBinLocation}",
     "orbd"         => "${jreBinLocation}",
     "pack200"      => "${jreBinLocation}",
-    "policytool"   => "${jreBinLocation}",
+    # "policytool"   => "${jreBinLocation}",
     "rmid"         => "${jreBinLocation}",
     "rmiregistry"  => "${jreBinLocation}",
     "servertool"   => "${jreBinLocation}",
@@ -135,7 +135,7 @@ define java::default::install(
     "keytool${manExt}"     => "${manLocation}",
     "orbd${manExt}"        => "${manLocation}",
     "pack200${manExt}"     => "${manLocation}",
-    "policytool${manExt}"  => "${manLocation}",
+    # "policytool${manExt}"  => "${manLocation}",
     "rmid${manExt}"        => "${manLocation}",
     "rmiregistry${manExt}" => "${manLocation}",
     "servertool${manExt}"  => "${manLocation}",
@@ -154,7 +154,7 @@ define java::default::install(
     "javadoc"                 => "${jdkBinLocation}",
     "javah"                   => "${jdkBinLocation}",
     "javap"                   => "${jdkBinLocation}",
-    "javaws"                  => "${jreBinLocation}",
+    # "javaws"                  => "${jreBinLocation}",
     "jconsole"                => "${jdkBinLocation}",
     "jcontrol"                => "${jreBinLocation}",
     "jdb"                     => "${jdkBinLocation}",
@@ -168,19 +168,19 @@ define java::default::install(
     "jstat"                   => "${jdkBinLocation}",
     "jstatd"                  => "${jdkBinLocation}",
     "jvisualvm"               => "${jdkBinLocation}",
-    "keytool"                 => "${jreBinLocation}",
+    # "keytool"                 => "${jreBinLocation}",
     "native2ascii"            => "${jdkBinLocation}",
-    "orbd"                    => "${jreBinLocation}",
-    "pack200"                 => "${jreBinLocation}",
+    # "orbd"                    => "${jreBinLocation}",
+    # "pack200"                 => "${jreBinLocation}",
     "policytool"              => "${jreBinLocation}",
     "rmic"                    => "${jdkBinLocation}",
-    "rmid"                    => "${jreBinLocation}",
-    "rmiregistry"             => "${jreBinLocation}",
+    # "rmid"                    => "${jreBinLocation}",
+    # "rmiregistry"             => "${jreBinLocation}",
     "schemagen"               => "${jdkBinLocation}",
     "serialver"               => "${jdkBinLocation}",
-    "servertool"              => "${jreBinLocation}",
-    "tnameserv"               => "${jreBinLocation}",
-    "unpack200"               => "${jreBinLocation}",
+    # "servertool"              => "${jreBinLocation}",
+    # "tnameserv"               => "${jreBinLocation}",
+    # "unpack200"               => "${jreBinLocation}",
     "wsgen"                   => "${jdkBinLocation}",
     "wsimport"                => "${jdkBinLocation}",
     "xjc"                     => "${jdkBinLocation}",
@@ -196,7 +196,7 @@ define java::default::install(
     "javadoc${manExt}"        => "${manLocation}",
     "javah${manExt}"          => "${manLocation}",
     "javap${manExt}"          => "${manLocation}",
-    "javaws${manExt}"         => "${manLocation}",
+    # "javaws${manExt}"         => "${manLocation}",
     "jconsole${manExt}"       => "${manLocation}",
     "jdb${manExt}"            => "${manLocation}",
     "jhat${manExt}"           => "${manLocation}",
@@ -209,19 +209,19 @@ define java::default::install(
     "jstat${manExt}"          => "${manLocation}",
     "jstatd${manExt}"         => "${manLocation}",
     "jvisualvm${manExt}"      => "${manLocation}",
-    "keytool${manExt}"        => "${manLocation}",
+    # "keytool${manExt}"        => "${manLocation}",
     "native2ascii${manExt}"   => "${manLocation}",
-    "orbd${manExt}"           => "${manLocation}",
-    "pack200${manExt}"        => "${manLocation}",
+    # "orbd${manExt}"           => "${manLocation}",
+    # "pack200${manExt}"        => "${manLocation}",
     "policytool${manExt}"     => "${manLocation}",
     "rmic${manExt}"           => "${manLocation}",
-    "rmid${manExt}"           => "${manLocation}",
-    "rmiregistry${manExt}"    => "${manLocation}",
+    # "rmid${manExt}"           => "${manLocation}",
+    # "rmiregistry${manExt}"    => "${manLocation}",
     "schemagen${manExt}"      => "${manLocation}",
     "serialver${manExt}"      => "${manLocation}",
-    "servertool${manExt}"     => "${manLocation}",
-    "tnameserv${manExt}"      => "${manLocation}",
-    "unpack200${manExt}"      => "${manLocation}",
+    # "servertool${manExt}"     => "${manLocation}",
+    # "tnameserv${manExt}"      => "${manLocation}",
+    # "unpack200${manExt}"      => "${manLocation}",
     "wsgen${manExt}"          => "${manLocation}",
     "wsimport${manExt}"       => "${manLocation}",
     "xjc${manExt}"            => "${manLocation}",
@@ -240,7 +240,7 @@ define java::default::install(
       "javapackager"            => "${jdkBinLocation}", #java 8 only
       "jdeps"                   => "${jdkBinLocation}",
       "jcmd"                    => "${jdkBinLocation}",
-      "jjs"                     => "${jreBinLocation}", #java 8 only
+      # "jjs"                     => "${jreBinLocation}", #java 8 only
       "jmc"                     => "${jdkBinLocation}",
       "jmc.ini"                 => "${jdkBinLocation}",
     }
@@ -249,7 +249,7 @@ define java::default::install(
       "javapackager${manExt}"   => "${manLocation}", #java 8 only
       "jcmd${manExt}"           => "${manLocation}",
       "jdeps${manExt}"          => "${manLocation}",
-      "jjs${manExt}"            => "${manLocation}", #java 8 only
+      # "jjs${manExt}"            => "${manLocation}", #java 8 only
       "jmc${manExt}"            => "${manLocation}",
     }
   } elsif (versioncmp("${major_version}", "7") == 0) {

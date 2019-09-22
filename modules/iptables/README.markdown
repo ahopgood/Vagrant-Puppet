@@ -20,3 +20,8 @@ Restart the machine to verify that the rule has been persisted:
 `sudo shutdown -r`  
 followed by:  
 `iptables --list-rules | /bin/grep -- <port>`   
+
+## Ubuntu
+Currently Ubuntu does not make use of iptables as its main firewall service.  
+This means iptables is available but there is no provision for it to run as a service making configuring iptables in Ubuntu redundant.  
+Make use of the `ufw` module instead.

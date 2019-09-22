@@ -1,13 +1,12 @@
 # Sudo
 ## Current Status / Support
 Support for the following operating systems:
+* Ubuntu 16.04
 * Ubuntu 15.10
 * CentOS 6
 * CentOS 7
 
-## Known Issues
-* Currently only supports adding sudo privileges for a user, not removal.  
-* Cannot be declared / used more than once; only supports sudo for a single user as a consequence.
+## Known Issues 
 * [Known Issues Ubuntu](#Known_issues_ubuntu)  
 * [Known Issues CentOS](#Known_issues_centos)  
 
@@ -28,6 +27,7 @@ For adding sudo privileges a [user resource](https://docs.puppet.com/puppet/late
 ## Testing performed
 Works on clean installs of:
 * Ubuntu 15.10
+* Ubuntu 16.04
 * CentOS 6
 * CentOS 7
 

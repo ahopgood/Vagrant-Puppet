@@ -36,8 +36,13 @@ class patch {
     $platform = "${architecture}.deb" #architecture = amd64
     $provider = "dpkg"
 
-    if (versioncmp ("15.10", "${operatingsystemmajrelease}") == 0){
+    if (versioncmp ("15.10", "${operatingsystemmajrelease}") == 0) {
       $release = "-1_"
+      $patch_file = "patch_2.7.5${release}${platform}"
+
+    } elsif (versioncmp ("16.04", "${operatingsystemmajrelease}") == 0){
+      #Note that patch 2.7.5 is already installed on Ubuntu 16.04 but this is here in case we want to add an update in future
+      $release = "-1ubuntu0.${operatingsystemmajrelease}.2_"
       $patch_file = "patch_2.7.5${release}${platform}"
 
     } else {
@@ -57,7 +62,9 @@ class patch {
     ensure => present,
     provider => "${provider}",
     source => "${local_install_dir}${patch_file}",
-    require => File["${local_install_dir}${patch_file}"],
+    require => [
+      File["${local_install_dir}${patch_file}"],
+    ]
     #1.12
   }
 }

@@ -26,15 +26,21 @@ Vagrant.configure("2") do |config|
   	centos6.vm.box_check_update = false
   end
 
-  config.vm.define "Ubuntu_15_test" do |ubuntu|
-    ubuntu.vm.box = "ubuntu/wily64"
-    ubuntu.vm.box_check_update = false
-  end
+    config.vm.define "Ubuntu_15_test" do |ubuntu|
+        ubuntu.vm.box = "ubuntu/wily64"
+        ubuntu.vm.box_version = "20160329.0.0"
+        ubuntu.vm.hostname = "ubuntu-15"
+        ubuntu.vm.network "private_network", ip: "192.168.33.15"
+        ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
+    end
 
-  config.vm.define "Ubuntu_16_test" do |ubuntu|
-    ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
-    ubuntu.vm.network "private_network", ip: "192.168.33.26"
-    ubuntu.vm.box = "reclusive/xenial64-puppet"
-    ubuntu.vm.box_check_update = true
-  end
+    config.vm.define "Ubuntu_16_test" do |ubuntu|
+        ubuntu.vm.box = "reclusive/xenial64-puppet"
+        ubuntu.vm.box_check_update = true
+        ubuntu.vm.hostname = "ubuntu-16"
+        ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+        ubuntu.vm.network "private_network", ip: "192.168.33.16"
+        ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
+        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
+    end
 end

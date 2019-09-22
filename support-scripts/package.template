@@ -1,0 +1,14 @@
+  $PACKAGE_FILE_ID_file_name = "PACKAGE_FILE_NAME"
+  file { "${PACKAGE_FILE_ID_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${PACKAGE_FILE_ID_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${PACKAGE_FILE_ID_file_name}",
+  }
+  package { "PACKAGE_NAME":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${PACKAGE_FILE_ID_file_name}",
+    require  => [
+        File["${PACKAGE_FILE_ID_file_name}"],
+    ]
+  }
