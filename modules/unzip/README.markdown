@@ -10,6 +10,7 @@ Installs the unzip binary.
 * CentOS 6 - unzip version 6.0 redhat patch version 2
 * CentOS 7 - unzip version 6.0 redhat patch version 16
 * Ubuntu 15.10 - unzip version 6.0 ubuntu patch version 17
+* Ubuntu 16.04 - unzip version 6.0 ubuntu patch version 20
 
 ## Usage
 ```
@@ -31,6 +32,7 @@ Requires the presence of a directory called **/etc/puppet/installers/** to insta
 * CentOS 6 - single call to class{"unzip":}
 * CentOS 7 - single call to class{"unzip":}
 * Ubuntu 15.10 - single call to class{"unzip":}
+* Ubuntu 16.04 - single call to class{"unzip":}
 
 ## Known Issues
 * Being defined as a class manifest means that multiple definitions will cause a puppet error.
