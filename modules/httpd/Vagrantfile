@@ -18,28 +18,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.synced_folder "files/", "/files/"
 
 
-  config.vm.define "ubuntu" do |ubuntu|
-    ubuntu.vm.hostname = "apache-dev-ubuntu"
-    ubuntu.vm.network "private_network", ip: "192.168.33.25"
-    ubuntu.vm.box = "ubuntu/wily64"
-
-  end
-  
-  
-  config.vm.define "centos6" do |centos6|
-  	centos6.vm.box = "puppetlabs/centos-6.6-64-puppet"
-	centos6.vm.network "private_network", ip: "192.168.33.26"
-	centos6.vm.box_version = "1.0.1"
-	centos6.vm.hostname = "httpd.centos6.vm"
-  end
-
-  config.vm.define "centos7" do |centos7|
-  	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
-    centos7.vm.network "private_network", ip: "192.168.33.27"
-	centos7.vm.box_version = "1.0.1"
-    centos7.vm.hostname = "httpd.centos7.vm"
-  end
-
   config.vm.define "CentOS_7_test" do |centos7|
   	centos7.vm.box = "puppetlabs/centos-7.0-64-puppet"
     centos7.vm.network "private_network", ip: "192.168.33.27"
@@ -55,16 +33,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "Ubuntu_15_test" do |ubuntu|
-    ubuntu.vm.network "private_network", ip: "192.168.33.25"
+    ubuntu.vm.network "private_network", ip: "192.168.33.15"
     ubuntu.vm.box = "ubuntu/wily64"
     ubuntu.vm.box_check_update = false
   end
 
   config.vm.define "Ubuntu_16_test" do |ubuntu|
     ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
-    ubuntu.vm.network "private_network", ip: "192.168.33.26"
+    ubuntu.vm.network "private_network", ip: "192.168.33.16"
     ubuntu.vm.box = "reclusive/xenial64-puppet"
     ubuntu.vm.box_check_update = true
+    ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
   end
 
+  config.vm.define "Ubuntu_18_test" do |ubuntu|
+    # Puppet 5 requires the following command to work
+    # sudo puppet apply --modulepath=/etc/puppet/modules /vagrant/tests/httpd.pp
+    ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+    ubuntu.vm.network "private_network", ip: "192.168.33.18"
+    ubuntu.vm.box = "reclusive/bionic64-puppet"
+    ubuntu.vm.box_check_update = true
+    ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
+  end
 end

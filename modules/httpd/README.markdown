@@ -20,6 +20,7 @@ Tested to work on the following operating systems:
 * CentOS 7 - Apache 2.4.6
 * Ubuntu 15.10 - Apache 2.4.12 **it is advisable to move on from Ubuntu 15.10 - these repositories are no longer being updated**
 * Ubuntu 16.04 - Apache 2.4.39
+* Ubuntu 18.04 - Apache 2.4.39
 
 ### Known Issues  
 * **64-bit support only**  
@@ -174,7 +175,7 @@ You will also need to add these new file names/versions to the main **ubuntu.pp*
     	default => undef,
 	}
 ```
-If there are **new** dependencies then you'll need to add their installers to the **/files/CentOS/x/** folder where x is the CentOS version and you'll need to create a whole new conditional resolution for the library name, similar to the **apr** example above to ensure that name resolves correctly.  
+If there are **new** dependencies then you'll need to add their installers to the **/files/Ubuntu/x/** folder where x is the CentOS version and you'll need to create a whole new conditional resolution for the library name, similar to the **apr** example above to ensure that name resolves correctly.  
 As well as name resolution you'll also need to add a conditional section based on the OS version to actually obtain the installer file and then install the package, an example for the apr installer is found below:  
 ```
 	file{
