@@ -10,11 +10,11 @@ define httpd::proxy::gateway::install{
   # Other modules might be required for other types of proxying
   # It might be worth setting this as a realised resource
   httpd::module::install{"install proxy module":
-    module_name => "proxy",
+    httpd_module_name => "proxy",
   }
   ->
   httpd::module::install{"install proxy_http module":
-    module_name => "proxy_http",
+    httpd_module_name => "proxy_http",
   }
 }
 

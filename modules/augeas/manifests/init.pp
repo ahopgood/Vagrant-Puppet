@@ -48,6 +48,12 @@ class augeas {
       $package = "-0ubuntu1.1"
       # $ensure = "${major_version}.${minor_version}.${patch_version}${package}"
       $ensure = "present"
+    } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
+      $major_version = "1"
+      $minor_version = "10"
+      $patch_version = "1"
+      $package = "-2"
+      $ensure = "present"
     } else {
       fail("Ubuntu ${operatingsystemmajrelease} is not supported")
     }
@@ -80,6 +86,7 @@ class augeas {
   } else {
     fail("${operatingsystem} is currently not supported for the augeas module")
   }
+
   file {"${augeas_libs_file}":
     ensure => present,
     path => "${local_install_dir}${augeas_libs_file}",
@@ -113,6 +120,7 @@ class augeas::xmlstarlet{
   $xmlstarlet = "xmlstarlet"
   $puppet_file_dir = "modules/augeas/"
   $file_location = "${operatingsystem}/${operatingsystemmajrelease}/"
+  $local_install_dir = $augeas::local_install_dir
 
   if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
     if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0){
@@ -121,6 +129,10 @@ class augeas::xmlstarlet{
       $ensure = "present"
     } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
       $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-1ubuntu1_amd64.deb"
+      $provider = "dpkg"
+      $ensure = "present"
+    } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
+      $xmlstarlet_file = "${xmlstarlet}_${major_version}.${minor_version}.${patch_version}-2_amd64.deb"
       $provider = "dpkg"
       $ensure = "present"
     } else {

@@ -8,6 +8,7 @@ Tested to work on the following operating systems:
 * CentOS 7 - 1.4.0
 * Ubuntu 15.10 - 1.4.0
 * Ubuntu 16.04 - 1.4.0
+* Ubuntu 18.04 - 1.10.0
 * Raspberian - 
 
 ### Known Issues  
@@ -122,6 +123,8 @@ an example would be:
 This provides the [XmlStarlet](http://xmlstar.sourceforge.net/) package version 1.6.1  
 Supports:
 * Ubuntu Wily 15.10 64-bit
+* Ubuntu Xenial 16.04 64-bit
+* Ubuntu Bionic 18.04 64-bit
 
 ### Usage
 ```

@@ -132,7 +132,7 @@ class httpd::ubuntu (
       source => "${local_install_dir}${libssl1_1_file}",
       require => File["libssl1_1-file"]
     }
-  }
+  } #Apache version check end
 
   $liblua_package = $apache_version ? {
     "2.4.12" => "liblua5.1-0",
