@@ -63,7 +63,7 @@ class ddclient{
   file { "/usr/share/augeas/lenses/dist/ddclientconf.aug":
     ensure => "present",
     source => "puppet:///${puppet_file_dir}DDClientConf.lns",
-    mode   => 0777,
+    mode   => "0777",
     #    require => [Service["ddclient"]],
   }
 
@@ -113,7 +113,7 @@ define ddclient::entry(
     file {"/etc/ddclient.conf  ${name}":
       path => "/etc/ddclient.conf",
       ensure => present,
-      mode => 0777,
+      mode => "0777",
       require => [Exec["remove ddclient.conf ${name}"]],
       before => Augeas["add-entry ${name}"]
     }
