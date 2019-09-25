@@ -25,7 +25,7 @@
 
   file { "/usr/share/augeas/lenses/tests/":
     ensure => directory,
-    mode => 0777,
+    mode => "0777",
   }
 
   #Run lens test
