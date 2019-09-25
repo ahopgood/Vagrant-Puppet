@@ -94,7 +94,8 @@ define ddclient::entry(
 
   if ((versioncmp("${operatingsystem}${operatingsystemmajrelease}","CentOS6") == 0)
      or (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu15.10") == 0)
-      or (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu16.04") == 0)){
+      or (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu16.04") == 0)
+        or (versioncmp("${operatingsystem}${operatingsystemmajrelease}","Ubuntu18.04") == 0)){
     $ls_path = "/bin/"
     $rm_path = "/bin/"
   } else {
