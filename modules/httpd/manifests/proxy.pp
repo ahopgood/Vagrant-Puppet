@@ -53,6 +53,7 @@ define httpd::proxy::gateway::set_virtual(
   # Require ip parameter
 
 
+ $space = ' '
 
   if ($host_address != undef){
     $proxy_contents = [
@@ -60,11 +61,11 @@ define httpd::proxy::gateway::set_virtual(
       "set VirtualHost/IfModule[arg = 'proxy_module']/directive[1] ProxyPreserveHost",
       "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPreserveHost']/arg[1] Off",
       "set VirtualHost/IfModule[arg = 'proxy_module']/directive[2] ProxyPass",
-      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPass']/arg[1] '\"/\"'",
-      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPass']/arg[2] '\"${host_address}/\"'",
+      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPass']/arg[1] '/",
+      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPass']/arg[2] '${host_address}/'",
       "set VirtualHost/IfModule[arg = 'proxy_module']/directive[3] ProxyPassReverse",
-      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPassReverse']/arg[1] '\"/\"'",
-      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPassReverse']/arg[2] '\"${host_address}/\"'",
+      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPassReverse']/arg[1] '/'",
+      "set VirtualHost/IfModule[arg = 'proxy_module']/directive[. = 'ProxyPassReverse']/arg[2] '${host_address}/'",
     ]
 
     augeas { "add proxy_module module to ${virtual_host} config":
@@ -72,7 +73,7 @@ define httpd::proxy::gateway::set_virtual(
       lens     => "Httpd.lns",
       context  => "${context}",
       changes  => $proxy_contents,
-      onlyif   => "match ${context}/VirtualHost/IfModule/arg[. = 'proxy_module']/directive[. = 'ProxyPass']/arg[2] != '\"${host_address}\"'",
+      onlyif   => "match ${context}/VirtualHost/IfModule/arg[. = 'proxy_module']/directive[. = 'ProxyPass']/arg[2] != '${host_address}\"'",
     }
   } else {
     augeas { "remove proxy_module module from ${virtual_host} config":
