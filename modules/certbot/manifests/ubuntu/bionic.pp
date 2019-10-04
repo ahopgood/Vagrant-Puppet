@@ -253,3 +253,63 @@ define certbot::ubuntu::bionic {
   }
 
 }
+
+define certbot::ubuntu::bionic::apache {
+  $puppet_file_dir = "modules/certbot/"
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+
+  $python_certbot_apache_file_name = "python-certbot-apache_0.23.0-1_all.deb"
+  file { "${python_certbot_apache_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${python_certbot_apache_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${python_certbot_apache_file_name}",
+  }
+  package { "python-certbot-apache":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${python_certbot_apache_file_name}",
+    require  => [
+      File["${python_certbot_apache_file_name}"],
+      Package["python3-certbot-apache"],
+    ]
+  }
+
+  $python3_certbot_apache_file_name = "python3-certbot-apache_0.23.0-1_all.deb"
+  file { "${python3_certbot_apache_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${python3_certbot_apache_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${python3_certbot_apache_file_name}",
+  }
+  package { "python3-certbot-apache":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${python3_certbot_apache_file_name}",
+    require  => [
+      File["${python3_certbot_apache_file_name}"],
+      Package["python3-augeas"],
+      # Package["apache2"],
+      Package["certbot"],
+      Package["python3-acme"],
+      Package["python3-certbot"],
+      Package["python3-mock"],
+      Package["python3-zope.component"],
+    ]
+  }
+
+  $python3_augeas_file_name = "python3-augeas_0.5.0-1_all.deb"
+  file { "${python3_augeas_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${python3_augeas_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${python3_augeas_file_name}",
+  }
+  package { "python3-augeas":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${python3_augeas_file_name}",
+    require  => [
+      File["${python3_augeas_file_name}"],
+    ]
+  }
+
+}

@@ -9,4 +9,9 @@ file {
     path       =>  "${local_install_dir}",
     ensure     =>  directory,
 }
+ufw::service{"ufw-service":}
 class {"certbot":}
+->
+class { "httpd": }
+->
+Certbot::Apache{"bionic":}
