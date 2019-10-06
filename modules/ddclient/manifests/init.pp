@@ -25,12 +25,69 @@ class ddclient{
   if (versioncmp("${os}","Ubuntu") == 0){
     $ddclient_file = "ddclient_${major_version}.${minor_version}.${patch_version}-1.1ubuntu1_all.deb"
     $provider = "dpkg"
+
+    $libio_socket_ssl_perl_file_name = "libio-socket-ssl-perl_2.060-3~ubuntu18.04.1_all.deb"
+
+    $ddclient_deps = [
+      File["${ddclient_file}"],
+      Package["libio-socket-ssl-perl"],
+    ]
+
+    file { "${libio_socket_ssl_perl_file_name}":
+      ensure => present,
+      path   => "${local_install_dir}${libio_socket_ssl_perl_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libio_socket_ssl_perl_file_name}",
+    }
+    package { "libio-socket-ssl-perl":
+      ensure   => present,
+      provider => dpkg,
+      source   => "${local_install_dir}${libio_socket_ssl_perl_file_name}",
+      require  => [
+        File["${libio_socket_ssl_perl_file_name}"],
+        Package["libnet-ssleay-perl"],
+      ]
+    }
+
+    $libnet_ssleay_perl_file_name = "libnet-ssleay-perl_1.84-1ubuntu0.2_amd64.deb"
+    file { "${libnet_ssleay_perl_file_name}":
+      ensure => present,
+      path   => "${local_install_dir}${libnet_ssleay_perl_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libnet_ssleay_perl_file_name}",
+    }
+    package { "libnet-ssleay-perl":
+      ensure   => present,
+      provider => dpkg,
+      source   => "${local_install_dir}${libnet_ssleay_perl_file_name}",
+      require  => [
+        File["${libnet_ssleay_perl_file_name}"],
+        Package["perl-openssl-defaults"],
+      ]
+    }
+
+    $perl_openssl_defaults_file_name = "perl-openssl-defaults_3build1_amd64.deb"
+    file { "${perl_openssl_defaults_file_name}":
+      ensure => present,
+      path   => "${local_install_dir}${perl_openssl_defaults_file_name}",
+      source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${perl_openssl_defaults_file_name}",
+    }
+    package { "perl-openssl-defaults":
+      ensure   => present,
+      provider => dpkg,
+      source   => "${local_install_dir}${perl_openssl_defaults_file_name}",
+      require  => [
+        File["${perl_openssl_defaults_file_name}"],
+      ]
+    }
+
   } elsif (versioncmp("${os}","CentOS") == 0){
     if (versioncmp("${os_version}", "7") == 0) {
       $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-2.el7.noarch.rpm"
     } elsif (versioncmp("${os_version}", "6") == 0) {
       $ddclient_file = "ddclient-${major_version}.${minor_version}.${patch_version}-1.el6.noarch.rpm"
     }
+    $ddclient_deps = [
+      File["${ddclient_file}"],
+    ]
     $provider = "rpm"
     Class["perl"]
     ->
@@ -51,7 +108,7 @@ class ddclient{
     ensure   => present,
     provider => "${provider}",
     source   => "${local_install_dir}/${ddclient_file}",
-    require  => File["${ddclient_file}"],
+    require  => $ddclient_deps,
   }
 
   service { "ddclient":
