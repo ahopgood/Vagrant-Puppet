@@ -12,7 +12,18 @@ Tested to work on the following operating systems:
 [Ubuntu Known Issues](#Ubuntu_known_issues)
 
 ## Usage 
-Can be declared via the 
+Can be declared via the certbot class:
+```
+class {"certbot":}
+```
+The certbot apache plugin requires apache to install and port 443 to be open to function correctly
+```
+ufw::service{"ufw-service":}
+class { "httpd": }
+->
+Certbot::Apache{"bionic":}
+
+```
 ## Dependencies
 
 ## Testing performed:
@@ -38,3 +49,4 @@ an example would be:
 * Move python2 shared dependencies into virtualised resources
 * Add support for obtaining certificates if not present
 * Add support for renewal 
+* Add support for install the apache plugin for certbot
