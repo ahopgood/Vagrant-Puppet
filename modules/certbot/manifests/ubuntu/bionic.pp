@@ -311,5 +311,48 @@ define certbot::ubuntu::bionic::apache {
       File["${python3_augeas_file_name}"],
     ]
   }
+}
 
+define certbot::ubuntu::bionic::apache::reinstall(
+  $server_name = undef,
+  $server_aliases = undef,
+  $document_root = undef,
+) {
+  $apache_virtual_host_sites = "/etc/apache2/sites-available/"
+  $certbox_home = "/etc/letsencrypt/"
+
+  if ($server_name == undef) {
+    fail("A virtual host is required to reinstall certbot certificates")
+  }
+
+  $domain_aliases = reduce($server_aliases) |$result, $alias|  { "${result} -d ${alias}"}
+
+  # sudo?
+  $reinstall_command = "certbot run \
+-i apache \
+-a webroot \
+-d ${server_name} \
+-d ${domain_aliases} \
+-w ${document_root} \
+--redirect \
+--uir \
+--hsts \
+--staple-ocsp \
+--must-staple \
+--reinstall \
+--dry-run"
+
+  $virtual_host_ssl_config = "${server_name}-le-ssl.conf"
+  exec { "Remove Apache SSL Configuration for ${server_name}":
+    path => "/bin/",
+    command => "rm ${apache_virtual_host_sites}${virtual_host_ssl_config}",
+    onlyif => "/bin/ls -1 ${apache_virtual_host_sites} | grep ${virtual_host_ssl_config}",
+    before => Exec["Reinstall SSL Configuration for ${server_name}"]
+  }
+
+  exec {"Reinstall SSL Configuration for ${server_name}":
+    path => "/usr/bin/",
+    command => "${reinstall_command}",
+    onlyif => "/bin/ls -1 ${certbox_home}live/${server_name}",
+  }
 }

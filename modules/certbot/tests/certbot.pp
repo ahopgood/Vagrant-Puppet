@@ -32,3 +32,9 @@ httpd::virtual_host{"test.alexanderhopgood.com":
   access_logs => true,
   error_logs => true
 }
+->
+Certbot::Apache::Reinstall{"test":
+  server_name   => "test.alexanderhopgood.com",
+  server_aliases => ["www.test.alexanderhopgood.com","test.alexanderhopgood.co.uk", "www.test.alexanderhopgood.co.uk"],
+  document_root => "/var/www/alexander/test/",
+}
