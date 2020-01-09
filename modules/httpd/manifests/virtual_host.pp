@@ -282,7 +282,6 @@ class httpd::virtual_host::sites(){
     $httpd_conf_location = "/etc/httpd/conf/httpd.conf"
     $sites_available_location = "/etc/httpd/sites-available/"
     $sites_enabled_location = "/etc/httpd/sites-enabled/"
-    $conf_file_name = "${server_name}"
     $httpd_package_name = "httpd"
 
     $httpd_major_version = "2"
@@ -296,7 +295,6 @@ class httpd::virtual_host::sites(){
     $sites_available_location = "/etc/apache2/sites-available/"
     $sites_enabled_location = "/etc/apache2/sites-enabled/"
 
-    $conf_file_name = "${server_name}"
     $httpd_package_name = "apache2"
 
     $httpd_major_version = "2"
