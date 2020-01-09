@@ -339,8 +339,7 @@ define certbot::ubuntu::bionic::apache::reinstall(
 --hsts \
 --staple-ocsp \
 --must-staple \
---reinstall \
---dry-run"
+--reinstall"
 
   $virtual_host_ssl_config = "${server_name}-le-ssl.conf"
   exec { "Remove Apache SSL Configuration for ${server_name}":
