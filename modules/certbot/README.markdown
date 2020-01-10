@@ -24,7 +24,20 @@ class { "httpd": }
 Certbot::Apache{"bionic":}
 
 ```
+To reinstall existing certificates for a VirtualHost you can use the following:
+```
+Certbot::Apache::Reinstall{"test":
+  server_name   => "test.alexanderhopgood.com",
+  server_aliases => ["www.test.alexanderhopgood.com","test.alexanderhopgood.co.uk", "www.test.alexanderhopgood.co.uk"],
+  document_root => "/var/www/alexander/test/",
+}
+```
 ## Dependencies
+`Certbot::Apache::Reinstall` requires:
+
+ * an apache VirtualHost to be setup for the correct domain
+ * LetsEncrypt/certbot installed
+ * Certificates already retrieved and stored in `/etc/letsencrypt/live/www.domain.com/`
 
 ## Testing performed:
 * Install on a fresh system
@@ -44,9 +57,6 @@ an example would be:
 ### Adding new major versions of Apache
 
 ## ToDo
-* Add support for installing certbot
 * Externalise python3 dependencies
 * Move python2 shared dependencies into virtualised resources
 * Add support for obtaining certificates if not present
-* Add support for renewal 
-* Add support for install the apache plugin for certbot
