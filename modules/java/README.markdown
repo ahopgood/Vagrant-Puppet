@@ -1,7 +1,7 @@
-# java #
+# Java 
 
 This is the java module. It provides...
-the Oracle Java Development Kit (JDK)
+the Oracle Java Development Kit (JDK) (6,7,8u212) and the AdoptOpenJdk distribution (8u232, 11+)
 
 The module can be passed the following parameters as Strings:  
 * Major version number, e.g. "6"
@@ -16,18 +16,20 @@ Java Cryptography Extensions are **not** provided as of yet.
 ## Current Status / Support
 Supports:
 * Ubuntu 15.10 (Wily)
-	* Major Java version 6,
-	* Major Java version 7,
-	* Major Java version 8 up to 8u112.  
+	* **Oracle** Major Java version 6,
+	* **Oracle** Major Java version 7,
+	* **Oracle** Major Java version 8 up to 8u112.  
 * CentOS 6
-	* Major Java version 5,
-	* Major Java version 6,
-	* Major Java version 7,
-	* Major Java version 8 up to 8u112.
+	* **Oracle** Major Java version 5,
+	* **Oracle** Major Java version 6,
+	* **Oracle** Major Java version 7,
+	* **Oracle** Major Java version 8 up to 8u112.
 * Ubuntu 16.04 (Xenial)
-    * Major Java version 6,
-    * Major Java version 7,
-    * Major Java version 8 up to 8u212 (Now End of Life - EOL)
+    * **Oracle** Major Java version 6,
+    * **Oracle** Major Java version 7,
+    * **Oracle** Major Java version 8 up to 8u212 (Now End of Life - EOL)
+    * **AdoptOpenJDK** Major Java version 8u232
+    * **AdoptOpenJDK** Major Java version 11u5
     
 ### Known Issues  
 
@@ -140,17 +142,21 @@ Unlike the JDK installers these are not platform dependent so are located in the
 
 * Minor versions of the same major version need to work on multi-tenancy environments
 * Need to be able to use multiple major versions on the same environment
- 
+
+<a name="centos"></a>
 ## CentOS
 Installs the Java Virtual Machine to `/usr/java/jdk1.<version>.0_<update_version>`
 
 Installation of a Java JDK from an RPM file.
 RPM files with the appropriate minor-major numbers need to be located in the **files** folder for the passed parameters to allow for installation of the correct java version.
-### <a href="CentOS_known_issues">Known issues</a>
+
+<a href="CentOS_known_issues"></a>
+### Known issues
 * Major version downgrades - alternatives are not removed so the previous version will still be pointed to. 
 * Multi-tenancy JVMs - removing a JVM from the manifest will leave it still installed on the file system.
 
-### <a href="CentOS_File_naming_conventions">CentOS File naming conventions</a>
+<a name="CentOS_File_naming_conventions"></a>
+### CentOS File naming conventions
 The *.rpm* files with the appropriate minor-major numbers need to be located in the **files/CentOS/6** folder for the passed parameters to allow for installation of the correct java version.  
 The *current* file naming structure by Oracle has no OS dependent parts and simply takes the following forms based on major versions:  
 * **Java 5** - jdk-1_<version>_0_<update_version>-linux-amd64.rpm
@@ -170,14 +176,44 @@ In the case of CentOS 6 these result in the values `CentOS` and `6` respectively
 Observe the packaging and [naming conventions](#CentOS_File_naming_conventions) mentioned previously.  
 Be wary of renamed packages or new formats by checking `rpm -qa jdk*` after doing a manual rpm install.  
 
+<a name="ubuntu"></a>
 ## Ubuntu
-Installs the Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
-Installation of a Java JDK from a .deb file.
+* Installs the **Oracle** Java Virtual Machine to `/usr/lib/jvm/jdk-<version>-oracle-x64/`
+* Installs the **AdoptOpenJdk** Java Virtual Machine to `/usr/lib/jvm/adoptopenjdk-<version>-hotspot-amd64/`
+* Installation of a Java JDK from a .deb file.
 
-###<a href="Ubuntu_known_issues">Ubuntu known issues</a>
+<a name="Ubuntu_known_issues"></a>
+### Ubuntu known issues
 * Multi-tenancy JVMs - currently removing of a java declaration won't remove it from the system, this is a scope issue, each instance doesn't know what other major versions are installed, they can clean up their minor versions without issue.  
+* **Oracle** Java stops at version 8u212 
+* **AdoptOpenJdk** Java picks up from version 8u232
+ 
+#### AdoptOpenJdk
+Due to Oracle Java 8's end of life it is no longer receiving updates unless a professional subscription is paid.  
+In order to continue receiving updates the switch to the [AdoptOpenJdk](https://adoptopenjdk.net/) distribution of Java has been made.  
 
-### <a href="Debian_file_naming_conventions">Debian File naming conventions</a>
+You can use the same `java` class as an entrypoint, the major and update versions of 8u232 will be used to determine when to delegate to the `openjdk` class:
+```
+java {"my-openjdk-8":
+	version => '8',
+	update_version => '232'
+}	
+```
+Things to note about the `openjdk` class:
+* It installs from a `.deb` under the file namespace `/files/Ubuntu/16.04/` (currently only Xenial is supported)
+* `update-java-alternatives` from the `java-common` package is now used to manage the alternatives subsystem for AdoptOpenJdk Java. 
+* The `openjdk` class will remove Oracle Java if **not** using multi-tenancy
+* The `openjdk` install is unable to co-exist in a multi-tenancy environment with Oracle Java 8 due to shared named resources in the Java module and the major version number being central to resource uniqueness.
+* The `openjdk` class can multi-tenant with other versions of Oracle Java except for 8.
+
+Migration for **multi-tenant** Oracle Java 8 installs to replace with AdoptOpenJdk 8 is best achieved via the following steps:
+1. Comment out all Java resources except for Java 8
+2. Update the Java 8 resource to `update_version => "232"` with `multiTenancy => false` and apply puppet to remove **all** Oracle Java installations
+3. Re-instate all commented out Oracle Java resources, set Java 8 to `multiTenancy => true`
+3. Apply puppet again to reinstall the remaining Oracle Java resource
+
+<a name="Debian_file_naming_conventions"></a>
+### Debian File naming conventions
 The *.deb* files with the appropriate minor-major numbers need to be located in the **files/Ubuntu/15.10** folder for the passed parameters to allow for installation of the correct java version.  
 These deb files should be created using the [java-package](https://wiki.debian.org/JavaPackage) utility on a 64-bit version of Ubuntu 15.10 in order for the correct prerequisite libraries to be installed.  
 ```
