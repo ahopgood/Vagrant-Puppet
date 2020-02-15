@@ -9,7 +9,10 @@ define java::openjdk::ubuntu::xenial(
   #   sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
   #   sudo apt-get update
   #   apt-get install adoptopenjdk-8-hotspot
+  # For older versions:
+  # https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/pool/main/a/adoptopenjdk-8-hotspot/
 
+  # Set alternatives
   # sudo update-java-alternatives -s adoptopenjdk-8-hotspot-amd64
 
   if ($multiTenancy) {
@@ -74,15 +77,23 @@ define java::openjdk::ubuntu::xenial(
     realize(File["${libxtst6_file_name}"])
     realize(Package["libxtst6"])
 
-    $adoptopenjdk_8_hotspot_file_name = "adoptopenjdk-8-hotspot_8u232-b09-2_amd64.deb"
+    $updateExtension = {
+      "222" => "b10-2",
+      "232" => "b09-2",
+      "242" => "b08-2",
+    }
+    $extension = $updateExtension["${update_version}"]
+
+    $adoptopenjdk_8_hotspot_file_name = "adoptopenjdk-8-hotspot_8u${update_version}-${extension}_amd64.deb"
     file { "${adoptopenjdk_8_hotspot_file_name}":
       ensure => present,
       path   => "${local_install_dir}${adoptopenjdk_8_hotspot_file_name}",
       source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${
         adoptopenjdk_8_hotspot_file_name}",
     }
+
     package { "adoptopenjdk-8-hotspot":
-      ensure   => present,
+      ensure   => latest,
       provider => dpkg,
       source   => "${local_install_dir}${adoptopenjdk_8_hotspot_file_name}",
       require  => [
@@ -109,7 +120,7 @@ define java::openjdk::ubuntu::xenial(
     realize(Package["libxrender1"])
     realize(File["${libxtst6_file_name}"])
     realize(Package["libxtst6"])
-    $adoptopenjdk_11_hotspot_file_name = "adoptopenjdk-11-hotspot_11.0.5+10-2_amd64.deb"
+    $adoptopenjdk_11_hotspot_file_name = "adoptopenjdk-11-hotspot_11.0.${update_version}-amd64.deb"
     file { "${adoptopenjdk_11_hotspot_file_name}":
       ensure => present,
       path   => "${local_install_dir}${adoptopenjdk_11_hotspot_file_name}",

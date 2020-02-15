@@ -42,7 +42,7 @@ file {
 # ->
 java {"AdoptOpenJdk test via the Java resource":
   major_version => "8",
-  update_version => "232",
+  update_version => "222",
   multiTenancy => false,
   isDefault => true,
 }
