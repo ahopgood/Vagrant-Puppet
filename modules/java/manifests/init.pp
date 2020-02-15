@@ -75,9 +75,10 @@ define java (
 
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
       if (
-        ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) ))
+        ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
         or
-        (versioncmp("${major_version}", "11") == 0) {
+        (versioncmp("${major_version}", "11") == 0)
+      ) {
         # Trigger the default to be set and used
         java::openjdk::ubuntu::set_default{"Set OpenJDK default":
           major_version => "${major_version}",
@@ -116,9 +117,10 @@ define java::default::install(
   }
 
   if (
-    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) ))
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
   or
-    (($::operatingsystem == "Ubuntu") and versioncmp("${major_version}", "11") == 0) {
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
+  ) {
     # Do nothing for AdoptOpenJdk installations as they already install themselves but try to install the default if one is pre-configuredd
     java::openjdk::ubuntu::set_default { "Set default for OpenJdk ${major_version}":
       major_version => "${major_version}"
@@ -416,9 +418,10 @@ define java::default::set(
 ){
   #JDK location changes based on OS
   if (
-    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) ))
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
     or
-    (($::operatingsystem == "Ubuntu") and versioncmp("${major_version}", "11") == 0) {
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
+  ) {
     java::openjdk::ubuntu::create_default { "Set default for OpenJdk ${major_version}":
       major_version => "${major_version}"
     }

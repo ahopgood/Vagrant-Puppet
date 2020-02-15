@@ -120,15 +120,25 @@ define java::openjdk::ubuntu::xenial(
     realize(Package["libxrender1"])
     realize(File["${libxtst6_file_name}"])
     realize(Package["libxtst6"])
-    $adoptopenjdk_11_hotspot_file_name = "adoptopenjdk-11-hotspot_11.0.${update_version}-amd64.deb"
+
+    $updateExtension = {
+      "3" => "+7-1",
+      "4" => "+11-2",
+      "5" => "+10-2",
+      "6" => "+10-2",
+    }
+    $extension = $updateExtension["${update_version}"]
+
+    $adoptopenjdk_11_hotspot_file_name = "adoptopenjdk-11-hotspot_11.0.${update_version}${extension}_amd64.deb"
     file { "${adoptopenjdk_11_hotspot_file_name}":
       ensure => present,
       path   => "${local_install_dir}${adoptopenjdk_11_hotspot_file_name}",
       source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${
         adoptopenjdk_11_hotspot_file_name}",
     }
+
     package { "adoptopenjdk-11-hotspot":
-      ensure   => present,
+      ensure   => latest,
       provider => dpkg,
       source   => "${local_install_dir}${adoptopenjdk_11_hotspot_file_name}",
       require  => [

@@ -11,7 +11,7 @@ define java::openjdk::ubuntu::set_default(
   # do update-java-alternatives -s default
   exec {"Set default for OpenJdk within version ${major_version} from create ${from_create}":
     command => "update-java-alternatives -s default",
-    onlyif => "/usr/sbin/update-java-alternatives -l | /bin/grep default > /dev/null",
+    onlyif => "/usr/sbin/update-java-alternatives -l default",
     user => "root",
     path => ["/usr/sbin/","/usr/bin/"],
     require => Package["java-common"],
@@ -25,7 +25,7 @@ define java::openjdk::ubuntu::create_default(
   file {"Setting default jinfo for OpenJdk ${major_version}":
     ensure => link,
     path => "/usr/lib/jvm/.default.jinfo",
-    target => ".${default_jdk}.jinfo",
+    target => ".${default_jdk}.jinfo"
   }
   ->
   file {"Setting default JDK directory for OpenJdk ${major_version}":

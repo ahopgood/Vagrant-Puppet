@@ -86,11 +86,12 @@ define java::ubuntu(
         ]
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
-    notify{"We're on Ubuntu Xenial trying to use OpenJDK Java package ":}
     if (
-      ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) ))
+      ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
       or
-      (versioncmp("${major_version}", "11") == 0) {
+      (versioncmp("${major_version}", "11") == 0)
+    ) {
+      notify{"We're on Ubuntu Xenial trying to use OpenJDK Java package ${major_version}":}
       # AdoptOpenJdk distro
       java::openjdk::ubuntu::xenial{"xenial AdoptOpenJdk ${major_version} ${update_version}":
         multiTenancy => $multiTenancy,

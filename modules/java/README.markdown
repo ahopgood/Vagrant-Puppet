@@ -28,8 +28,15 @@ Supports:
     * **Oracle** Major Java version 6,
     * **Oracle** Major Java version 7,
     * **Oracle** Major Java version 8 up to 8u212 (Now End of Life - EOL)
-    * **AdoptOpenJDK** Major Java version 8u232
-    * **AdoptOpenJDK** Major Java version 11u5
+    * **AdoptOpenJDK** Major Java version 8
+        * 8u222
+        * 8u232
+        * 8u242
+    * **AdoptOpenJDK** Major Java version 11
+        * 11u3
+        * 11u4
+        * 11u5
+        * 11u6
     
 ### Known Issues  
 
