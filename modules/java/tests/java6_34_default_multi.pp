@@ -15,3 +15,10 @@ java{"java-6":
   isDefault => true,
   multiTenancy => true,
 }
+
+java{"java-7":
+  major_version => '7',
+  update_version => '76',
+  isDefault => false,
+  multiTenancy => true,
+}
