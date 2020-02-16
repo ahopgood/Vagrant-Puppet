@@ -6,8 +6,9 @@ class java::oracle::home {
     path => "${jvm_home_directory}",
   }
 
-  @file  {"/usr/local/share/man/man1":
-    path => "/usr/local/share/man/man1",
+  $manual_path = "/usr/local/share/man/man1"
+  @file  {"${manual_path}":
+    path => "${manual_path}",
     ensure => directory,
   }
 }

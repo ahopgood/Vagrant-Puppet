@@ -7,11 +7,12 @@ define java::ubuntu::xenial(
   $local_install_dir = "${local_install_path}installers/"
   $puppet_file_dir = "modules/java/"
   $platform = "amd64"
+  $manual_path = "/usr/local/share/man/man1"
   $jvm_home_directory = "/usr/lib/jvm/"
 
   include java::oracle::home
   realize(File["${jvm_home_directory}"])
-  realize(File["/usr/local/share/man/man1"])
+  realize(File["${manual_path}"])
 
   $major_version_home_directory = "${jvm_home_directory}jdk-${major_version}-oracle-x64/"
 
@@ -26,8 +27,7 @@ define java::ubuntu::xenial(
     file { "${java_archive_file_name}":
       path    => "${major_version_home_directory}${java_archive_file_name}",
       source  => ["puppet:///${puppet_file_dir}${::operatingsystem}/${java_archive_file_name}"],
-      require => File["${major_version_home_directory}"],
-      before => File["/usr/local/share/man/man1"]
+      require => [File["${major_version_home_directory}"], File["${manual_path}"]]
     }
 
     $decompress_exec_name = "Decompress and untar Java ${major_version}"
@@ -49,11 +49,6 @@ define java::ubuntu::xenial(
         Exec["${decompress_exec_name}"]
       ]
     }
-    # file  {"/usr/local/share/man/man1":
-    #   path => "/usr/local/share/man/man1",
-    #   ensure => directory,
-    #   require => File["${java_archive_file_name}"]
-    # }
   } elsif (versioncmp("${major_version}", "6") == 0) {
     $java_archive_file_name = "jdk-${major_version}u${update_version}-linux-x64.bin"
 
@@ -74,8 +69,7 @@ define java::ubuntu::xenial(
     file { "${java_archive_file_name}":
       path    => "${jvm_home_directory}${java_archive_file_name}",
       source  => ["puppet:///${puppet_file_dir}${::operatingsystem}/${java_archive_file_name}"],
-      require => File["${jvm_home_directory}"],
-      before => File["/usr/local/share/man/man1"]
+      require => [File["${jvm_home_directory}"], File["${manual_path}"]]
     }
 
     $run_bin_exec_name = "Run Java ${major_version} .bin file"
@@ -111,11 +105,6 @@ define java::ubuntu::xenial(
         Exec["${move_exec_name}"]
       ]
     }
-    # file { "Java ${major_version} /usr/local/share/man/man1":
-    #   path    => "/usr/local/share/man/man1",
-    #   ensure  => directory,
-    #   require => File["${java_archive_file_name}"]
-    # }
   }  else {
     fail("Java is ${major_version} not supported on ${operatingsystem}  ${operatingsystemmajrelease}")
   }

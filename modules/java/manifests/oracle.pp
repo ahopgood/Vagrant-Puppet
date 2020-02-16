@@ -388,3 +388,103 @@ define java::oracle::default::install (
       priority            => $priority,
   }
 }
+
+define java::oracle::default::set (
+  $major_version = undef,
+  $update_version = undef,
+) {
+  if ($::operatingsystem == "Ubuntu") {
+    $jdkLocation = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+  } elsif ($::operatingsystem == "CentOS") {
+    if ($update_version == undef) {
+      fail("CentOS Java default is missing an update_version")
+    }
+    $jdkLocation = "/usr/java/jdk1.${major_version}.0_${update_version}/"
+  } else {
+    fail("operating system [${::operatingsystem}] not supported for setting defaults via alternatives")
+  }
+
+  $jdkBinLocation = "${jdkLocation}bin/"
+  $jreBinLocation = "${jdkLocation}jre/bin/"
+  $pluginLocation = "${jdkLocation}jre/lib/amd64/"
+  $manLocation = "${jdkLocation}man/man1/"
+  $priority = 1500 + "${major_version}"
+
+  #/jre/lib/amd64
+  alternatives::set {
+    "firefox-javaplugin.so-set-alternative":
+      executableName     => "firefox-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "iceape-javaplugin.so-set-alternative":
+      executableName     => "iceape-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "iceweasel-javaplugin.so-set-alternative":
+      executableName     => "iceweasel-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/bin
+  alternatives::set {
+    "java-set-alternative":
+      executableName     => "java",
+      executableLocation => "${jreBinLocation}",
+      priority           => $priority,
+  }
+  #/bin
+  alternatives::set {
+    "javac-set-alternative":
+      executableName     => "javac",
+      executableLocation => "${jdkBinLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib
+  alternatives::set {
+    "jexec-set-alternative":
+      executableName     => "jexec",
+      executableLocation => "${jdkLocation}jre/lib/",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "midbrowser-javaplugin.so-set-alternative":
+      executableName     => "midbrowser-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "mozilla-javaplugin.so-set-alternative":
+      executableName     => "mozilla-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "xulrunner-addons-javaplugin.so-set-alternative":
+      executableName     => "xulrunner-addons-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+  #/jre/lib/amd64
+  alternatives::set {
+    "xulrunner-javaplugin.so-set-alternative":
+      executableName     => "xulrunner-javaplugin.so",
+      execAlias          => "libnpjp2.so",
+      executableLocation => "${pluginLocation}",
+      priority           => $priority,
+  }
+}
