@@ -67,18 +67,30 @@ define java (
   if ($isDefault == true){
     #IsDefault is false by default - probably should change this?
     Java::Default::Install["install-default-to-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
-#    ->
+
     java::default::set{"set-default-to-java-${major_version}":
       major_version => "${major_version}",
       update_version => "${update_version}",
     }
 
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
-      file { "create default link ${major_version}":
-        ensure => link,
-        path => "/usr/lib/jvm/default",
-        target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",
-        require => Java::Ubuntu["test-java-${major_version}"],
+      if (
+        ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
+        or
+        (versioncmp("${major_version}", "11") == 0)
+      ) {
+        # Trigger the default to be set and used
+        java::openjdk::ubuntu::set_default{"Set OpenJDK default":
+          major_version => "${major_version}",
+          from_create => true,
+        }
+      } else {
+        file { "create default link ${major_version}":
+          ensure => link,
+          path => "/usr/lib/jvm/default",
+          target => "/usr/lib/jvm/jdk-${major_version}-oracle-x64/",
+          require => Java::Ubuntu["test-java-${major_version}"],
+        }
       }
     }
   }
@@ -92,296 +104,20 @@ define java::default::install(
   $major_version = undef,
   $update_version = undef,
 ){
-  #JDK location changes based on OS
-  if ($::operatingsystem == "Ubuntu") {
-    $jdkLocation = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
-  } elsif ($::operatingsystem == "CentOS"){
-    if ($update_version == undef){
-      fail("CentOS Java default is missing an updateVersion")
+  if (
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
+  or
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
+  ) {
+    # Do nothing for AdoptOpenJdk installations as they already install themselves but try to install the default if one is pre-configuredd
+    java::openjdk::ubuntu::set_default { "Set default for OpenJdk ${major_version}":
+      major_version => "${major_version}"
     }
-    $jdkLocation    = "/usr/java/jdk1.${major_version}.0_${update_version}/"
-  } else {
-    fail("operating system [${::operatingsystem}] not supported for setting defaults via alternatives")
-  }
-
-  $jdkBinLocation = "${jdkLocation}bin/"
-  $jreBinLocation = "${jdkLocation}jre/bin/"
-  $pluginLocation = "${jdkLocation}jre/lib/amd64/"
-  $manLocation    = "${jdkLocation}man/man1/"
-  $priority = 100000  + (1000 * "${major_version}") + "${update_version}"
-  #e.g. java 8u112 and 7u80 respectively:
-  #100000 + 8000 = 180000 + 112 = 180112
-  #100000 + 7000 = 170000 + 80 = 1700080
-
-  $manExt = ".1"
-  # Common binaries that are slaved to the java command
-  $javaSlaveCommonHash = {
-    # "ControlPanel" => "${jreBinLocation}",
-    "javaws"       => "${jreBinLocation}",
-    # "jcontrol"     => "${jreBinLocation}",
-    "keytool"      => "${jreBinLocation}",
-    "orbd"         => "${jreBinLocation}",
-    "pack200"      => "${jreBinLocation}",
-    # "policytool"   => "${jreBinLocation}",
-    "rmid"         => "${jreBinLocation}",
-    "rmiregistry"  => "${jreBinLocation}",
-    "servertool"   => "${jreBinLocation}",
-    "tnameserv"    => "${jreBinLocation}",
-    "unpack200"    => "${jreBinLocation}",
-  }
-
-  $javaManSlaveCommonHash = {
-    "javaws${manExt}"      => "${manLocation}",
-    "keytool${manExt}"     => "${manLocation}",
-    "orbd${manExt}"        => "${manLocation}",
-    "pack200${manExt}"     => "${manLocation}",
-    # "policytool${manExt}"  => "${manLocation}",
-    "rmid${manExt}"        => "${manLocation}",
-    "rmiregistry${manExt}" => "${manLocation}",
-    "servertool${manExt}"  => "${manLocation}",
-    "tnameserv${manExt}"   => "${manLocation}",
-    "unpack200${manExt}"   => "${manLocation}",
-  }
-
-  # Common binaries and man files that are slaved to the javac command
-  $javaCompilerslaveCommonHash = {
-    "appletviewer"            => "${jdkBinLocation}",
-    "ControlPanel"            => "${jreBinLocation}",
-    "extcheck"                => "${jdkBinLocation}",
-    "idlj"                    => "${jdkBinLocation}",
-    "jar"                     => "${jdkBinLocation}",
-    "jarsigner"               => "${jdkBinLocation}",
-    "javadoc"                 => "${jdkBinLocation}",
-    "javah"                   => "${jdkBinLocation}",
-    "javap"                   => "${jdkBinLocation}",
-    # "javaws"                  => "${jreBinLocation}",
-    "jconsole"                => "${jdkBinLocation}",
-    "jcontrol"                => "${jreBinLocation}",
-    "jdb"                     => "${jdkBinLocation}",
-    "jhat"                    => "${jdkBinLocation}",
-    "jinfo"                   => "${jdkBinLocation}",
-    "jmap"                    => "${jdkBinLocation}",
-    "jps"                     => "${jdkBinLocation}",
-    "jrunscript"              => "${jdkBinLocation}",
-    "jsadebugd"               => "${jdkBinLocation}",
-    "jstack"                  => "${jdkBinLocation}",
-    "jstat"                   => "${jdkBinLocation}",
-    "jstatd"                  => "${jdkBinLocation}",
-    "jvisualvm"               => "${jdkBinLocation}",
-    # "keytool"                 => "${jreBinLocation}",
-    "native2ascii"            => "${jdkBinLocation}",
-    # "orbd"                    => "${jreBinLocation}",
-    # "pack200"                 => "${jreBinLocation}",
-    "policytool"              => "${jreBinLocation}",
-    "rmic"                    => "${jdkBinLocation}",
-    # "rmid"                    => "${jreBinLocation}",
-    # "rmiregistry"             => "${jreBinLocation}",
-    "schemagen"               => "${jdkBinLocation}",
-    "serialver"               => "${jdkBinLocation}",
-    # "servertool"              => "${jreBinLocation}",
-    # "tnameserv"               => "${jreBinLocation}",
-    # "unpack200"               => "${jreBinLocation}",
-    "wsgen"                   => "${jdkBinLocation}",
-    "wsimport"                => "${jdkBinLocation}",
-    "xjc"                     => "${jdkBinLocation}",
-  }
-  $javaCompilersManSlaveCommonHash = {
-    "appletviewer${manExt}"   => "${manLocation}",
-    "extcheck${manExt}"       => "${manLocation}",
-    "idlj${manExt}"           => "${manLocation}",
-    "jar${manExt}"            => "${manLocation}",
-    "jarsigner${manExt}"      => "${manLocation}",
-    "java${manExt}"           => "${manLocation}",
-    "javac${manExt}"          => "${manLocation}",
-    "javadoc${manExt}"        => "${manLocation}",
-    "javah${manExt}"          => "${manLocation}",
-    "javap${manExt}"          => "${manLocation}",
-    # "javaws${manExt}"         => "${manLocation}",
-    "jconsole${manExt}"       => "${manLocation}",
-    "jdb${manExt}"            => "${manLocation}",
-    "jhat${manExt}"           => "${manLocation}",
-    "jinfo${manExt}"          => "${manLocation}",
-    "jmap${manExt}"           => "${manLocation}",
-    "jps${manExt}"            => "${manLocation}",
-    "jrunscript${manExt}"     => "${manLocation}",
-    "jsadebugd${manExt}"      => "${manLocation}",
-    "jstack${manExt}"         => "${manLocation}",
-    "jstat${manExt}"          => "${manLocation}",
-    "jstatd${manExt}"         => "${manLocation}",
-    "jvisualvm${manExt}"      => "${manLocation}",
-    # "keytool${manExt}"        => "${manLocation}",
-    "native2ascii${manExt}"   => "${manLocation}",
-    # "orbd${manExt}"           => "${manLocation}",
-    # "pack200${manExt}"        => "${manLocation}",
-    "policytool${manExt}"     => "${manLocation}",
-    "rmic${manExt}"           => "${manLocation}",
-    # "rmid${manExt}"           => "${manLocation}",
-    # "rmiregistry${manExt}"    => "${manLocation}",
-    "schemagen${manExt}"      => "${manLocation}",
-    "serialver${manExt}"      => "${manLocation}",
-    # "servertool${manExt}"     => "${manLocation}",
-    # "tnameserv${manExt}"      => "${manLocation}",
-    # "unpack200${manExt}"      => "${manLocation}",
-    "wsgen${manExt}"          => "${manLocation}",
-    "wsimport${manExt}"       => "${manLocation}",
-    "xjc${manExt}"            => "${manLocation}",
-  }
-
-  if (versioncmp("${major_version}", "8") == 0){
-    $javaSlaveVersionSpecificHash = {
-      "jjs"                     => "${jreBinLocation}", #java 8 only
+  } else { # Oracle Java block
+    java::oracle::default::install { "Set default for Oracle JDK ${major_version}":
+      major_version => "${major_version}",
+      update_version => "${update_version}"
     }
-    $javaManSlaveVersionSpecificHash = {
-      "jjs${manExt}"            => "${manLocation}", #java 8 only
-    }
-    $javaCompilerslaveVersionSpecificHash = {
-      "java-rmi.cgi"            => "${jdkBinLocation}",
-      "javafxpackager"          => "${jdkBinLocation}",
-      "javapackager"            => "${jdkBinLocation}", #java 8 only
-      "jdeps"                   => "${jdkBinLocation}",
-      "jcmd"                    => "${jdkBinLocation}",
-      # "jjs"                     => "${jreBinLocation}", #java 8 only
-      "jmc"                     => "${jdkBinLocation}",
-      "jmc.ini"                 => "${jdkBinLocation}",
-    }
-    $javaCompilersManSlaveVersionSpecificHash = {
-      "javafxpackager${manExt}" => "${manLocation}",
-      "javapackager${manExt}"   => "${manLocation}", #java 8 only
-      "jcmd${manExt}"           => "${manLocation}",
-      "jdeps${manExt}"          => "${manLocation}",
-      # "jjs${manExt}"            => "${manLocation}", #java 8 only
-      "jmc${manExt}"            => "${manLocation}",
-    }
-  } elsif (versioncmp("${major_version}", "7") == 0) {
-    $javaSlaveVersionSpecificHash = { # checked
-      "java_vm"              => "${jreBinLocation}",
-    }
-    $javaManSlaveVersionSpecificHash = {}
-    $javaCompilerslaveVersionSpecificHash = {
-      "apt"                     => "${jdkBinLocation}",
-      "java-rmi.cgi"            => "${jdkBinLocation}",
-      "javafxpackager"          => "${jdkBinLocation}",
-      "jcmd"                    => "${jdkBinLocation}",
-      "jmc"                     => "${jdkBinLocation}",
-      "jmc.ini"                 => "${jdkBinLocation}",
-    }
-    $javaCompilersManSlaveVersionSpecificHash = {
-      "apt${manExt}"            => "${manLocation}",
-      "javafxpackager${manExt}" => "${manLocation}",
-      "jcmd${manExt}"           => "${manLocation}",
-      "jmc${manExt}"            => "${manLocation}",
-    }
-  } elsif (versioncmp("${major_version}", "6") == 0) { # java 6
-    $javaSlaveVersionSpecificHash = { # checked
-      "java_vm"              => "${jreBinLocation}",
-    }
-    $javaManSlaveVersionSpecificHash = {}
-    $javaCompilerslaveVersionSpecificHash = {
-      "HtmlConverter"           => "${jdkBinLocation}",
-      "apt"                     => "${jdkBinLocation}",
-    }
-    $javaCompilersManSlaveVersionSpecificHash = {
-      "apt${manExt}"            => "${manLocation}",
-    }
-  } else {
-    fail("Java ${major_version} alternatives not supported")
-  }
-  #Merge common hash of java slaves with version specific ones
-  $javaSlaveHash = $javaSlaveCommonHash+$javaSlaveVersionSpecificHash
-  $javaManSlaveHash = $javaManSlaveCommonHash+$javaManSlaveVersionSpecificHash
-  #Merge common hash of javac slaves with version specific ones
-  $javaCompilerslaveHash=$javaCompilerslaveCommonHash+$javaCompilerslaveVersionSpecificHash
-  $javaCompilersManSlaveHash = $javaCompilersManSlaveCommonHash+$javaCompilersManSlaveVersionSpecificHash
-
-
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-firefox-javaplugin.so":
-    executableName      => "firefox-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-iceape-javaplugin.so":
-    executableName      => "iceape-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-iceweasel-javaplugin.so":
-    executableName      => "iceweasel-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-
-  #/jre/bin
-  alternatives::install{
-    "java-${major_version}-java":
-    executableName      => "java",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-    manExecutable       => "java${manExt}",
-    manLocation         => "${manLocation}",
-    slaveBinariesHash   => $javaSlaveHash,
-    slaveManPagesHash   => $javaManSlaveHash,
-  }
-  #/bin
-  alternatives::install{
-    "java-${major_version}-javac":
-    executableName      => "javac",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,      
-    manExecutable       => "javac${manExt}",
-    manLocation         => "${manLocation}",
-    slaveBinariesHash   => $javaCompilerslaveHash,
-    slaveManPagesHash   => $javaCompilerManSlaveHash,
-  }
-
-  #/jre/lib
-  alternatives::install{
-    "java-${major_version}-jexec":
-    executableName      => "jexec",
-    executableLocation  => "${jdkLocation}jre/lib/",
-    priority            => $priority,
-  }
-
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-midbrowser-javaplugin.so":
-    executableName      => "midbrowser-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-mozilla-javaplugin.so":
-    executableName      => "mozilla-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-xulrunner-addons-javaplugin.so":
-    executableName      => "xulrunner-addons-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::install{
-    "java-${major_version}-xulrunner-javaplugin.so":
-    executableName      =>  "xulrunner-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
   }
 }
 
@@ -394,137 +130,21 @@ define java::default::set(
   $update_version = undef,
 ){
   #JDK location changes based on OS
-  if ($::operatingsystem == "Ubuntu"){
-    $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
-  } elsif ($::operatingsystem == "CentOS"){
-    if ($update_version == undef){
-      fail("CentOS Java default is missing an update_version")
+  if (
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
+    or
+    (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
+  ) {
+    java::openjdk::ubuntu::create_default { "Set default for OpenJdk ${major_version}":
+      major_version => "${major_version}"
     }
-    $jdkLocation    = "/usr/java/jdk1.${major_version}.0_${update_version}/"
   } else {
-    fail("operating system [${::operatingsystem}] not supported for setting defaults via alternatives")
+    java::oracle::default::set {"Set default for Oracle JDK ${major_version}":
+      major_version => "${major_version}",
+      update_version => "${update_version}"
+    }
   }
 
-  $jdkBinLocation = "${jdkLocation}bin/"
-  $jreBinLocation = "${jdkLocation}jre/bin/"
-  $pluginLocation = "${jdkLocation}jre/lib/amd64/"
-  $manLocation     = "${jdkLocation}man/man1/"
-  $priority = 1500 + "${major_version}"
-
-#  if ((versioncmp($major_version, 7) == 0) or (versioncmp($major_version, 8) == 0)){
-#    #7 & 8
-#    #/bin
-#    alternatives::set{
-#     "jmc-set-alternative":
-#      executableName      => "jmc",
-#      executableLocation  => "${jdkBinLocation}",
-#      priority            => $priority,
-##     manExecutable       => "jmc${manExt}",
-##     manLocation         => "${jdkBinLocation}",
-#    }
-#    #7 & 8
-#    #/bin
-#    alternatives::set{
-#      "jcmd-set-alternative":
-#      executableName      => "jcmd",
-#      executableLocation  => "${jdkBinLocation}",
-#      priority            => $priority,
-##     manExecutable       => "jcmd${manExt}",
-##     manLocation         => "${manLocation}",
-#    }
-#  }
-#  if ($major_version == 8){
-#    #8
-#    #/bin
-#    alternatives::set{
-#      "jdeps-set-alternative":
-#      executableName      => "jdeps",
-#      executableLocation  => "${jdkBinLocation}",
-#      priority            => $priority,
-##      manExecutable       => "jdeps${manExt}",
-##      manLocation         => "${manLocation}",
-#    }
-#  } else { #java 6 & 7
-#
-#  }
-
-  #/jre/lib/amd64
-  alternatives::set{
-    "firefox-javaplugin.so-set-alternative":
-    executableName      => "firefox-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "iceape-javaplugin.so-set-alternative":
-    executableName      => "iceape-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "iceweasel-javaplugin.so-set-alternative":
-    executableName      => "iceweasel-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/bin
-  alternatives::set{
-    "java-set-alternative":
-    executableName      => "java",
-    executableLocation  => "${jreBinLocation}",
-    priority            => $priority,
-  }
-  #/bin
-  alternatives::set{
-    "javac-set-alternative":
-    executableName      => "javac",
-    executableLocation  => "${jdkBinLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib
-  alternatives::set{
-    "jexec-set-alternative":
-      executableName      => "jexec",
-      executableLocation  => "${jdkLocation}jre/lib/",
-      priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "midbrowser-javaplugin.so-set-alternative":
-    executableName      => "midbrowser-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "mozilla-javaplugin.so-set-alternative":
-    executableName      => "mozilla-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "xulrunner-addons-javaplugin.so-set-alternative":
-    executableName      => "xulrunner-addons-javaplugin.so",
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
-  }
-  #/jre/lib/amd64
-  alternatives::set{
-    "xulrunner-javaplugin.so-set-alternative":
-    executableName      =>  "xulrunner-javaplugin.so", 
-    execAlias           => "libnpjp2.so",
-    executableLocation  => "${pluginLocation}",
-    priority            => $priority,
- }
 }
 
 define java::jce(
