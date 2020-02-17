@@ -17,7 +17,7 @@ Package{
   allow_virtual => false,
 }
 $java_major_version = "8"
-$java_update_version = "112"
+$java_update_version = "242"
 
 $maven_major_version="3"
 $maven_minor_version="0"
@@ -27,7 +27,7 @@ file {
     ensure     =>  directory,
 }
 ->
-#HOw do we create the back up location?
+#How do we create the back up location?
 file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
   ensure => directory,
 }
@@ -38,6 +38,9 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 # }
 # ->
 # sudo puppet apply --parser=future /vagrant/manifests/jenkins.pp
+
+class{'augeas':}
+->
 class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
@@ -95,8 +98,6 @@ class { 'maven':
   minor_version => $maven_minor_version,
   patch_version => $maven_patch_version,
 }
-->
-class{'augeas':}
 ->
 jenkins::global::maven{"maven-global-setup":
   major_version => $maven_major_version,

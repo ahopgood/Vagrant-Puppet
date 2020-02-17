@@ -15,6 +15,10 @@ define java::openjdk::ubuntu::xenial(
   # Set alternatives
   # sudo update-java-alternatives -s adoptopenjdk-8-hotspot-amd64
 
+  $local_install_path = "/etc/puppet/"
+  $local_install_dir = "${local_install_path}installers/"
+  $puppet_file_dir    = "modules/java/"
+
   if ($multiTenancy) {
     notify{"Java ${major_version}":
       message => "Multi tenancy JVMs allowed"
@@ -157,6 +161,7 @@ define java::openjdk::ubuntu::xenial(
 }
 
 class java::openjdk::ubuntu::xenial::deps() {
+  $puppet_file_dir    = "modules/java/"
   # Packages common to AdoptOpenJDK packages on Ubuntu Xenial
   $java_common_file_name = "java-common_0.56ubuntu2_all.deb"
   $libasound2_file_name = "libasound2_1.1.0-0ubuntu1_amd64.deb"

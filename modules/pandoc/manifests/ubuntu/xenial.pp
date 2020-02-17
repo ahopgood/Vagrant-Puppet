@@ -50,6 +50,8 @@ class pandoc::ubuntu::xenial {
     ]
   }
 
+  include java::openjdk::ubuntu::xenial::deps
+
   $texlive_binaries_file_name = "texlive-binaries_2015.20160222.37495-1ubuntu0.1_${architecture}.${package_type}"
   @file { "${texlive_binaries_file_name}":
     ensure => present,
@@ -619,19 +621,21 @@ class pandoc::ubuntu::xenial {
   }
 
   $x11_common_file_name = "x11-common_1%3a7.7+13ubuntu3.1_all.deb"
-  file {"${x11_common_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${x11_common_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}"
-  }
-  package { "x11-common":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${x11_common_file_name}",
-    require  => [
-      File["${x11_common_file_name}"],
-    ]
-  }
+  realize(File["${x11_common_file_name}"])
+  realize(Package["x11-common"])
+  # file {"${x11_common_file_name}":
+  #   ensure  => present,
+  #   path    => "${local_install_dir}${x11_common_file_name}",
+  #   source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}"
+  # }
+  # package { "x11-common":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${x11_common_file_name}",
+  #   require  => [
+  #     File["${x11_common_file_name}"],
+  #   ]
+  # }
 
   $libxmu6_file_name = "libxmu6_2%3a1.1.2-2_amd64.deb"
   file {"${libxmu6_file_name}":
@@ -665,19 +669,22 @@ class pandoc::ubuntu::xenial {
   }
 
   $libxi6_file_name = "libxi6_2%3a1.7.6-1_amd64.deb"
-  file {"${libxi6_file_name}":
-    ensure  => present,
-    path    => "${local_install_dir}${libxi6_file_name}",
-    source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}"
-  }
-  package { "libxi6":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxi6_file_name}",
-    require  => [
-      File["${libxi6_file_name}"],
-    ]
-  }
+  realize(File["${libxi6_file_name}"])
+  realize(Package["libxi6"])
+
+  # file {"${libxi6_file_name}":
+  #   ensure  => present,
+  #   path    => "${local_install_dir}${libxi6_file_name}",
+  #   source  => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}"
+  # }
+  # package { "libxi6":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${libxi6_file_name}",
+  #   require  => [
+  #     File["${libxi6_file_name}"],
+  #   ]
+  # }
 
   $libzzip_0_13_file_name = "libzzip-0-13_0.13.62-3ubuntu0.16.04.2_amd64.deb"
   file {"${libzzip_0_13_file_name}":

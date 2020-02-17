@@ -34,6 +34,15 @@ class jenkins (
   } elsif $::operatingsystem == "Ubuntu"{
     if $::operatingsystemmajrelease == "15.10" { #Ubuntu wily
       notify{"We're on Ubuntu wiley trying to use Java package ${java_major_version}.${java_update_version}":}
+    } elsif $::operatingsystemmajrelease == "16.04" { #Ubuntu Xenial
+      notify{"We're on Ubuntu xenial trying to use Java package ${java_major_version}.${java_update_version}":}
+
+
+
+      # dpkg: dependency problems prevent configuration of jenkins:
+      # jenkins depends on default-jre-headless (>= 2:1.8) | java8-runtime-headless; however:
+      # Package default-jre-headless is not installed. - 2:1.8-56ubuntu2
+      # Package java8-runtime-headless is not installed.
     }
     #install correct versions of dependencies for the ubuntu distro
     
@@ -182,6 +191,7 @@ class jenkins (
     }
     exec {"Restore plugins":
       path => ["/bin/","/usr/bin/","/usr/local/bin/"],
+      user => 'jenkins',
       command => "/usr/local/bin/${restore_all_plugins_script} ${plugin_backup_location} /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/${restore_all_plugins_script}.log 2>&1",
       require => File["${restore_all_plugins_script}"],
     }

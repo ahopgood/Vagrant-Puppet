@@ -68,7 +68,9 @@ define jenkins::credentials::gitCredentials(
     lens      => 'Xml.lns',
     context   => '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl/',
     require   => [File["${jenkins::credentials::credentials_file}"],
-      Augeas["jenkins_credentials_config"]],
+      Augeas["jenkins_credentials_config"],
+      Package["jenkins"]
+    ],
     changes   => [
       "set scope/#text \"GLOBAL\"",
       "set id/#text \"${token_name}\"",
