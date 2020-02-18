@@ -166,10 +166,15 @@ class java::openjdk::ubuntu::xenial::deps() {
   $java_common_file_name = "java-common_0.56ubuntu2_all.deb"
   $libasound2_file_name = "libasound2_1.1.0-0ubuntu1_amd64.deb"
   $libasound2_data_file_name = "libasound2-data_1.1.0-0ubuntu1_all.deb"
-  $libxi6_file_name = "libxi6_2%3a1.7.6-1_amd64.deb"
-  $x11_common_file_name = "x11-common_1%3a7.7+13ubuntu3.1_all.deb"
   $libxrender1_file_name = "libxrender1_1%3a0.9.9-0ubuntu1_amd64.deb"
   $libxtst6_file_name = "libxtst6_2%3a1.2.2-1_amd64.deb"
+
+  include linux::ubuntu::xenial::deps
+  realize(File["${linux::ubuntu::xenial::deps::libxi6_file_name}"])
+  realize(Package["${linux::ubuntu::xenial::deps::libxi6_package_name}"])
+
+  realize(File["${linux::ubuntu::xenial::deps::x11_common_file_name}"])
+  realize(Package["${linux::ubuntu::xenial::deps::x11_common_package_name}"])
 
   @file { "${java_common_file_name}":
     ensure => present,
@@ -211,35 +216,6 @@ class java::openjdk::ubuntu::xenial::deps() {
     source   => "${local_install_dir}${libasound2_data_file_name}",
     require  => [
       File["${libasound2_data_file_name}"],
-    ]
-  }
-
-  @file { "${libxi6_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${libxi6_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}",
-  }
-  @package { "libxi6":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxi6_file_name}",
-    require  => [
-      File["${libxi6_file_name}"],
-      Package["x11-common"],
-    ]
-  }
-
-  @file { "${x11_common_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${x11_common_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}",
-  }
-  @package { "x11-common":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${x11_common_file_name}",
-    require  => [
-      File["${x11_common_file_name}"],
     ]
   }
 

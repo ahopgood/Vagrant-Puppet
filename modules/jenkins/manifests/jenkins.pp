@@ -124,4 +124,6 @@ jenkins::credentials::ssh{"jenkins-ssh":
 ->
 class {"dos2unix":}
 ->
-jenkins::global::reload::config{"set labels":}
+jenkins::global::reload::config{"set labels":
+  password => "admin"
+}
