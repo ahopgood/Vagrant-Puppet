@@ -1,4 +1,4 @@
-# jenkins #
+# jenkins
 
 This is the jenkins module. It provides...
 a standalone jenkins instance
@@ -10,7 +10,7 @@ The module can be passed the following parameters as Strings:
 * perform_manual_setup boolean, defaults to false to allow for installation from a backup location, true will create a new installation
 * password_bcrypt_hash, a bcrypt hash of the admin password to be set, requires bcrypt 2a and a cost factor of 10.
 * plugin_backup_location, the location of the backed up plugin archives and the plugin manifest file
-* $job_backup_location, the location of the job backups
+* job_backup_location, the location of the job backups
 The module will default to 2.19.1.
 
 Modules supported/available:  
@@ -32,7 +32,7 @@ Supports:
 
 Some modules (gitCredentials) require the `hiera` class.  
 Currently this has two impacts:
- 1. The hiera config file needs to be specified as `puppet apply --parser=future --hiera-config=/etc/puppet/hiera.yaml init.pp` to override the default of `~/.puppet/hiera.yaml`.
+ 1. The hiera config file needs to be specified as `puppet apply --parser=future --hiera_config=/etc/puppet/hiera.yaml init.pp` to override the default of `~/.puppet/hiera.yaml`.
  2. It will require **two** runs of the manifest to ensure that the hiera files are generated in the correct location.  
 At some point in the future this will be broken out into a separate manifest call to be run prior as a setup step.  
 
@@ -116,6 +116,8 @@ Currently there is no enforced naming conventions beyond the following:
 
 ### Useful to know
 [Job/Script security](https://github.com/jenkinsci/job-dsl-plugin/wiki/Script-Security) with the Jobs DSL
+If the `retrieve-all-plugins.sh` fails, try running it manually without writing to the root protected logs folder, it is likely the bash script needs `dos2unix` run on it.  
+
 
 <a name="modules"></a>
 ## Modules
@@ -210,7 +212,7 @@ Supported calls:
 
 <a name="config-reload"></a>
 #### Configuration Reload
-Allows for the Jenkins configuration to be reloaded with having to restart jenkins, useful for configuration file changes 
+Allows for the Jenkins configuration to be reloaded without having to restart jenkins, useful for configuration file changes 
 such as adding labels to a node.  
 
 ```
