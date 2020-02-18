@@ -73,6 +73,7 @@ jenkins::seed_job{"seed-dsl":
 jenkins::global::java_jdk{"Java-8":
   major_version => "${java_major_version}",
   update_version => "${java_update_version}",
+  adoptOpenJDK => true,
 }
 ->
 jenkins::global::java_jdk{"Java-7":

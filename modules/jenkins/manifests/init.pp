@@ -136,7 +136,8 @@ class jenkins (
     ensure => directory,
     owner => "jenkins",
     group => "jenkins",
-    mode => "0777"
+    mode => "0777",
+    require => [Package["jenkins"],]
   }
   # iptables port exemption needed?
   if ($perform_manual_setup == true){

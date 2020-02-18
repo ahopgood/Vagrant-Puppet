@@ -6,6 +6,9 @@ class jenkins::credentials {
     group => "jenkins",
     owner => "jenkins",
     content => "<?xml version='1.0' encoding='UTF-8'?>\n<com.cloudbees.plugins.credentials.SystemCredentialsProvider></com.cloudbees.plugins.credentials.SystemCredentialsProvider>",
+    require => [
+      Package["jenkins"],
+    ]
   }
 
   @augeas { "jenkins_credentials_config":
