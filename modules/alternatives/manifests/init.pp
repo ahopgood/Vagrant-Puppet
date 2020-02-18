@@ -115,6 +115,12 @@ define alternatives::remove(
     $alternativesName = "alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
     $alternativesName = "update-alternatives"
+    if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
+      $awk = "/bin/awk"
+    } else {
+      $awk = "/usr/bin/awk"
+    }
+
   } else {
     notify {"${::operatingsystem} is not supported":}
   }
@@ -138,7 +144,7 @@ define alternatives::remove(
   
   exec {
     "remove-alternative-${executableName}-${executableLocation}":
-      command     =>  "${alternativesName} --remove ${executableName} \$(${alternativesName} --display ${executableName}| /bin/grep \"${executableLocation}${targetExecutable} \" | /bin/awk '{ print \$1 }')",
+      command     =>  "${alternativesName} --remove ${executableName} \$(${alternativesName} --display ${executableName}| /bin/grep \"${executableLocation}${targetExecutable} - priority *\" | ${awk} '{ print \$1 }')",
       onlyif      =>  "${remove_onlyif}",  
       path        =>  '/usr/sbin/',
       cwd         =>  '/usr/sbin/',

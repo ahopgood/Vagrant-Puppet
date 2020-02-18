@@ -36,9 +36,9 @@ define java::ubuntu(
       }
 
       $versionsToRemove = {
-        "6" => ["oracle-java7-jdk","oracle-java8-jdk"],
-        "7" => ["oracle-java6-jdk","oracle-java8-jdk"],
-        "8" => ["oracle-java6-jdk","oracle-java7-jdk"],
+        "6" => ["oracle-java7-jdk","oracle-java8-jdk","adoptopenjdk-8-hotspot-amd64","adoptopenjdk-11-hotspot-amd64"],
+        "7" => ["oracle-java6-jdk","oracle-java8-jdk","adoptopenjdk-8-hotspot-amd64","adoptopenjdk-11-hotspot-amd64"],
+        "8" => ["oracle-java6-jdk","oracle-java7-jdk","adoptopenjdk-8-hotspot-amd64","adoptopenjdk-11-hotspot-amd64"],
       }
 
       package {
@@ -86,35 +86,58 @@ define java::ubuntu(
         ]
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
-    notify{"We're on Ubuntu Xenial trying to use Java package ${jdk}":}
-    java::ubuntu::xenial{"xenial ${package_name}u${update_version}":
-      java_package => "${package_name}u${update_version}",
-      major_version => "${major_version}",
-      update_version => "${update_version}"
-    }
-    if ($multiTenancy){
-      notify{"Java ${major_version}":
-        message => "Multi tenancy JVMs allowed"
+    if (
+      ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
+      or
+      (versioncmp("${major_version}", "11") == 0)
+    ) {
+      notify{"We're on Ubuntu Xenial trying to use OpenJDK Java package ${major_version}":}
+      # AdoptOpenJdk distro
+      java::openjdk::ubuntu::xenial{"xenial AdoptOpenJdk ${major_version} ${update_version}":
+        multiTenancy => $multiTenancy,
+        major_version => "${major_version}",
+        update_version => "${update_version}",
       }
     } else {
-      notify{"Java ${major_version}":
-        message => "Multi tenancy JVMs not supported"
+      #Oracle
+      java::ubuntu::xenial{"xenial ${package_name}u${update_version}":
+        java_package => "${package_name}u${update_version}",
+        major_version => "${major_version}",
+        update_version => "${update_version}"
       }
-      $jvm_home_directory = "/usr/lib/jvm/"
-      $versionsToRemove = {
-        "6" => ["${jvm_home_directory}jdk-7-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
-        "7" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
-        "8" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-7-oracle-x64"],
-      }
+      if ($multiTenancy){
+        notify{"Java ${major_version}":
+          message => "Multi tenancy JVMs allowed"
+        }
+      } else {
+        notify{"Java ${major_version}":
+          message => "Multi tenancy JVMs not supported"
+        }
+        $jvm_home_directory = "/usr/lib/jvm/"
+        $versionsToRemove = {
+          "6" => ["${jvm_home_directory}jdk-7-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
+          "7" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
+          "8" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-7-oracle-x64"],
+        }
 
-      file {
-        $versionsToRemove["${major_version}"]:
-          ensure => "absent",
-          force => true,
-      }
-    }#end multi-tenancy else
+        file {
+          $versionsToRemove["${major_version}"]:
+            ensure => "absent",
+            force => true,
+        }
 
-
+        $packageVersionsToRemove = {
+          "6" => ["adoptopenjdk-11-hotspot","adoptopenjdk-8-hotspot"],
+          "7" => ["adoptopenjdk-11-hotspot","adoptopenjdk-8-hotspot"],
+          "8" => ["adoptopenjdk-11-hotspot","adoptopenjdk-8-hotspot"],
+        }
+        package {
+          $packageVersionsToRemove["${major_version}"]:
+            ensure      => "purged",
+            provider    =>  'dpkg',
+        }
+      }#end multi-tenancy else
+    }
   } else {
     fail("${operatingsystemmajrelease} not supported for Java package ${jdk}")
   } #End OS Check

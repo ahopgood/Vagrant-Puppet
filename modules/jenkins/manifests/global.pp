@@ -2,11 +2,16 @@ define jenkins::global::java_jdk(
   $major_version = undef,
   $update_version = undef,
   $appendNewJdk = false,
+  $adoptOpenJDK = false,
 ) {
 
   $jdk_name = "1.${major_version}.0_${update_version}"
   if (versioncmp("${operatingsystem}", "Ubuntu")) {
-    $jdk_location = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    if ($adoptOpenJDK) {
+      $jdk_location = "/usr/lib/jvm/adoptopenjdk-${major_version}-hotspot-amd64/"
+    } else {
+      $jdk_location = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    }
   } else {
     fail("Operating System [${operatingsystem}] is not supported for setting a Java Jdk")
   }

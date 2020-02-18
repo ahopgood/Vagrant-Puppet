@@ -45,5 +45,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ubuntu.vm.box = "reclusive/xenial64-puppet"
         ubuntu.vm.network "private_network", ip: "192.168.33.26"
         ubuntu.vm.hostname = "ubuntu-16"
+        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
     end
 end

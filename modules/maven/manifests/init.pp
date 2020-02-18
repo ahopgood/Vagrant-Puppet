@@ -6,9 +6,9 @@ class maven(
 ){
 
 
-  if (versioncmp("${operatingsystem}", "Ubuntu") == "0"){
+  if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
     notify{"Installing onto ${operatingsystem} ${operatingsystemmajrelease}":}
-    if (versioncmp("${major_version}", "3") == "0"){
+    if (versioncmp("${major_version}", "3") == 0){
       notify{"Using maven version ${major_version}.${minor_version}.${patch_version} ${operatingsystemrelease}": }
     } else {
       fail("Maven version ${major_version} not supported")
