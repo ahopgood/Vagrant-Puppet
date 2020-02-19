@@ -17,7 +17,7 @@ java{"java-7":
 }
 java {"java8":
   major_version => "8",
-  update_version => "212",
+  update_version => "112",
   isDefault => false,
   multiTenancy => true,
 }
