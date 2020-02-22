@@ -7,11 +7,16 @@ define java::openjdk::ubuntu::set_default(
   $from_create = false,
 ) {
 
+  if (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+    $onlyif = "/usr/sbin/update-java-alternatives -l default"
+  } else {
+    $onlyif = "/usr/sbin/update-java-alternatives -l default | /bin/grep default"
+  }
   # If update-java-alternatives -l | grep default is present then
   # do update-java-alternatives -s default
   exec {"Set default for OpenJdk within version ${major_version} from create ${from_create}":
     command => "update-java-alternatives -s default",
-    onlyif => "/usr/sbin/update-java-alternatives -l default",
+    onlyif => "${onlyif}",
     user => "root",
     path => ["/usr/sbin/","/usr/bin/"],
     require => Package["java-common"],

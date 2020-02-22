@@ -1,4 +1,4 @@
-define  java::openjdk::ubuntu::bionic(
+define java::openjdk::ubuntu::bionic(
   $multiTenancy = undef,
   $major_version = undef,
   $update_version = undef,
@@ -8,14 +8,58 @@ define  java::openjdk::ubuntu::bionic(
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/java/"
 
-  notify{"Within BIONIC!":}
+  if ($multiTenancy) {
+    notify{"Java ${major_version}":
+      message => "Multi tenancy JVMs allowed"
+    }
+  } else {
+    notify{"Java ${major_version}":
+      message => "Multi tenancy JVMs not supported"
+    }
+
+    java::oracle::default::remove{"remove-default-for-java-${major_version}":
+      major_version => "${major_version}",
+      update_version => "${update_version}",
+      before => Package["adoptopenjdk-${major_version}-hotspot"]
+    }
+
+    $packagedVersionsToRemove = {
+      "8" => ["adoptopenjdk-11-hotspot"],
+      "11" => ["adoptopenjdk-8-hotspot"],
+    }
+    package {
+      $packagedVersionsToRemove["${major_version}"]:
+        ensure      => "purged",
+        provider    =>  'dpkg',
+    }
+    $jvm_home_directory = "/usr/lib/jvm/"
+    $versionsToRemove = {
+      "8" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-7-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
+      "11" => ["${jvm_home_directory}jdk-6-oracle-x64","${jvm_home_directory}jdk-7-oracle-x64","${jvm_home_directory}jdk-8-oracle-x64"],
+    }
+
+    file {
+      $versionsToRemove["${major_version}"]:
+        ensure => "absent",
+        force => true,
+        require => [Java::Oracle::Default::Remove["remove-default-for-java-${major_version}"]]
+    }
+  }
 
   include java::openjdk::ubuntu::bionic::deps
   realize(Package["${java::openjdk::ubuntu::bionic::deps::java_common_package_name}"],
+    File["${java::openjdk::ubuntu::bionic::deps::java_common_file_name}"],
     Package["${java::openjdk::ubuntu::bionic::deps::libasound2_package_name}"],
+    File["${java::openjdk::ubuntu::bionic::deps::libasound2_file_name}"],
     Package["${java::openjdk::ubuntu::bionic::deps::libxi6_package_name}"],
+    File["${java::openjdk::ubuntu::bionic::deps::libxi6_file_name}"],
     Package["${java::openjdk::ubuntu::bionic::deps::libxtst6_package_name}"],
-    Package["${java::openjdk::ubuntu::bionic::deps::libxrender1_package_name}"])
+    File["${java::openjdk::ubuntu::bionic::deps::libxtst6_file_name}"],
+    Package["${java::openjdk::ubuntu::bionic::deps::libxrender1_package_name}"],
+    File["${java::openjdk::ubuntu::bionic::deps::libxrender1_file_name}"],
+    Package["${java::openjdk::ubuntu::bionic::deps::x11_common_package_name}"],
+    File["${java::openjdk::ubuntu::bionic::deps::x11_common_file_name}"],
+  )
 
   if (versioncmp("${major_version}", "8") == 0) {
     $updateExtension = {
@@ -101,12 +145,12 @@ class java::openjdk::ubuntu::bionic::deps {
   $libasound2_data_file_name = "libasound2-data_1.1.3-5ubuntu0.2_all.deb"
   $libasound2_data_package_name = "libasound2-data"
 
-  file { "${java_common_file_name}":
+  @file { "${java_common_file_name}":
     ensure => present,
     path   => "${local_install_dir}${java_common_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${java_common_file_name}",
   }
-  package { "${java_common_package_name}":
+  @package { "${java_common_package_name}":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${java_common_file_name}",
@@ -115,12 +159,12 @@ class java::openjdk::ubuntu::bionic::deps {
     ]
   }
 
-  file { "${x11_common_file_name}":
+  @file { "${x11_common_file_name}":
     ensure => present,
     path   => "${local_install_dir}${x11_common_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}",
   }
-  package { "${x11_common_package_name}":
+  @package { "${x11_common_package_name}":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${x11_common_file_name}",
@@ -129,12 +173,12 @@ class java::openjdk::ubuntu::bionic::deps {
     ]
   }
 
-  file { "${libxtst6_file_name}":
+  @file { "${libxtst6_file_name}":
     ensure => present,
     path   => "${local_install_dir}${libxtst6_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxtst6_file_name}",
   }
-  package { "${libxtst6_package_name}":
+  @package { "${libxtst6_package_name}":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libxtst6_file_name}",
@@ -144,12 +188,12 @@ class java::openjdk::ubuntu::bionic::deps {
     ]
   }
 
-  file { "${libxrender1_file_name}":
+  @file { "${libxrender1_file_name}":
     ensure => present,
     path   => "${local_install_dir}${libxrender1_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxrender1_file_name}",
   }
-  package { "${libxrender1_package_name}":
+  @package { "${libxrender1_package_name}":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libxrender1_file_name}",
@@ -158,12 +202,12 @@ class java::openjdk::ubuntu::bionic::deps {
     ]
   }
 
-  file { "${libxi6_file_name}":
+  @file { "${libxi6_file_name}":
     ensure => present,
     path   => "${local_install_dir}${libxi6_file_name}",
     source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}",
   }
-  package { "${libxi6_package_name}":
+  @package { "${libxi6_package_name}":
     ensure   => present,
     provider => dpkg,
     source   => "${local_install_dir}${libxi6_file_name}",

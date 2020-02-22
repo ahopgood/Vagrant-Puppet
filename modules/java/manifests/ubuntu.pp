@@ -143,7 +143,7 @@ define java::ubuntu(
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
     notify{"We're on Ubuntu Bionic trying to use OpenJDK Java package ${major_version}":}
-    java::openjdk::ubuntu::bionic { "xenial AdoptOpenJdk ${major_version} ${update_version}":
+    java::openjdk::ubuntu::bionic { "Bionic AdoptOpenJdk ${major_version} ${update_version}":
       multiTenancy   => $multiTenancy,
       major_version  => "${major_version}",
       update_version => "${update_version}",
