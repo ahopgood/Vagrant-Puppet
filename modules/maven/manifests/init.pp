@@ -30,6 +30,18 @@ class maven(
     "mvnDebug" => "${maven_home}bin/",
   }
 
+  exec {"Remove old /usr/share/maven":
+    path => "/bin/",
+    command => "rm -rf /usr/share/maven${major_version}",
+    onlyif => "ls -l /usr/share | /bin/grep maven"
+  }
+  ->
+  exec {"Remove old /etc/maven":
+    path => "/bin/",
+    command => "rm -rf /etc/maven${major_version}",
+    onlyif => "ls -l /etc/ | /bin/grep maven"
+  }
+  ->
   file {"maven-installer":
     ensure => present,
     path => "${local_install_dir}${maven_binary_name}",
