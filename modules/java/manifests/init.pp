@@ -166,7 +166,15 @@ define java::jce(
 
   # Derive jdk location based on OS
   if ($::operatingsystem == "Ubuntu"){
-    $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    if (((versioncmp("$update_version", "212") > 0) and (versioncmp("$major_version", "8") == 0))
+      or (versioncmp("$major_version", "8") > 0)){
+      # $jdkLocation    = "/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/"
+      fail("AdoptOpenJDK uses unlimited JCE by default")
+    } else {
+      $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    }
+
+
   } elsif ($::operatingsystem == "CentOS"){
     if ($update_version == undef){
       fail("CentOS unlimited strength JCE is missing an update_version")

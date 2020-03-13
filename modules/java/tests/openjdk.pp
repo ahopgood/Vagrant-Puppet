@@ -40,17 +40,22 @@ file {
 #   isDefault => false,
 # }
 # ->
-# java {"AdoptOpenJdk test via the Java resource":
+java {"AdoptOpenJdk test via the Java resource":
+  major_version => "8",
+  update_version => "242",
+}
+# ->
+# java::jce {"jce8":
 #   major_version => "8",
 #   update_version => "242",
 # }
 # ->
-java {"AdoptOpenJdk 11 test via the Java resource":
-  major_version => "11",
-  update_version => "3",
-  # multiTenancy => true,
-  # isDefault => false,
-}
+# java {"AdoptOpenJdk 11 test via the Java resource":
+#   major_version => "11",
+#   update_version => "3",
+#   # multiTenancy => true,
+#   # isDefault => false,
+# }
 # ->
 # java::openjdk::ubuntu::create_default{"test-11-create":
 #   major_version => "8",
