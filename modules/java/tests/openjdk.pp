@@ -44,11 +44,11 @@ java {"AdoptOpenJdk test via the Java resource":
   major_version => "8",
   update_version => "242",
 }
-# ->
-# java::jce {"jce8":
-#   major_version => "8",
-#   update_version => "242",
-# }
+->
+java::jce {"jce8":
+  major_version => "8",
+  update_version => "242",
+}
 # ->
 # java {"AdoptOpenJdk 11 test via the Java resource":
 #   major_version => "11",
