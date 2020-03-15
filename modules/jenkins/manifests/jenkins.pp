@@ -20,8 +20,8 @@ $java_major_version = "8"
 $java_update_version = "242"
 
 $maven_major_version="3"
-$maven_minor_version="0"
-$maven_patch_version="5"
+$maven_minor_version="5"
+$maven_patch_version="2"
 file {
   "/etc/puppet/installers/":
     ensure     =>  directory,
@@ -37,7 +37,8 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 #   plugin_backup => "/vagrant/backup/jenkins/",
 # }
 # ->
-# sudo puppet apply --parser=future /vagrant/manifests/jenkins.pp
+# sudo puppet apply --parser=future /vagrant/manifests/hiera_setup.pp
+# sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
 
 class{'augeas':}
 ->
@@ -45,10 +46,10 @@ class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
   major_version => "2",
-  minor_version => "73",
-  patch_version => "1",
+  minor_version => "121",
+  patch_version => "3",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/05-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/01-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",

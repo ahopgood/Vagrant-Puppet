@@ -116,6 +116,13 @@ define jenkins::global::reload::config(
   $username = 'admin',
   $password = hiera('jenkins::admin::password::plaintext','test'),
 ){
+
+  if (versioncmp("${jenkins::major_version}.${jenkins::minor_version}.${jenkins::patch_version}", "2.107.1") > 0) {
+    $command = "java -jar /usr/bin/jenkins-cli.jar -s http://127.0.0.1:8080 -auth ${username}:${password} reload-configuration"
+  } else {
+    $command = "java -jar /usr/bin/jenkins-cli.jar -s http://127.0.0.1:8080 reload-configuration --username ${username} --password ${password}"
+  }
+
   include jenkins::cli
   realize(File["jenkins-cli.jar"])
   exec{"reload-config [${title}]":
@@ -123,7 +130,7 @@ define jenkins::global::reload::config(
     # user => "root",
     tries => 10,
     try_sleep => 5,
-    command => "java -jar /usr/bin/jenkins-cli.jar -s http://127.0.0.1:8080 reload-configuration --username ${username} --password ${password}",
+    command => "${command}",
     require => File["jenkins-cli.jar"]
   }
 }
