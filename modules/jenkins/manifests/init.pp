@@ -94,6 +94,10 @@ class jenkins (
     require => File["${daemon}"]
   }
 
+  $restore_plugin_script="retrieve-plugin.sh"
+  $restore_all_plugins_script="retrieve-all-plugins.sh"
+  $restore_jobs_script="restore-jobs.sh"
+
   $jenkins = "jenkins_${major_version}.${minor_version}.${patch_version}_all.deb"
   file {
     "${jenkins}":
@@ -148,20 +152,58 @@ class jenkins (
       require => File["${backup_script}"],
     }
   } else {
-    augeas{ 'jenkins_admin_config':
-      show_diff => true,
-      incl => '/var/lib/jenkins/users/admin/config.xml',
-      lens => 'Xml.lns',
-      context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
-      changes => [
-        "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
-      ],
-      require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
+    if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.138.4") < 0) {
+      augeas{ 'jenkins_admin_config':
+        show_diff => true,
+        incl => '/var/lib/jenkins/users/admin/config.xml',
+        lens => 'Xml.lns',
+        context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
+        changes => [
+          "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
+        ],
+        before => File["${restore_plugin_script}"],
+        require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
+      }
+    } else {
+      # fail("Complex augeas stuff not yet implemented")
+      # Try out piping admin directory discovery into augtool
+      # Try out piping augeas
+
+      file {"/var/lib/jenkins/users/":
+        ensure => directory,
+        owner => "jenkins",
+        group => "jenkins",
+        recurse => true,
+        recurselimit => "2",
+        mode => "0755",
+        require => [
+          Package["jenkins"],
+        ]
+      }
+
+      file {"/usr/local/bin/setAdminPassword.sh":
+        ensure => file,
+        owner => "jenkins",
+        group => "jenkins",
+        mode => "0755",
+        source => "puppet:///${puppet_file_dir}setAdminPassword.sh",
+        require => [
+          Package["jenkins"],
+          File["/var/lib/jenkins/users/"],
+        ]
+      }
+
+      exec {"jenkins_admin_config":
+        path => ["/usr/local/bin/", "/bin/", "/usr/bin/"],
+        user => "root",
+        command => "bash setAdminPassword.sh '${password_bcrypt_hash}'",
+        before => File["${restore_plugin_script}"],
+        require => [
+          File["/usr/local/bin/setAdminPassword.sh"],
+        ]
+      }
     }
 
-    $restore_plugin_script="retrieve-plugin.sh"
-    $restore_all_plugins_script="retrieve-all-plugins.sh"
-    $restore_jobs_script="restore-jobs.sh"
     file {"jenkins.install.InstallUtil.lastExecVersion":
       ensure => present,
       mode => "755",
@@ -177,7 +219,6 @@ class jenkins (
       mode => "755",
       owner => "jenkins",
       group => "jenkins",
-      require => [Augeas['jenkins_admin_config']],
       path => "/usr/local/bin/${restore_plugin_script}",
       source => "puppet:///${puppet_file_dir}${restore_plugin_script}",
     }
