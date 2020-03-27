@@ -46,10 +46,10 @@ class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
   major_version => "2",
-  minor_version => "121",
-  patch_version => "3",
+  minor_version => "150",
+  patch_version => "1",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/01-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/10-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
