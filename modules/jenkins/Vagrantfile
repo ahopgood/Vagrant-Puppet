@@ -59,6 +59,11 @@ Vagrant.configure(2) do |config|
     ubuntu.vm.hostname = "jenkins.ubuntu.vm"
     ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
     ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
+    ubuntu.vm.provision "shell", inline: <<-SHELL
+    	echo "Running shell provisioner"
+    	sudo puppet apply --parser=future /vagrant/manifests/hiera_setup.pp && sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
+
+    SHELL
   end
 
   config.vm.define "Ubuntu_15_test" do |ubuntu|

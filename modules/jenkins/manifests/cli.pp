@@ -6,5 +6,9 @@ class jenkins::cli {
     # owner => "root",
     # group => "root",
     mode => "777",
+    require => [
+      Package["jenkins"],
+      Exec["wait"]
+    ]
   }
 }
