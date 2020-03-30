@@ -19,7 +19,9 @@ class jenkins (
   $java_update_version = undef,
   $password_bcrypt_hash = "\$2a\$10\$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka", #admin
   $plugin_backup_location = "",
-  $job_backup_location = undef) {
+  $job_backup_location = undef,
+  $jenkins_host_address = "http://localhost:8080/",
+) {
 
   $jenkins_short_ver     = "jenkins"
   $jenkins_group         = "${jenkins_short_ver}"
@@ -165,10 +167,6 @@ class jenkins (
         require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
       }
     } else {
-      # fail("Complex augeas stuff not yet implemented")
-      # Try out piping admin directory discovery into augtool
-      # Try out piping augeas
-
       file {"/var/lib/jenkins/users/":
         ensure => directory,
         owner => "jenkins",
@@ -200,6 +198,60 @@ class jenkins (
         before => File["${restore_plugin_script}"],
         require => [
           File["/usr/local/bin/setAdminPassword.sh"],
+        ]
+      }
+    } #End admin user version check
+
+    # Mark Jenkins as an existing running service to avoid going through the setup wizard
+    augeas { 'jenkins-config':
+      show_diff => true,
+      incl      => '/var/lib/jenkins/config.xml',
+      lens      => 'Xml.lns',
+      context   => '/files/var/lib/jenkins/config.xml/',
+      changes   => [
+        "set hudson/installStateName/#text RUNNING"
+      ],
+      # before    => Exec["Restore plugins"],
+      require   => [
+        Package["jenkins"],
+        Service["jenkins"],
+        Exec["wait"],
+        Exec["Restore plugins"],
+      ]
+    }
+
+    if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.121.1") >= 0) {
+      $location_configuration_filename = "jenkins.model.JenkinsLocationConfiguration.xml"
+      file {"${location_configuration_filename}":
+        ensure => file,
+        path => "/var/lib/jenkins/${location_configuration_filename}",
+        owner => "jenkins",
+        group => "jenkins",
+        mode => "0755",
+        source => "puppet:///${puppet_file_dir}${location_configuration_filename}",
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+        ]
+      }
+
+      augeas { "Configure ${location_configuration_filename}":
+        show_diff => true,
+        incl      => "/var/lib/jenkins/${location_configuration_filename}",
+        lens      => 'Xml.lns',
+        context   => "/files/var/lib/jenkins/${location_configuration_filename}/",
+        changes   => [
+          "set jenkins.model.JenkinsLocationConfiguration/#text[1] '\n   '",
+          "set jenkins.model.JenkinsLocationConfiguration/jenkinsUrl/#text ${jenkins_host_address}",
+          "set jenkins.model.JenkinsLocationConfiguration/#text[2] '\n'",
+        ],
+        before    => Exec["Restore plugins"],
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+          File["${location_configuration_filename}"],
         ]
       }
     }
