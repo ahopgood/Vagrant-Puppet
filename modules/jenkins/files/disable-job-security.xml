@@ -1,5 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration plugin="job-dsl@1.61">
-    <category class="jenkins.model.GlobalConfigurationCategory$Security"/>
+<javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration plugin="job-dsl@1.77">
     <useScriptSecurity>false</useScriptSecurity>
 </javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration>

@@ -49,9 +49,9 @@ class{"augeas::xmlstarlet":}
 class {'jenkins':
   major_version => "2",
   minor_version => "204",
-  patch_version => "1",
+  patch_version => "4",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/10-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/11-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
@@ -69,6 +69,10 @@ jenkins::credentials::gitCredentials{"git-api-token":
   token_name => "github_token",
 }
 ->
+jenkins::credentials::ssh{"jenkins-ssh":
+  key_name => "jenkins",
+  ssh_creds_name => "jenkins_ssh"
+}->
 jenkins::seed_job{"seed-dsl":
   github_credentials_name => "github_token",
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
@@ -122,13 +126,12 @@ Jenkins::Global::Labels { "labels":
   labels => "Java6 Java7 Java8 Pandoc Dos2Unix"
 }
 ->
-jenkins::credentials::ssh{"jenkins-ssh":
-  key_name => "jenkins",
-  ssh_creds_name => "jenkins_ssh"
-}
-->
 class {"dos2unix":}
 ->
 jenkins::global::reload::config{"set labels":
   password => "admin"
 }
+# ->
+# jenkins::global::restart{"restart":
+#   password => "admin"
+# }
