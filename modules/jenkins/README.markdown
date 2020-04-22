@@ -82,6 +82,7 @@ Back up and restore functionality is provided by a series of local scripts:
     * If there is no file or the hash doesn't match then the version of the plugin is retrieved from the jenkins plugin centre using the `retrieve-plugin.sh` script.
     * If there is no hash then the plugin is downloaded as is from the jenins plugin centre using the `retrieve-plugin.sh` script.
     * If the downloaded file doesn't match the hash (if provided) then an error is thrown
+    * **Note** if you get an error involving an if statement not evaluating properly (via the logs) then you need to run `dos2unix` on your scripts
 * `/usr/local/bin/retrieve-plugin.sh` is used to restore a single plugin:version:hash string value, this will check for a local version with a matching hash first and then resort to the plugin centre. If no version is provided it will pull the latest version of the plugin by default.
     * **Param 1.** Plugin name
     * **Param 2.** (Optional) Plugin version, defaults to "LATEST"
