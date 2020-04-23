@@ -5,6 +5,10 @@ This is the patch module. It provides...
 ## Current Status / Support
 Supports:
 * CentOS 6
+* Ubuntu
+    * 15.10
+    * 16.04
+    * 18.04
 
 ### Known Issues
 **64-bit support only**  

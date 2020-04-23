@@ -7,7 +7,9 @@ The module can be passed the following parameters as Strings:
   
 ## Current Status / Support
 Tested to work on the following operating systems:
-* Ubuntu 15 - 
+* Ubuntu 15 
+* Ubuntu 16.04
+* Ubuntu 18.04
 
 ### Known Issues  
 **64-bit support only**  
