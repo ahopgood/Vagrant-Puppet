@@ -24,7 +24,8 @@ define alternatives::install(
   if $::operatingsystem == 'CentOS' {
     $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+    (versioncmp("${operatingsystemrelease}","18.04") == 0) {
       $alternativesName = "/usr/bin/update-alternatives"
     } else {
       $alternativesName = "/usr/sbin/update-alternatives"
@@ -73,7 +74,8 @@ define alternatives::set(
   if $::operatingsystem == 'CentOS' {
     $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+      (versioncmp("${operatingsystemrelease}","18.04") == 0) {
       $alternativesName = "/usr/bin/update-alternatives"
     } else {
       $alternativesName = "/usr/sbin/update-alternatives"
@@ -119,7 +121,8 @@ define alternatives::remove(
     } else {
       $awk = "/usr/bin/awk"
     }
-    if (versioncmp("${operatingsystemrelease}","18.04") == 0) {
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+      (versioncmp("${operatingsystemrelease}","18.04") == 0) {
       $alternativesName = "/usr/bin/update-alternatives"
     } else {
       $alternativesName = "/usr/sbin/update-alternatives"
