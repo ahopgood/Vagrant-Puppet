@@ -20,8 +20,8 @@ $java_major_version = "8"
 $java_update_version = "242"
 
 $maven_major_version="3"
-$maven_minor_version="0"
-$maven_patch_version="5"
+$maven_minor_version="5"
+$maven_patch_version="2"
 file {
   "/etc/puppet/installers/":
     ensure     =>  directory,
@@ -37,7 +37,10 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 #   plugin_backup => "/vagrant/backup/jenkins/",
 # }
 # ->
-# sudo puppet apply --parser=future /vagrant/manifests/jenkins.pp
+# sudo puppet apply --parser=future /vagrant/manifests/hiera_setup.pp
+# sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
+# sudo puppet apply --parser=future /vagrant/manifests/hiera_setup.pp && sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
+# vagrant destroy Ubuntu_16_test -f && vagrant up Ubuntu_16_test
 
 class{'augeas':}
 ->
@@ -45,13 +48,14 @@ class{"augeas::xmlstarlet":}
 ->
 class {'jenkins':
   major_version => "2",
-  minor_version => "73",
-  patch_version => "1",
+  minor_version => "204",
+  patch_version => "4",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/05-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/11-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
+  jenkins_host_address => "http://jenkins.alexanderhopgood.com/",
 }
 ->
 class{"hiera":}
@@ -65,6 +69,10 @@ jenkins::credentials::gitCredentials{"git-api-token":
   token_name => "github_token",
 }
 ->
+jenkins::credentials::ssh{"jenkins-ssh":
+  key_name => "jenkins",
+  ssh_creds_name => "jenkins_ssh"
+}->
 jenkins::seed_job{"seed-dsl":
   github_credentials_name => "github_token",
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
@@ -118,13 +126,12 @@ Jenkins::Global::Labels { "labels":
   labels => "Java6 Java7 Java8 Pandoc Dos2Unix"
 }
 ->
-jenkins::credentials::ssh{"jenkins-ssh":
-  key_name => "jenkins",
-  ssh_creds_name => "jenkins_ssh"
-}
-->
 class {"dos2unix":}
 ->
 jenkins::global::reload::config{"set labels":
   password => "admin"
 }
+# ->
+# jenkins::global::restart{"restart":
+#   password => "admin"
+# }

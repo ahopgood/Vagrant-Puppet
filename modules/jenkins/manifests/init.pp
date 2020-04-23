@@ -19,7 +19,9 @@ class jenkins (
   $java_update_version = undef,
   $password_bcrypt_hash = "\$2a\$10\$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfka", #admin
   $plugin_backup_location = "",
-  $job_backup_location = undef) {
+  $job_backup_location = undef,
+  $jenkins_host_address = "http://localhost:8080/",
+) {
 
   $jenkins_short_ver     = "jenkins"
   $jenkins_group         = "${jenkins_short_ver}"
@@ -94,6 +96,10 @@ class jenkins (
     require => File["${daemon}"]
   }
 
+  $restore_plugin_script="retrieve-plugin.sh"
+  $restore_all_plugins_script="retrieve-all-plugins.sh"
+  $restore_jobs_script="restore-jobs.sh"
+
   $jenkins = "jenkins_${major_version}.${minor_version}.${patch_version}_all.deb"
   file {
     "${jenkins}":
@@ -148,20 +154,108 @@ class jenkins (
       require => File["${backup_script}"],
     }
   } else {
-    augeas{ 'jenkins_admin_config':
+    if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.138.4") < 0) {
+      augeas{ 'jenkins_admin_config':
+        show_diff => true,
+        incl => '/var/lib/jenkins/users/admin/config.xml',
+        lens => 'Xml.lns',
+        context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
+        changes => [
+          "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
+        ],
+        before => File["${restore_plugin_script}"],
+        require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
+      }
+    } else {
+      file {"/var/lib/jenkins/users/":
+        ensure => directory,
+        owner => "jenkins",
+        group => "jenkins",
+        recurse => true,
+        recurselimit => "2",
+        mode => "0755",
+        require => [
+          Package["jenkins"],
+        ]
+      }
+
+      file {"/usr/local/bin/setAdminPassword.sh":
+        ensure => file,
+        owner => "jenkins",
+        group => "jenkins",
+        mode => "0755",
+        source => "puppet:///${puppet_file_dir}setAdminPassword.sh",
+        require => [
+          Package["jenkins"],
+          File["/var/lib/jenkins/users/"],
+        ]
+      }
+
+      exec {"jenkins_admin_config":
+        path => ["/usr/local/bin/", "/bin/", "/usr/bin/"],
+        user => "root",
+        command => "bash setAdminPassword.sh '${password_bcrypt_hash}'",
+        before => File["${restore_plugin_script}"],
+        require => [
+          File["/usr/local/bin/setAdminPassword.sh"],
+        ]
+      }
+    } #End admin user version check
+
+    # Mark Jenkins as an existing running service to avoid going through the setup wizard
+    augeas { 'jenkins-config':
       show_diff => true,
-      incl => '/var/lib/jenkins/users/admin/config.xml',
-      lens => 'Xml.lns',
-      context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
-      changes => [
-        "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
+      incl      => '/var/lib/jenkins/config.xml',
+      lens      => 'Xml.lns',
+      context   => '/files/var/lib/jenkins/config.xml/',
+      changes   => [
+        "set hudson/installStateName/#text RUNNING"
       ],
-      require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
+      # before    => Exec["Restore plugins"],
+      require   => [
+        Package["jenkins"],
+        Service["jenkins"],
+        Exec["wait"],
+        Exec["Restore plugins"],
+      ]
     }
 
-    $restore_plugin_script="retrieve-plugin.sh"
-    $restore_all_plugins_script="retrieve-all-plugins.sh"
-    $restore_jobs_script="restore-jobs.sh"
+    if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.121.1") >= 0) {
+      $location_configuration_filename = "jenkins.model.JenkinsLocationConfiguration.xml"
+      file {"${location_configuration_filename}":
+        ensure => file,
+        path => "/var/lib/jenkins/${location_configuration_filename}",
+        owner => "jenkins",
+        group => "jenkins",
+        mode => "0755",
+        source => "puppet:///${puppet_file_dir}${location_configuration_filename}",
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+        ]
+      }
+
+      augeas { "Configure ${location_configuration_filename}":
+        show_diff => true,
+        incl      => "/var/lib/jenkins/${location_configuration_filename}",
+        lens      => 'Xml.lns',
+        context   => "/files/var/lib/jenkins/${location_configuration_filename}/",
+        changes   => [
+          "set jenkins.model.JenkinsLocationConfiguration/#text[1] '\n   '",
+          "set jenkins.model.JenkinsLocationConfiguration/jenkinsUrl/#text ${jenkins_host_address}",
+          "set jenkins.model.JenkinsLocationConfiguration/#text[2] '\n'",
+        ],
+        before    => Exec["Restore plugins"],
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+          File["${location_configuration_filename}"],
+        ]
+      }
+    }
+
     file {"jenkins.install.InstallUtil.lastExecVersion":
       ensure => present,
       mode => "755",
@@ -177,7 +271,6 @@ class jenkins (
       mode => "755",
       owner => "jenkins",
       group => "jenkins",
-      require => [Augeas['jenkins_admin_config']],
       path => "/usr/local/bin/${restore_plugin_script}",
       source => "puppet:///${puppet_file_dir}${restore_plugin_script}",
     }

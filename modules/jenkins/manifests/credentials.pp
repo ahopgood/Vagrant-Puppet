@@ -18,7 +18,7 @@ class jenkins::credentials {
     context   => "/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/",
     require   => [File["${credentials_file}"]],
     changes   => [
-      "set #attribute/plugin credentials@2.1.6",
+      "set #attribute/plugin credentials@2.3.7",
       "set domainCredentialsMap/#attribute/class hudson.util.CopyOnWriteMap\$Hash",
       "set domainCredentialsMap/entry/com.cloudbees.plugins.credentials.domains.Domain/specifications #empty", #common to all credentials
     ]
@@ -42,13 +42,13 @@ define jenkins::credentials::ssh (
     require   => [File["${jenkins::credentials::credentials_file}"],
       Augeas["jenkins_credentials_config"]],
     changes   => [
-      "set #attribute/plugin ssh-credentials@1.13",
+      "set #attribute/plugin ssh-credentials@1.18.1",
       "set scope/#text \"GLOBAL\"",
       "set id/#text \"${ssh_creds_name}\"",
       "set description/#text \"The SSH user that represents Jenkins when deploying to other systems\"",
       "set username/#text \"${key_name}\"",
       "set privateKeySource/#attribute/class \"com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey\$DirectEntryPrivateKeySource\"",
-      "set privateKeySource/privateKey/#text \"${ssh_private_key}\""
+      "set privateKeySource/privateKey/#text \"\n${ssh_private_key}\n\""
     ]
   }
   ->
