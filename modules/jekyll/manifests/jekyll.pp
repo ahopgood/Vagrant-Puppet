@@ -1,3 +1,4 @@
 class {'jekyll':
-  showDrafts => "true"
+  showDrafts => "true",
+  blog_host_address => "192.168.33.28",
 }
