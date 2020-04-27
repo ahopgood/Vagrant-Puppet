@@ -41,6 +41,7 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 # sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
 # sudo puppet apply --parser=future /vagrant/manifests/hiera_setup.pp && sudo puppet apply --parser=future --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
 # vagrant destroy Ubuntu_16_test -f && vagrant up Ubuntu_16_test
+#  vagrant destroy Server_16 -f && vagrant up Server_16
 
 class{'augeas':}
 ->
@@ -49,7 +50,7 @@ class{"augeas::xmlstarlet":}
 class {'jenkins':
   major_version => "2",
   minor_version => "204",
-  patch_version => "4",
+  patch_version => "6",
   perform_manual_setup => false,
   plugin_backup_location => "/vagrant/backup/plugins/11-plugins/",
   java_major_version => "${java_major_version}",
