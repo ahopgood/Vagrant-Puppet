@@ -24,7 +24,8 @@ define alternatives::install(
   if $::operatingsystem == 'CentOS' {
     $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+    (versioncmp("${operatingsystemrelease}","18.04") == 0) {
       $alternativesName = "/usr/bin/update-alternatives"
     } else {
       $alternativesName = "/usr/sbin/update-alternatives"
@@ -73,7 +74,8 @@ define alternatives::set(
   if $::operatingsystem == 'CentOS' {
     $alternativesName = "/usr/sbin/alternatives"
   } elsif $::operatingsystem == 'Ubuntu' {
-    if (versioncmp("${operatingsystemrelease}","14.04") == "0"){
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+      (versioncmp("${operatingsystemrelease}","18.04") == 0) {
       $alternativesName = "/usr/bin/update-alternatives"
     } else {
       $alternativesName = "/usr/sbin/update-alternatives"
@@ -111,14 +113,19 @@ define alternatives::remove(
   $onlyif = undef,
 ){
   #Decide which alternatives program we have based on OS
-  if $::operatingsystem == 'CentOS' {
-    $alternativesName = "alternatives"
-  } elsif $::operatingsystem == 'Ubuntu' {
-    $alternativesName = "update-alternatives"
+  if ("${operatingsystem}" == "CentOS") {
+    $alternativesName = "/usr/sbin/alternatives"
+  } elsif ("${operatingsystem}" == "Ubuntu") {
     if (versioncmp("${operatingsystemmajrelease}", "15.10") == 0) {
       $awk = "/bin/awk"
     } else {
       $awk = "/usr/bin/awk"
+    }
+    if (versioncmp("${operatingsystemrelease}","14.04") == 0) or
+      (versioncmp("${operatingsystemrelease}","18.04") == 0) {
+      $alternativesName = "/usr/bin/update-alternatives"
+    } else {
+      $alternativesName = "/usr/sbin/update-alternatives"
     }
 
   } else {
@@ -139,15 +146,15 @@ define alternatives::remove(
   if ($onlyif != undef){
     $remove_onlyif = $onlyif
   } else {
-    $remove_onlyif = "/usr/sbin/${alternativesName} --display ${executableName} | /bin/grep \"${executableLocation}${targetExecutable} - priority *\" > /dev/null"
+    $remove_onlyif = "${alternativesName} --display ${executableName} | /bin/grep \"${executableLocation}${targetExecutable} - priority *\" > /dev/null"
   }
   
   exec {
     "remove-alternative-${executableName}-${executableLocation}":
       command     =>  "${alternativesName} --remove ${executableName} \$(${alternativesName} --display ${executableName}| /bin/grep \"${executableLocation}${targetExecutable} - priority *\" | ${awk} '{ print \$1 }')",
       onlyif      =>  "${remove_onlyif}",  
-      path        =>  '/usr/sbin/',
-      cwd         =>  '/usr/sbin/',
+      path        =>  '/',
+      cwd         =>  '/',
   }
 }
 #"/usr/sbin/alternatives --display firefox-javaplugin.so | /bin/grep \"link currently points to /usr/java/jdk1.8.0_*/jre/lib/amd64/firefox-javaplugin.so" > /dev/null",

@@ -38,6 +38,9 @@ class unzip (
     } elsif (versioncmp("${operatingsystemmajrelease}","16.04") == 0){
       #Note that unzip 6.0 is already installed on Ubuntu 16.04 but this is here in case we want to add an update in future
       $platform="-20ubuntu1_amd64.deb"
+    } elsif (versioncmp("${operatingsystemmajrelease}","18.04") == 0){
+      #Note that unzip 6.0 is already installed on Ubuntu 16.04 but this is here in case we want to add an update in future
+      $platform="-21ubuntu1_amd64.deb"
     } else {
       #could use ${operatingsystemrelease} here but would make sensible ifs difficult want to use ${os['release']['minor']}
       fail("${operatingsystem} ${operatingsystemrelease} is unsupported")

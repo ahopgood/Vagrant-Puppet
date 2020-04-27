@@ -13,9 +13,9 @@ file{"${local_install_dir}":
   ensure => directory
 }
 ->
-java{"java-6":
-  major_version => "7",
-  update_version => "76",
+java{"java-11":
+  major_version => "11",
+  update_version => "6",
   isDefault => true,
 }
 ->

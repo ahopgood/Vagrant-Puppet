@@ -316,7 +316,11 @@ class pandoc {
       source   => "${local_install_dir}${libgs9_common_file_name}",
       require  => File["${libgs9_common_file_name}"]
     }
-  } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
+  } elsif (
+      (versioncmp("${operatingsystemmajrelease}", "16.04") == 0)
+        or
+      (versioncmp("${operatingsystemmajrelease}", "18.04") == 0)
+  ){
     notify { "${pandoc_file_name}": }
     file { "${pandoc_file_name}":
       ensure => present,
@@ -358,6 +362,8 @@ define pandoc::texlive_fonts_recommended {
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
     pandoc::ubuntu::xenial::texlive_fonts_recommended{"xenial dependencies":}
+  } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
+    pandoc::ubuntu::bionic::texlive_fonts_recommended { "bionic dependencies": }
   } else {
     fail("${operatingsystemmajrelease} is not supported")
   }
@@ -422,6 +428,8 @@ define pandoc::texlive_latex_extra {
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
     pandoc::ubuntu::xenial::texlive_latex_extra{"xenial dependencies":}
+  } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
+    pandoc::ubuntu::bionic::texlive_latex_extra{"bionic dependencies":}
   } else {
     fail("${operatingsystemmajrelease} is not supported")
   }
@@ -460,6 +468,8 @@ define pandoc::lmodern {
     }
   } elsif (versioncmp("${operatingsystemmajrelease}", "16.04") == 0) {
     pandoc::ubuntu::xenial::lmodern{"xenial dependencies":}
+  } elsif (versioncmp("${operatingsystemmajrelease}", "18.04") == 0) {
+    pandoc::ubuntu::bionic::lmodern{"bionic dependencies":}
   } else {
     fail("${operatingsystemmajrelease} is not supported")
   }

@@ -64,7 +64,7 @@ define java (
     update_version => "${update_version}",
   }
 
-  if ($isDefault == true){
+  if ("${isDefault}" == "true"){
     #IsDefault is false by default - probably should change this?
     Java::Default::Install["install-default-to-java-${major_version}"] -> Java::Default::Set["set-default-to-java-${major_version}"]
 
@@ -73,9 +73,11 @@ define java (
       update_version => "${update_version}",
     }
 
+    notify{"${operatingsystem}":}
     if (versioncmp("${operatingsystem}", "Ubuntu") == 0){
+      notify{"Within Ubuntu & default block":}
       if (
-        ((versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
+        ( (versioncmp("${major_version}", "8") == 0) and (versioncmp("${update_version}", "212") > 0 ) )
         or
         (versioncmp("${major_version}", "11") == 0)
       ) {
@@ -110,9 +112,9 @@ define java::default::install(
     (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
   ) {
     # Do nothing for AdoptOpenJdk installations as they already install themselves but try to install the default if one is pre-configuredd
-    java::openjdk::ubuntu::set_default { "Set default for OpenJdk ${major_version}":
-      major_version => "${major_version}"
-    }
+    # java::openjdk::ubuntu::set_default { "Set default for OpenJdk ${major_version}":
+    #   major_version => "${major_version}"
+    # }
   } else { # Oracle Java block
     java::oracle::default::install { "Set default for Oracle JDK ${major_version}":
       major_version => "${major_version}",
@@ -135,7 +137,11 @@ define java::default::set(
     or
     (($::operatingsystem == "Ubuntu") and (versioncmp("${major_version}", "11") == 0))
   ) {
-    java::openjdk::ubuntu::create_default { "Set default for OpenJdk ${major_version}":
+    java::openjdk::ubuntu::create_default { "Installing default for OpenJdk ${major_version}":
+      major_version => "${major_version}"
+    }
+    ->
+    java::openjdk::ubuntu::set_default { "Set default for OpenJdk ${major_version}":
       major_version => "${major_version}"
     }
   } else {
@@ -160,7 +166,15 @@ define java::jce(
 
   # Derive jdk location based on OS
   if ($::operatingsystem == "Ubuntu"){
-    $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    if (((versioncmp("$update_version", "212") > 0) and (versioncmp("$major_version", "8") == 0))
+      or (versioncmp("$major_version", "8") > 0)){
+      # $jdkLocation    = "/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/"
+      fail("AdoptOpenJDK uses unlimited JCE by default")
+    } else {
+      $jdkLocation    = "/usr/lib/jvm/jdk-${major_version}-oracle-x64/"
+    }
+
+
   } elsif ($::operatingsystem == "CentOS"){
     if ($update_version == undef){
       fail("CentOS unlimited strength JCE is missing an update_version")

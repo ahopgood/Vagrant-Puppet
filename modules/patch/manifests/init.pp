@@ -44,7 +44,10 @@ class patch {
       #Note that patch 2.7.5 is already installed on Ubuntu 16.04 but this is here in case we want to add an update in future
       $release = "-1ubuntu0.${operatingsystemmajrelease}.2_"
       $patch_file = "patch_2.7.5${release}${platform}"
-
+    } elsif (versioncmp ("18.04", "${operatingsystemmajrelease}") == 0){
+      #Note that patch 2.7.6 is already installed on Ubuntu 18.04 but this is here in case we want to add an update in future
+      $release = "-2ubuntu1.1_"
+      $patch_file = "patch_2.7.6${release}${platform}"
     } else {
       fail("${operatingsystem} version ${operatingsystemmajrelease} is not currently supported by the patch module")
     }

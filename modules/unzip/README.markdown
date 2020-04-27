@@ -11,6 +11,7 @@ Installs the unzip binary.
 * CentOS 7 - unzip version 6.0 redhat patch version 16
 * Ubuntu 15.10 - unzip version 6.0 ubuntu patch version 17
 * Ubuntu 16.04 - unzip version 6.0 ubuntu patch version 20
+* Ubuntu 18.04 - unzip version 6 ubuntu patch version 
 
 ## Usage
 ```

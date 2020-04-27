@@ -15,6 +15,8 @@ If this isn't used then the catalogue/manifest won't compile.
 Currently there is support for the following operating systems:  
 * **Ubuntu** via the `update-alternatives` binary
 	* 15.10 tested
+	* 16.04
+	* 18.04
 * **CentOS** via the `alternatives` binary
 	* 6 tested
 	* 7 tested

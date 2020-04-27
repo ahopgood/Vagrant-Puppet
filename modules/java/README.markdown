@@ -134,6 +134,12 @@ Testing performed:
 	* Java 8 - done
 
 ## Java Cryptography Extensions (JCE)
+This module only supports:
+* Oracle Java 6
+* Oracle Java 7
+* Oracle Java 8
+
+**Any** version of AdoptOpenJDK will use unlimited strength Java Cryptography Extensions by default.   
 
 ### JCE Naming Conventions
 
@@ -144,6 +150,7 @@ For example:
 * Java 7 -> `jce_policy-7.zip`
 * Java 8 -> `jce_policy-8.zip`
 Unlike the JDK installers these are not platform dependent so are located in the root `/files` folder for the module.
+
 
 #### To Do
 

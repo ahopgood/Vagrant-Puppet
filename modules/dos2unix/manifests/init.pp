@@ -3,10 +3,16 @@ class dos2unix{
   $local_install_dir  = "${local_install_path}installers/"
   $puppet_file_dir    = "modules/dos2unix/"
 
-  $major_version = "6"
-  $minor_version = "0"
-  $patch_version = "4"
-  $dos2unix_file = "dos2unix_${major_version}.${minor_version}.${patch_version}-1_${architecture}.deb"
+  if (versioncmp("${operatingsystemmajrelease}", "18.04") == 0 ){
+    $major_version = "7"
+    $minor_version = "3"
+    $patch_version = "4-3"
+  } else {
+    $major_version = "6"
+    $minor_version = "0"
+    $patch_version = "4-1"
+  }
+  $dos2unix_file = "dos2unix_${major_version}.${minor_version}.${patch_version}_${architecture}.deb"
 
   file {"${dos2unix_file}":
     ensure => present,

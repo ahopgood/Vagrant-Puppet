@@ -1,0 +1,15 @@
+  $GEM_FILE_ID_file_name = "GEM_FILE_NAME"
+  $GEM_FILE_ID_package_name = "GEM_NAME"
+  file { "${GEM_FILE_ID_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${GEM_FILE_ID_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${GEM_FILE_ID_file_name}",
+  }
+  package { "${GEM_FILE_ID_package_name}":
+    ensure   => installed,
+    provider => gem,
+    source   => "${local_install_dir}${GEM_FILE_ID_file_name}",
+    require  => [
+        File["${GEM_FILE_ID_file_name}"],
+    ]
+  }

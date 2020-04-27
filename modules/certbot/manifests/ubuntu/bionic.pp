@@ -6,7 +6,7 @@ define certbot::ubuntu::bionic {
   include python3
   realize(Python3::Ubuntu::Bionic["virtual"])
 
-  $certbot_file_name = "certbot_0.23.0-1_all.deb"
+  $certbot_file_name = "certbot_0.27.0-1~ubuntu18.04.1_all.deb"
   file { "${certbot_file_name}":
     ensure => present,
     path   => "${local_install_dir}${certbot_file_name}",
@@ -23,7 +23,7 @@ define certbot::ubuntu::bionic {
     ]
   }
 
-  $python3_certbot_file_name = "python3-certbot_0.23.0-1_all.deb"
+  $python3_certbot_file_name = "python3-certbot_0.27.0-1~ubuntu18.04.1_all.deb"
   file { "${python3_certbot_file_name}":
     ensure => present,
     path   => "${local_install_dir}${python3_certbot_file_name}",
@@ -47,7 +47,7 @@ define certbot::ubuntu::bionic {
     ]
   }
 
-  $python3_acme_file_name = "python3-acme_0.22.2-1ubuntu0.1_all.deb"
+  $python3_acme_file_name = "python3-acme_0.31.0-2~ubuntu18.04.1_all.deb"
   file { "${python3_acme_file_name}":
     ensure => present,
     path   => "${local_install_dir}${python3_acme_file_name}",
@@ -63,6 +63,23 @@ define certbot::ubuntu::bionic {
       Package["python3-mock"],
       Package["python3-rfc3339"],
       Package["python3-tz"],
+      Package["python3-requests-toolbelt"]
+    ]
+  }
+
+  $python3_requests_toolbelt_file_name = "python3-requests-toolbelt_0.8.0-1_all.deb"
+  $python3_requests_toolbelt_package_name = "python3-requests-toolbelt"
+  file { "${python3_requests_toolbelt_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${python3_requests_toolbelt_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${python3_requests_toolbelt_file_name}",
+  }
+  package { "${python3_requests_toolbelt_package_name}":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${python3_requests_toolbelt_file_name}",
+    require  => [
+    File["${python3_requests_toolbelt_file_name}"],
     ]
   }
 

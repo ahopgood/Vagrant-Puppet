@@ -28,6 +28,7 @@ For adding sudo privileges a [user resource](https://docs.puppet.com/puppet/late
 Works on clean installs of:
 * Ubuntu 15.10
 * Ubuntu 16.04
+* Ubuntu 18.04
 * CentOS 6
 * CentOS 7
 

@@ -1,5 +1,9 @@
 # Maven
-Supports Ubuntu 15.10.  
+Supports Ubuntu:
+ * 15.10
+ * 16.04
+ * 18.04  
+
 Currently only support major version multiple tenancy, e.g. maven 2 side by side with maven 3.
 ## To Do
 * Improve readme

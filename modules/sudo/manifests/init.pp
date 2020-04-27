@@ -16,8 +16,9 @@ define sudo (
   } elsif (versioncmp($operatingsystem, "Ubuntu") == 0){
     if (versioncmp($operatingsystemmajrelease, "15.10") == 0) {
 
-    } elsif (versioncmp($operatingsystemmajrelease, "16.04") == 0){
+    } elsif (versioncmp($operatingsystemmajrelease, "16.04") == 0) {
 
+    } elsif (versioncmp($operatingsystemmajrelease, "18.04") == 0){
     } else {
       fail("sudo is currently not supported on $operatingsystem $operatingsystemmajrelease")
     }

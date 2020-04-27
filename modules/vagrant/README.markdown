@@ -8,6 +8,7 @@ It will revoke the sudo privileges of the `vagrant` user.
 ## Support
 * Ubuntu 15.10
 * Ubuntu 16.04
+* Ubuntu 18.04
 
 ## Usage
 ```
