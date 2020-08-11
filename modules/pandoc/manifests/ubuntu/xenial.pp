@@ -775,8 +775,6 @@ define pandoc::ubuntu::xenial::texlive_latex_extra {
   realize(Package["texlive-base"])
 
   realize(Python::Ubuntu::Xenial["virtual"])
-  realize(File["python"])
-  realize(Package["python"])
 
   $texlive_latex_extra_file_name = "texlive-latex-extra_2015.20160320-1_all.deb"
   file { "${texlive_latex_extra_file_name}":
