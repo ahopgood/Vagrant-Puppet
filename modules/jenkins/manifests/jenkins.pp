@@ -16,8 +16,8 @@ $local_install_dir = "${local_install_path}installers/"
 Package{
   allow_virtual => false,
 }
-$java_major_version = "8"
-$java_update_version = "242"
+$java_major_version = "11"
+$java_update_version = "6"
 
 $maven_major_version="3"
 $maven_minor_version="5"
@@ -79,22 +79,10 @@ jenkins::seed_job{"seed-dsl":
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
 }
 ->
-jenkins::global::java_jdk{"Java-8":
-  major_version => "${java_major_version}",
-  update_version => "${java_update_version}",
-  adoptOpenJDK => true,
-}
-->
-jenkins::global::java_jdk{"Java-7":
-  major_version => "7",
-  update_version => "173",
-  appendNewJdk => true,
-}
-->
-jenkins::global::java_jdk{"Java-6":
-  major_version => "6",
-  update_version => "99",
-  appendNewJdk => true,
+jenkins::global::java_jdk{"Java-11":
+  major_version => "11",
+  update_version => "6",
+  adoptOpenJDK => "true",
 }
 ->
 jenkins::backup_jobs{"backup-script":
