@@ -6,7 +6,6 @@ ADMIN_DIR=$(printf "%s\n%s" "${DEFINE_VAR}" "${GET_ADMIN_DIR}" | augtool -At "Xm
 
 echo "Found admin directory: ${ADMIN_DIR}"
 
-#HASH_VALUE="#jbcrypt:\$2a\$10\$2dr50M9GvFH49WjsOASfCe3dOVctegmK8SRtAJEIrzSPbjSTGhfkacccc"
 HASH_VALUE="${1}"
 SET_HASH="set /files/var/lib/jenkins/users/${ADMIN_DIR}/config.xml/user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:"
 SAVE="save"

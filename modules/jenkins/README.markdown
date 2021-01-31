@@ -36,6 +36,21 @@ Currently this has two impacts:
  2. It will require **two** runs of the manifest to ensure that the hiera files are generated in the correct location.  
 At some point in the future this will be broken out into a separate manifest call to be run prior as a setup step.  
 
+#### Errors
+> Error: /usr/local/bin/retrieve-all-plugins.sh /home/vagrant/backup/Plugins/ /var/lib/jenkins/plugins/ >> /var/lib/jenkins/logs/retrieve-all-plugins.sh.log 2>&1 returned 1 instead of one of [0]
+
+Open the log file `/var/lib/jenkins/logs/retrieve-all-plugins.sh.log`  
+The log file contents can look something like this:
+```
+/usr/local/bin/retrieve-all-plugins.sh: line 47: /home/vagrant/backup/Plugins/ssh-credentials.md5: Permission denied
+/home/vagrant/backup/Plugins/ssh-credentials.hpi: FAILED
+md5sum: WARNING: 1 computed checksum did NOT match
+[/usr/local/bin/retrieve-all-plugins.sh] Hash does not match downloaded file, check that you have the correct version and hash on your back up file.
+```
+You need to update the permissions on the Plugins directory it reads from.  
+```
+sudo chmod 777 -R /home/vagrant/backup/Plugins/
+```
 ### Credentials.xml
 How is the github token encrypted?
 Using a secret specific to the jenkins install.
@@ -44,19 +59,19 @@ If the token cannot be decrypted then Jenkins will assume that the token is in p
 ## Usage
 First time manual setup can be declared via the *jenkins* class:
 ```
-	class {'jenkins':
-      perform_manual_setup => true,
-      plugin_backup => "/vagrant/backup/test/",
-    }
+class {'jenkins':
+  perform_manual_setup => true,
+  plugin_backup => "/vagrant/backup/test/",
+}
 ```
 The `plugin_backup` location is where the back up script will store the plugin archives and the generated plugins.txt.
 
 Automatic setup from a previous backup:
 ```
-	class {'jenkins':
-      perform_manual_setup => false,
-      plugin_backup => "/vagrant/backup/test/",
-    }
+class {'jenkins':
+  perform_manual_setup => false,
+  plugin_backup => "/vagrant/backup/test/",
+}
 ```
 
 Job backup script:  
