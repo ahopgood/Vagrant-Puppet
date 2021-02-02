@@ -21,12 +21,21 @@ class hiera {
 
   notify {"Puppet file directory ${puppet_file_dir}":}
 
+  if (versioncmp("${clientversion}", "5.0.0") == "-1") {
+    notify{"We're on an old version of puppet [${clientversion}], we will use hiera 3 syntax":}
+    $versioned_location = "puppet/4/"
+  } else {
+    notify{"We're on puppet version greater than 5.0.0 [${clientversion}], we will use hiera 5 syntax":}
+    $versioned_location = "puppet/5/"
+  }
+
+
   file {
     "${hiera_conf}":
     # require    =>  File["${puppet_home}"],
     path       =>  "${puppet_home}${hiera_conf}",
     ensure     =>  present,
-    source     =>  ["puppet:///${puppet_file_dir}${hiera_conf}"],
+    source     =>  ["puppet:///${puppet_file_dir}${versioned_location}${hiera_conf}"],
   }
 
   file {

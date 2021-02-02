@@ -45,4 +45,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.synced_folder "files/keys/", 	"/etc/puppet/hieradata/keys/"
   end
 
+  config.vm.define "Ubuntu_18_test" do |ubuntu|
+    ubuntu.vm.box_check_update = true
+    ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+    ubuntu.vm.box = "reclusive/bionic64-puppet"
+    ubuntu.vm.network "private_network", ip: "192.168.33.28"
+    ubuntu.vm.hostname = "jenkins.ubuntu.vm"
+    ubuntu.vm.box_version = "0.0.2020-12-01-0200"
+    ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
+    #ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
+    ubuntu.vm.synced_folder "files/keys/", 	"/etc/puppet/hieradata/keys/"
+  end
 end
