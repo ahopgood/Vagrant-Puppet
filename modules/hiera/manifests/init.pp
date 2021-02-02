@@ -29,7 +29,6 @@ class hiera {
     $versioned_location = "puppet/5/"
   }
 
-
   file {
     "${hiera_conf}":
     # require    =>  File["${puppet_home}"],
