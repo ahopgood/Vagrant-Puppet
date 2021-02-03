@@ -47,6 +47,13 @@ class{'augeas':}
 ->
 class{"augeas::xmlstarlet":}
 ->
+class{"hiera":}
+->
+class{"hiera::eyaml":
+  private_key_file => "private_key.pkcs7.pem",
+  public_key_file => "public_key.pkcs7.pem",
+}
+->
 class {'jenkins':
   major_version => "2",
   minor_version => "204",
@@ -57,13 +64,6 @@ class {'jenkins':
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
   jenkins_host_address => "http://jenkins.alexanderhopgood.com/",
-}
-->
-class{"hiera":}
-->
-class{"hiera::eyaml":
-  private_key_file => "private_key.pkcs7.pem",
-  public_key_file => "public_key.pkcs7.pem",
 }
 ->
 jenkins::credentials::gitCredentials{"git-api-token":
