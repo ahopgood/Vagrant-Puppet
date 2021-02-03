@@ -2,6 +2,8 @@ class pandoc::ubuntu::bionic {
   $package_type=$pandoc::package_type
   $puppet_file_dir=$pandoc::puppet_file_dir
 
+  include linux::ubuntu::bionic::deps
+
   $fonts_lmodern_file_name = "fonts-lmodern_2.004.5-3_all.deb"
   $fonts_lmodern_package_name = "fonts-lmodern"
   @file { "${fonts_lmodern_file_name}":
@@ -325,21 +327,25 @@ class pandoc::ubuntu::bionic {
     ]
   }
 
-  $libxrender1_file_name = "libxrender1_1%3a0.9.10-1_amd64.deb"
-  $libxrender1_package_name = "libxrender1"
-  file { "${libxrender1_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${libxrender1_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxrender1_file_name}",
-  }
-  package { "${libxrender1_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxrender1_file_name}",
-    require  => [
-      File["${libxrender1_file_name}"],
-    ]
-  }
+  realize(
+    Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libxrender1_file_name}"]
+  )
+  # $libxrender1_file_name = "libxrender1_1%3a0.9.10-1_amd64.deb"
+  # $libxrender1_package_name = "libxrender1"
+  # file { "${libxrender1_file_name}":
+  #   ensure => present,
+  #   path   => "${local_install_dir}${libxrender1_file_name}",
+  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxrender1_file_name}",
+  # }
+  # package { "${libxrender1_package_name}":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${libxrender1_file_name}",
+  #   require  => [
+  #     File["${libxrender1_file_name}"],
+  #   ]
+  # }
 
   $libcairo2_file_name = "libcairo2_1.15.10-2ubuntu0.1_amd64.deb"
   $libcairo2_package_name = "libcairo2"
@@ -358,7 +364,7 @@ class pandoc::ubuntu::bionic {
       Package["${libpixman_1_0_package_name}"],
       Package["${libxcb_render0_package_name}"],
       Package["${libxcb_shm0_package_name}"],
-      Package["${libxrender1_package_name}"],
+      Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
     ]
   }
 
@@ -719,21 +725,25 @@ class pandoc::ubuntu::bionic {
     ]
   }
 
-  $x11_common_file_name = "x11-common_1%3a7.7+19ubuntu7.1_all.deb"
-  $x11_common_package_name = "x11-common"
-  file { "${x11_common_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${x11_common_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}",
-  }
-  package { "${x11_common_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${x11_common_file_name}",
-    require  => [
-      File["${x11_common_file_name}"],
-    ]
-  }
+  realize(Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"],
+    File["${linux::ubuntu::bionic::deps::x11_common_file_name}"]
+  )
+
+  # $x11_common_file_name = "x11-common_1%3a7.7+19ubuntu7.1_all.deb"
+  # $x11_common_package_name = "x11-common"
+  # file { "${x11_common_file_name}":
+  #   ensure => present,
+  #   path   => "${local_install_dir}${x11_common_file_name}",
+  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}",
+  # }
+  # package { "${x11_common_package_name}":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${x11_common_file_name}",
+  #   require  => [
+  #     File["${x11_common_file_name}"],
+  #   ]
+  # }
 
   $libice6_file_name = "libice6_2%3a1.0.9-2_amd64.deb"
   $libice6_package_name = "libice6"
@@ -748,7 +758,7 @@ class pandoc::ubuntu::bionic {
     source   => "${local_install_dir}${libice6_file_name}",
     require  => [
       File["${libice6_file_name}"],
-      Package["${x11_common_package_name}"],
+      Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"],
     ]
   }
 
@@ -838,21 +848,25 @@ class pandoc::ubuntu::bionic {
     ]
   }
 
-  $libxi6_file_name = "libxi6_2%3a1.7.9-1_amd64.deb"
-  $libxi6_package_name = "libxi6"
-  file { "${libxi6_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${libxi6_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}",
-  }
-  package { "${libxi6_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libxi6_file_name}",
-    require  => [
-      File["${libxi6_file_name}"],
-    ]
-  }
+  realize(
+    Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libxi6_file_name}"]
+  )
+  # $libxi6_file_name = "libxi6_2%3a1.7.9-1_amd64.deb"
+  # $libxi6_package_name = "libxi6"
+  # file { "${libxi6_file_name}":
+  #   ensure => present,
+  #   path   => "${local_install_dir}${libxi6_file_name}",
+  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}",
+  # }
+  # package { "${libxi6_package_name}":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${libxi6_file_name}",
+  #   require  => [
+  #     File["${libxi6_file_name}"],
+  #   ]
+  # }
 
   $libzzip_0_13_file_name = "libzzip-0-13_0.13.62-3.1ubuntu0.18.04.1_amd64.deb"
   $libzzip_0_13_package_name = "libzzip-0-13"
@@ -898,7 +912,7 @@ class pandoc::ubuntu::bionic {
       Package["${libpoppler73_package_name}"],
       Package["${libpotrace0_package_name}"],
       Package["${libxaw7_package_name}"],
-      Package["${libxi6_package_name}"],
+      Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
     ]
   }
 

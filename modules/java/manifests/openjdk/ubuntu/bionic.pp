@@ -56,9 +56,13 @@ define java::openjdk::ubuntu::bionic(
   )
 
   include linux::ubuntu::bionic::deps
-  realize(Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"], File["${linux::ubuntu::bionic::deps::x11_common_file_name}"])
-  realize(Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"], File["${linux::ubuntu::bionic::deps::libxrender1_file_name}"])
-  realize(Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"], File["${linux::ubuntu::bionic::deps::libxi6_file_name}"])
+  realize(Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"],
+    File["${linux::ubuntu::bionic::deps::x11_common_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libxrender1_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libxi6_file_name}"]
+  )
 
   if (versioncmp("${major_version}", "8") == 0) {
     $updateExtension = {
