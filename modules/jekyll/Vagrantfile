@@ -68,7 +68,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ubuntu.vm.box_check_update = true
         ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
         ubuntu.vm.box = "reclusive/bionic64-puppet"
-        ubuntu.vm.box_version = "0.0.4"
+        #ubuntu.vm.box_version = "0.0.2020-05-06-0100"
         ubuntu.vm.network "private_network", ip: "192.168.33.28"
         ubuntu.vm.hostname = "ubuntu-18"
         ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/support/"
@@ -81,24 +81,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         SHELL
     end
 
-    config.vm.define "test" do |ubuntu|
+    config.vm.define "blog-test" do |ubuntu|
         ubuntu.vm.box_check_update = false
         ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
-        ubuntu.vm.box = "jekyll-4"
+        ubuntu.vm.box = "reclusive/jekyll4"
         ubuntu.vm.network "private_network", ip: "192.168.33.28"
         ubuntu.vm.hostname = "ubuntu-18"
 #        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
         ubuntu.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
         ubuntu.vm.synced_folder "published_blog", "/published_blog"
-
-#        ubuntu.vm.provision "shell", inline: <<-SHELL
-#            echo "Running shell provisioner"
-#            sudo systemctl start jekyll
-#        SHELL
-
-#        ubuntu.vm.provision "shell", inline: <<-SHELL
-#            echo "Running shell provisioner"
-#            sudo puppet apply --modulepath=/etc/puppet/modules/ /vagrant/manifests/jekyll.pp
-#        SHELL
     end
 end

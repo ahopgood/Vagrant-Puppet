@@ -96,10 +96,18 @@ class hiera::eyaml(
     require => File["${eyaml_keys}"]
   }
 
+  if (versioncmp("${clientversion}", "5.0.0") == "-1") {
+    notify{"We're on an old version of puppet [${clientversion}], we will use hiera 3 syntax for eyaml":}
+    $versioned_location = "puppet/4/"
+  } else {
+    notify{"We're on puppet version greater than 5.0.0 [${clientversion}], we will use hiera 5 syntax for eyaml":}
+    $versioned_location = "puppet/5/"
+  }
+
   file {"${puppet_home}heira-eyaml.yaml":
     ensure => present,
     path => "${puppet_home}hiera-eyaml.yaml",
-    content => template("${module_name}/hiera-eyaml.yaml.erb"),
+    content => template("${module_name}/${versioned_location}hiera-eyaml.yaml.erb"),
     # owner => "puppet",
     # group => "puppet",
     mode => "0777",
