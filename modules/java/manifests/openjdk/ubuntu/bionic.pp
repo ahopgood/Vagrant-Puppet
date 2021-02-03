@@ -51,14 +51,8 @@ define java::openjdk::ubuntu::bionic(
     File["${java::openjdk::ubuntu::bionic::deps::java_common_file_name}"],
     Package["${java::openjdk::ubuntu::bionic::deps::libasound2_package_name}"],
     File["${java::openjdk::ubuntu::bionic::deps::libasound2_file_name}"],
-    # Package["${java::openjdk::ubuntu::bionic::deps::libxi6_package_name}"],
-    # File["${java::openjdk::ubuntu::bionic::deps::libxi6_file_name}"],
     Package["${java::openjdk::ubuntu::bionic::deps::libxtst6_package_name}"],
     File["${java::openjdk::ubuntu::bionic::deps::libxtst6_file_name}"],
-    # Package["${java::openjdk::ubuntu::bionic::deps::libxrender1_package_name}"],
-    # File["${java::openjdk::ubuntu::bionic::deps::libxrender1_file_name}"],
-    # Package["${java::openjdk::ubuntu::bionic::deps::x11_common_package_name}"],
-    # File["${java::openjdk::ubuntu::bionic::deps::x11_common_file_name}"],
   )
 
   include linux::ubuntu::bionic::deps
@@ -140,14 +134,8 @@ class java::openjdk::ubuntu::bionic::deps {
   $java_common_package_name = "java-common"
   $libxtst6_file_name = "libxtst6_2%3a1.2.3-1_amd64.deb"
   $libxtst6_package_name = "libxtst6"
-  # $libxrender1_file_name = "libxrender1_1%3a0.9.10-1_amd64.deb"
-  # $libxrender1_package_name = "libxrender1"
-  # $libxi6_file_name = "libxi6_2%3a1.7.9-1_amd64.deb"
-  # $libxi6_package_name = "libxi6"
   $libasound2_file_name = "libasound2_1.1.3-5ubuntu0.2_amd64.deb"
   $libasound2_package_name = "libasound2"
-  # $x11_common_file_name = "x11-common_1%3a7.7+19ubuntu7.1_all.deb"
-  # $x11_common_package_name = "x11-common"
   $libasound2_data_file_name = "libasound2-data_1.1.3-5ubuntu0.2_all.deb"
   $libasound2_data_package_name = "libasound2-data"
   include linux::ubuntu::bionic::deps
@@ -166,21 +154,6 @@ class java::openjdk::ubuntu::bionic::deps {
     ]
   }
 
-  # @file { "${x11_common_file_name}":
-  #   ensure => present,
-  #   path   => "${local_install_dir}${x11_common_file_name}",
-  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${x11_common_file_name}",
-  # }
-  # @package { "${x11_common_package_name}":
-  #   ensure   => present,
-  #   provider => dpkg,
-  #   source   => "${local_install_dir}${x11_common_file_name}",
-  #   require  => [
-  #     File["${x11_common_file_name}"],
-  #   ]
-  # }
-
-
   @file { "${libxtst6_file_name}":
     ensure => present,
     path   => "${local_install_dir}${libxtst6_file_name}",
@@ -195,34 +168,6 @@ class java::openjdk::ubuntu::bionic::deps {
       Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"],
     ]
   }
-
-  # @file { "${libxrender1_file_name}":
-  #   ensure => present,
-  #   path   => "${local_install_dir}${libxrender1_file_name}",
-  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxrender1_file_name}",
-  # }
-  # @package { "${libxrender1_package_name}":
-  #   ensure   => present,
-  #   provider => dpkg,
-  #   source   => "${local_install_dir}${libxrender1_file_name}",
-  #   require  => [
-  #     File["${libxrender1_file_name}"],
-  #   ]
-  # }
-  #
-  # @file { "${libxi6_file_name}":
-  #   ensure => present,
-  #   path   => "${local_install_dir}${libxi6_file_name}",
-  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxi6_file_name}",
-  # }
-  # @package { "${libxi6_package_name}":
-  #   ensure   => present,
-  #   provider => dpkg,
-  #   source   => "${local_install_dir}${libxi6_file_name}",
-  #   require  => [
-  #     File["${libxi6_file_name}"],
-  #   ]
-  # }
 
   file { "${libasound2_data_file_name}":
     ensure => present,
