@@ -56,8 +56,8 @@ class{"hiera::eyaml":
 ->
 class {'jenkins':
   major_version => "2",
-  minor_version => "204",
-  patch_version => "6",
+  minor_version => "263",
+  patch_version => "3",
   perform_manual_setup => false,
   plugin_backup_location => "/vagrant/backup/plugins/11-plugins/",
   java_major_version => "${java_major_version}",
@@ -112,7 +112,7 @@ pandoc::texlive_latex_extra{"texlive-latex-extra":}
 pandoc::lmodern{"lmodern":}
 ->
 Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Pandoc Dos2Unix"
+  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix"
 }
 ->
 class {"dos2unix":}
