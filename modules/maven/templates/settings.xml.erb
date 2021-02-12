@@ -1,0 +1,58 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+					  https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <servers>
+    <server>
+      <id>central</id>
+      <username><%= @user %></username>
+      <password><%= @password %></password>
+    </server>
+    <server>
+      <id>snapshots</id>
+      <username><%= @user %></username>
+      <password><%= @password %></password>
+    </server>
+  </servers>
+
+  <profiles>
+    <profile>
+      <id>artifactory</id>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name><%= @repository_name %></name>
+          <url><%= @repository_address %></url>
+        </repository>
+        <repository>
+          <snapshots />
+          <id>snapshots</id>
+          <name><%= @repository_name %></name>
+          <url><%= @repository_address %></url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name><%= @repository_name %></name>
+          <url><%= @repository_address %></url>
+        </pluginRepository>
+        <pluginRepository>
+          <snapshots />
+          <id>snapshots</id>
+          <name><%= @repository_name %></name>
+          <url><%= @repository_address %></url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  <activeProfiles>
+    <activeProfile>artifactory</activeProfile>
+  </activeProfiles>
+</settings>
