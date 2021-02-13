@@ -59,7 +59,7 @@ class {'jenkins':
   minor_version => "263",
   patch_version => "3",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/11-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/2021-02-07-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",

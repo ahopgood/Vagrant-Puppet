@@ -88,9 +88,9 @@ define java::openjdk::ubuntu::bionic(
         File["${adoptopenjdk_8_hotspot_file_name}"],
         Package["${java::openjdk::ubuntu::bionic::deps::java_common_package_name}"],
         Package["${java::openjdk::ubuntu::bionic::deps::libasound2_package_name}"],
-        Package["${java::openjdk::ubuntu::bionic::deps::libxi6_package_name}"],
+        Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
         Package["${java::openjdk::ubuntu::bionic::deps::libxtst6_package_name}"],
-        Package["${java::openjdk::ubuntu::bionic::deps::libxrender1_package_name}"],
+        Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
       ]
     }
   } elsif (versioncmp("${major_version}", "11") == 0) {
