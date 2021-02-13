@@ -25,18 +25,27 @@ class { 'maven':
   patch_version => $maven_patch_version,
 }
 ->
+class{"hiera":}
+->
+class{"hiera::eyaml":
+  private_key_file => "private_key.pkcs7.pem",
+  public_key_file => "public_key.pkcs7.pem",
+}
+->
 maven::repository {"vagrant repository":
   user => "vagrant"
 }
 ->
 maven::repository::settings {"vagrant settings":
   user => "vagrant",
-  password => "test",
+  password => hiera('maven::repository::settings::server::password',''),
   repository_name => "reclusive-repo",
   repository_address => "https://artifactory.alexanderhopgood.com/artifactory/reclusive-repo",
 }
 ->
 maven::repository::settings::security {"vagrant settings security":
   user => "vagrant",
-  master_password => "fhfhfh",
+  master_password => hiera('maven::repository::settings::security::master_password',''),
 }
+
+# sudo puppet apply --modulepath=/etc/puppet/modules/ --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/tests/maven3_settings.pp
