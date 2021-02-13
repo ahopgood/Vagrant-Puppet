@@ -5,6 +5,39 @@ Supports Ubuntu:
  * 18.04  
 
 Currently only support major version multiple tenancy, e.g. maven 2 side by side with maven 3.
+
+## Repository Module
+The repository directory is a **require** clause for both `settings.xml` and `settings-security.xml`
+```
+maven::repository {"vagrant repository":
+  user => "vagrant"
+}
+```
+It is **strongly** recommended you use hiera **and** eyaml to look and encrypt/decrypt (respectively) the passwords you use for maven.   
+### Settings.xml
+The `maven::repository::settings` allows for the generation of the settings.xml file in the `~/.m2/` repository directory for the specified user.  
+The module will populate a template with values for:
+* a `central` and a `snaphots` server entries containing the `username` and `password` for the remote repository servers
+* a maven profile for `artifactory`, activated by default
+* a `central` and a `snaphots` repository entries, these map to use the credentials found in the above servers
+* a `central` and a `snaphots` plugin repository entries, these map to use the credentials found in the above servers
+```
+maven::repository::settings {"vagrant settings":
+  user => "vagrant",
+  password => "test",
+  repository_name => "reclusive-repo",
+  repository_address => "https://artifactory.alexanderhopgood.com/artifactory/reclusive-repo",
+}
+```
+### Settings-Security.xml
+The `maven::repository::settings::secruity` allows for the generation of the settings-security.xml file in the `~/.m2/` repository directory for the specified user.
+The module will populate a template with a value for the master password used to encrypt user/server passwords in the regular `settings.xml` file.
+```
+maven::repository::settings::security {"vagrant settings security":
+  user => "vagrant",
+  master_password => hiera('maven::repository::settings::security::master_password',''),
+}
+```
 ## To Do
 * Improve readme
     * Information on alternatives support
