@@ -22,6 +22,9 @@ $java_update_version = "6"
 $maven_major_version="3"
 $maven_minor_version="5"
 $maven_patch_version="2"
+
+$username = "jenkins";
+
 file {
   "/etc/puppet/installers/":
     ensure     =>  directory,
@@ -101,6 +104,22 @@ jenkins::global::maven{"maven-global-setup":
   major_version => $maven_major_version,
   minor_version => $maven_minor_version,
   patch_version => $maven_patch_version,
+}
+->
+maven::repository {"vagrant repository":
+  user => $username
+}
+->
+maven::repository::settings {"vagrant settings":
+  user => $username,
+  password => hiera('maven::repository::settings::server::password',''),
+  repository_name => "reclusive-repo",
+  repository_address => "https://artifactory.alexanderhopgood.com/artifactory/reclusive-repo",
+}
+->
+maven::repository::settings::security {"vagrant settings security":
+  user => $username,
+  master_password => hiera('maven::repository::settings::security::master_password',''),
 }
 ->
 class{"pandoc":}
