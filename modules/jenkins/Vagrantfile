@@ -57,7 +57,7 @@ Vagrant.configure(2) do |config|
     ubuntu.vm.box = "reclusive/bionic64-puppet"
     ubuntu.vm.network "private_network", ip: "192.168.33.28"
     ubuntu.vm.hostname = "jenkins.ubuntu.vm"
-    ubuntu.vm.box_version = "0.0.2020-12-01-0200"
+    ubuntu.vm.box_version = "0.0.2021-03-01-2051"
     ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
     ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
     ubuntu.vm.provision "shell", inline: <<-SHELL

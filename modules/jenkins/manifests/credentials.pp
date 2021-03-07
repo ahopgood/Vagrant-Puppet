@@ -87,3 +87,39 @@ define jenkins::credentials::gitCredentials(
     filepath => "${jenkins::credentials::credentials_file}"
   }
 }
+
+define jenkins::credentials::dockerRegistryCredentials(
+  $registryPassword = hiera('jenkins::dockerRegistry::credentials::password','test-password'),
+  $registryUsername = hiera('jenkins::dockerRegistry::credentials::username','test-username'),
+  $credentialsName = "docker",
+  $registryAddress = hiera('jenkins::dockerRegistry::address', 'test-address')
+#   https://registry.test.alexanderhopgood.com
+) {
+  include jenkins::credentials
+  realize(File["${jenkins::credentials::credentials_file}"])
+  realize(Augeas["jenkins_credentials_config"])
+
+  $context = '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[2]/'
+  augeas { 'jenkins_docker_registry_credentials_config ${credentialsName}':
+    show_diff => true,
+    incl      => "${jenkins::credentials::credentials_file}",
+    lens      => 'Xml.lns',
+    context   => "${context}",
+    onlyif   => "get ${context}/password/#text != ${registryPassword}",
+    require   => [File["${jenkins::credentials::credentials_file}"],
+      Augeas["jenkins_credentials_config"],
+      Package["jenkins"]
+    ],
+    changes   => [
+      "set scope/#text \"SYSTEM\"",
+      "set id/#text \"${credentialsName}\"",
+      "set description/#text \"${registryAddress}\"",
+      "set username/#text \"${registryUsername}\"",
+      "set password/#text \"${registryPassword}\"",
+    ]
+  }
+  ->
+  augeas::formatXML{"format ${jenkins::credentials::credentials_file} jenkins_docker_registry_credentials_config ${credentialsName}":
+    filepath => "${jenkins::credentials::credentials_file}"
+  }
+}
