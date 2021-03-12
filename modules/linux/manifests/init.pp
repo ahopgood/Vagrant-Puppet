@@ -52,6 +52,13 @@ class linux::ubuntu::bionic::deps {
   $libxi6_file_name = "libxi6_2%3a1.7.9-1_amd64.deb"
   $libxi6_package_name = "libxi6"
 
+  $fontconfig_file_name = "fontconfig_2.12.6-0ubuntu2_amd64.deb"
+  $fontconfig_package_name = "fontconfig"
+  $fontconfig_config_file_name = "fontconfig-config_2.12.6-0ubuntu2_all.deb"
+  $fontconfig_config_package_name = "fontconfig-config"
+  $libfontconfig1_file_name = "libfontconfig1_2.12.6-0ubuntu2_amd64.deb"
+  $libfontconfig1_package_name = "libfontconfig1"
+
   @file { "${x11_common_file_name}":
     ensure => present,
     path   => "${local_install_dir}${x11_common_file_name}",
@@ -93,5 +100,68 @@ class linux::ubuntu::bionic::deps {
       File["${libxi6_file_name}"],
     ]
   }
+
+  $fonts_liberation_file_name = "fonts-liberation_1%3a1.07.4-7~18.04.1_all.deb"
+  $fonts_liberation_package_name = "fonts-liberation"
+  @file { "${fonts_liberation_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fonts_liberation_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_liberation_file_name}",
+  }
+  @package { "${fonts_liberation_package_name}":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fonts_liberation_file_name}",
+    require  => [
+      File["${fonts_liberation_file_name}"],
+    ]
+  }
+
+  @file { "${fontconfig_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fontconfig_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fontconfig_file_name}",
+  }
+  @package { "${fontconfig_package_name}":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fontconfig_file_name}",
+    require  => [
+      File["${fontconfig_file_name}"],
+      Package["${linux::ubuntu::bionic::deps::fontconfig_config_package_name}"],
+      Package["${linux::ubuntu::bionic::deps::libfontconfig1_package_name}"],
+    ]
+  }
+
+  @file { "${fontconfig_config_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${fontconfig_config_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fontconfig_config_file_name}",
+  }
+  @package { "${fontconfig_config_package_name}":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${fontconfig_config_file_name}",
+    require  => [
+      File["${fontconfig_config_file_name}"],
+      Package["${linux::ubuntu::bionic::deps::fonts_liberation_package_name}"],
+    ]
+  }
+
+  @file { "${libfontconfig1_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libfontconfig1_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libfontconfig1_file_name}",
+  }
+  @package { "${libfontconfig1_package_name}":
+    ensure   => present,
+    provider => dpkg,
+    source   => "${local_install_dir}${libfontconfig1_file_name}",
+    require  => [
+      File["${libfontconfig1_file_name}"],
+      Package["${fontconfig_config_package_name}"],
+    ]
+  }
+
 
 }

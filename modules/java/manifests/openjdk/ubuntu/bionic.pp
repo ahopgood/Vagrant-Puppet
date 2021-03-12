@@ -55,13 +55,22 @@ define java::openjdk::ubuntu::bionic(
     File["${java::openjdk::ubuntu::bionic::deps::libxtst6_file_name}"],
   )
 
+  notify{"${linux::ubuntu::bionic::deps::fontconfig_package_name}":}
   include linux::ubuntu::bionic::deps
   realize(Package["${linux::ubuntu::bionic::deps::x11_common_package_name}"],
     File["${linux::ubuntu::bionic::deps::x11_common_file_name}"],
     Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
     File["${linux::ubuntu::bionic::deps::libxrender1_file_name}"],
     Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
-    File["${linux::ubuntu::bionic::deps::libxi6_file_name}"]
+    File["${linux::ubuntu::bionic::deps::libxi6_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::fontconfig_package_name}"],
+    File["${linux::ubuntu::bionic::deps::fontconfig_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::libfontconfig1_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libfontconfig1_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::fontconfig_config_package_name}"],
+    File["${linux::ubuntu::bionic::deps::fontconfig_config_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::fonts_liberation_package_name}"],
+    File["${linux::ubuntu::bionic::deps::fonts_liberation_file_name}"],
   )
 
   if (versioncmp("${major_version}", "8") == 0) {
@@ -91,6 +100,7 @@ define java::openjdk::ubuntu::bionic(
         Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
         Package["${java::openjdk::ubuntu::bionic::deps::libxtst6_package_name}"],
         Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
+        Package["${linux::ubuntu::bionic::deps::fontconfig_file_name}"],
       ]
     }
   } elsif (versioncmp("${major_version}", "11") == 0) {
@@ -121,6 +131,7 @@ define java::openjdk::ubuntu::bionic(
         Package["${linux::ubuntu::bionic::deps::libxi6_package_name}"],
         Package["${java::openjdk::ubuntu::bionic::deps::libxtst6_package_name}"],
         Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
+        Package["${linux::ubuntu::bionic::deps::fontconfig_package_name}"],
       ]
     }
   } else {
