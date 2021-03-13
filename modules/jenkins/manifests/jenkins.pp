@@ -76,7 +76,10 @@ jenkins::credentials::gitCredentials{"git-api-token":
 jenkins::credentials::ssh{"jenkins-ssh":
   key_name => "jenkins",
   ssh_creds_name => "jenkins_ssh"
-}->
+}
+->
+jenkins::credentials::dockerRegistryCredentials{"docker-registry-creds":}
+->
 jenkins::seed_job{"seed-dsl":
   github_credentials_name => "github_token",
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
@@ -122,6 +125,12 @@ maven::repository::settings::security {"vagrant settings security":
   master_password => hiera('maven::repository::settings::security::master_password',''),
 }
 ->
+jenkins::docker::global{"docker-global-setup":}
+->
+jenkins::docker::workflow{"docker-workflow-setup":}
+->
+jenkins::docker::group{"Adding Jenkins to docker group":}
+->
 class{"pandoc":}
 ->
 pandoc::texlive_fonts_recommended{"texlive-fonts-recommended":}
@@ -131,7 +140,7 @@ pandoc::texlive_latex_extra{"texlive-latex-extra":}
 pandoc::lmodern{"lmodern":}
 ->
 Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix"
+  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker"
 }
 ->
 class {"dos2unix":}
@@ -139,7 +148,7 @@ class {"dos2unix":}
 jenkins::global::reload::config{"set labels":
   password => "admin"
 }
-# ->
-# jenkins::global::restart{"restart":
-#   password => "admin"
-# }
+# # ->
+# # jenkins::global::restart{"restart":
+# #   password => "admin"
+# # }

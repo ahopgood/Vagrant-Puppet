@@ -214,21 +214,11 @@ class pandoc::ubuntu::bionic {
     ]
   }
 
-  $fonts_liberation_file_name = "fonts-liberation_1%3a1.07.4-7~18.04.1_all.deb"
-  $fonts_liberation_package_name = "fonts-liberation"
-  file { "${fonts_liberation_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${fonts_liberation_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fonts_liberation_file_name}",
-  }
-  package { "${fonts_liberation_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${fonts_liberation_file_name}",
-    require  => [
-      File["${fonts_liberation_file_name}"],
-    ]
-  }
+  $fonts_liberation_package_name = "${linux::ubuntu::bionic::deps::fonts_liberation_package_name}"
+  realize(
+    Package["${linux::ubuntu::bionic::deps::fonts_liberation_package_name}"],
+    File["${linux::ubuntu::bionic::deps::fonts_liberation_file_name}"],
+  )
 
   $libgraphite2_3_file_name = "libgraphite2-3_1.3.11-2_amd64.deb"
   $libgraphite2_3_package_name = "libgraphite2-3"
@@ -246,38 +236,15 @@ class pandoc::ubuntu::bionic {
     ]
   }
 
-  $fontconfig_config_file_name = "fontconfig-config_2.12.6-0ubuntu2_all.deb"
-  $fontconfig_config_package_name = "fontconfig-config"
-  file { "${fontconfig_config_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${fontconfig_config_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${fontconfig_config_file_name}",
-  }
-  package { "${fontconfig_config_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${fontconfig_config_file_name}",
-    require  => [
-      File["${fontconfig_config_file_name}"],
-    ]
-  }
+  $fontconfig_config_package_name = "${linux::ubuntu::bionic::deps::fontconfig_config_package_name}"
+  $libfontconfig1_package_name = "${linux::ubuntu::bionic::deps::libfontconfig1_package_name}"
 
-  $libfontconfig1_file_name = "libfontconfig1_2.12.6-0ubuntu2_amd64.deb"
-  $libfontconfig1_package_name = "libfontconfig1"
-  file { "${libfontconfig1_file_name}":
-    ensure => present,
-    path   => "${local_install_dir}${libfontconfig1_file_name}",
-    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libfontconfig1_file_name}",
-  }
-  package { "${libfontconfig1_package_name}":
-    ensure   => present,
-    provider => dpkg,
-    source   => "${local_install_dir}${libfontconfig1_file_name}",
-    require  => [
-      File["${libfontconfig1_file_name}"],
-      Package["${fontconfig_config_package_name}"],
-    ]
-  }
+  realize(
+    Package["${linux::ubuntu::bionic::deps::libfontconfig1_package_name}"],
+    File["${linux::ubuntu::bionic::deps::libfontconfig1_file_name}"],
+    Package["${linux::ubuntu::bionic::deps::fontconfig_config_package_name}"],
+    File["${linux::ubuntu::bionic::deps::fontconfig_config_file_name}"],
+  )
 
   $libpixman_1_0_file_name = "libpixman-1-0_0.34.0-2_amd64.deb"
   $libpixman_1_0_package_name = "libpixman-1-0"
@@ -331,21 +298,6 @@ class pandoc::ubuntu::bionic {
     Package["${linux::ubuntu::bionic::deps::libxrender1_package_name}"],
     File["${linux::ubuntu::bionic::deps::libxrender1_file_name}"]
   )
-  # $libxrender1_file_name = "libxrender1_1%3a0.9.10-1_amd64.deb"
-  # $libxrender1_package_name = "libxrender1"
-  # file { "${libxrender1_file_name}":
-  #   ensure => present,
-  #   path   => "${local_install_dir}${libxrender1_file_name}",
-  #   source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libxrender1_file_name}",
-  # }
-  # package { "${libxrender1_package_name}":
-  #   ensure   => present,
-  #   provider => dpkg,
-  #   source   => "${local_install_dir}${libxrender1_file_name}",
-  #   require  => [
-  #     File["${libxrender1_file_name}"],
-  #   ]
-  # }
 
   $libcairo2_file_name = "libcairo2_1.15.10-2ubuntu0.1_amd64.deb"
   $libcairo2_package_name = "libcairo2"
