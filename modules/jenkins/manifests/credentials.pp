@@ -93,7 +93,6 @@ define jenkins::credentials::dockerRegistryCredentials(
   $registryUsername = hiera('jenkins::dockerRegistry::credentials::username','test-username'),
   $credentialsName = "docker",
   $registryAddress = hiera('jenkins::dockerRegistry::address', 'test-address')
-#   https://registry.test.alexanderhopgood.com
 ) {
   include jenkins::credentials
   realize(File["${jenkins::credentials::credentials_file}"])
@@ -111,7 +110,7 @@ define jenkins::credentials::dockerRegistryCredentials(
       Package["jenkins"]
     ],
     changes   => [
-      "set scope/#text \"SYSTEM\"",
+      "set scope/#text \"GLOBAL\"",
       "set id/#text \"${credentialsName}\"",
       "set description/#text \"${registryAddress}\"",
       "set username/#text \"${registryUsername}\"",

@@ -62,7 +62,14 @@ Vagrant.configure(2) do |config|
     ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
     ubuntu.vm.provision "shell", inline: <<-SHELL
     	echo "Running shell provisioner"
+    	sudo lvextend -L+5G /dev/ubuntu-vg/ubuntu-lv
+        sudo resize2fs  /dev/ubuntu-vg/ubuntu-lv
     	sudo sed -i "2i192.168.2.4 artifactory.alexanderhopgood.com" /etc/hosts
+    	# Docker Setup
+    	sudo sed -i "2i192.168.2.4 registry.test.alexanderhopgood.com" /etc/hosts
+    	sudo cp /usr/local/bin/fakelerootx1.crt /usr/local/share/ca-certificates/
+        sudo update-ca-certificates
+        sudo systemctl restart docker
 #    	sudo puppet apply /vagrant/manifests/hiera_setup.pp --modulepath=/etc/puppet/modules/ && sudo puppet apply --modulepath=/etc/puppet/modules/ --hiera_config=/etc/puppet/hiera-eyaml.yaml /vagrant/manifests/jenkins.pp
         echo "Remember to dos2unix the files/*.sh scripts or else things will fail silently!"
     SHELL

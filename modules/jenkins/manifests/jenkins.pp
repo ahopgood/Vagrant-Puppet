@@ -125,6 +125,12 @@ maven::repository::settings::security {"vagrant settings security":
   master_password => hiera('maven::repository::settings::security::master_password',''),
 }
 ->
+jenkins::docker::global{"docker-global-setup":}
+->
+jenkins::docker::workflow{"docker-workflow-setup":}
+->
+jenkins::docker::group{"Adding Jenkins to docker group":}
+->
 class{"pandoc":}
 ->
 pandoc::texlive_fonts_recommended{"texlive-fonts-recommended":}
@@ -142,7 +148,7 @@ class {"dos2unix":}
 jenkins::global::reload::config{"set labels":
   password => "admin"
 }
-# ->
-# jenkins::global::restart{"restart":
-#   password => "admin"
-# }
+# # ->
+# # jenkins::global::restart{"restart":
+# #   password => "admin"
+# # }
