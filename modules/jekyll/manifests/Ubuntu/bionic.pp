@@ -571,8 +571,39 @@ class jekyll::ubuntu::bionic::ruby {
     ]
   }
 
-  $ruby2_5_dev_file_name = "ruby2.5-dev_2.5.1-1ubuntu1.6_amd64.deb"
+  $libruby_file_name = "libruby2.5_2.5.1-1ubuntu1.6_amd64.deb"
+  $libruby_package_name = "libruby2.5"
   $ruby2_5_dev_package_name = "ruby2.5-dev"
+
+  file { "${libruby_file_name}":
+    ensure => present,
+    path   => "${local_install_dir}${libruby_file_name}",
+    source => "puppet:///${puppet_file_dir}${operatingsystem}/${operatingsystemmajrelease}/${libruby_file_name}",
+  }
+
+  exec { "Install ${libruby_package_name} 1ubuntu1.6":
+    path => ["/usr/bin","/bin/", "/sbin/"],
+    command  => "dpkg -i ${local_install_dir}${libruby_file_name}",
+    require => [
+      File["${libruby_file_name}"],
+    ],
+    before => [
+      Package["${ruby2_5_dev_package_name}"],
+      # Package["${libruby_package_name}"],
+    ]
+  }
+
+  # package { "${libruby_package_name}":
+  #   ensure   => present,
+  #   provider => dpkg,
+  #   source   => "${local_install_dir}${libruby_file_name}",
+  #   require  => [
+  #     File["${libruby_file_name}"]
+  #   ]
+  # }
+
+  $ruby2_5_dev_file_name = "ruby2.5-dev_2.5.1-1ubuntu1.6_amd64.deb"
+
   file { "${ruby2_5_dev_file_name}":
     ensure => present,
     path   => "${local_install_dir}${ruby2_5_dev_file_name}",
@@ -585,6 +616,8 @@ class jekyll::ubuntu::bionic::ruby {
     require  => [
       File["${ruby2_5_dev_file_name}"],
       Package["${libgmp_dev_package_name}"],
+      Exec["Install ${libruby_package_name} 1ubuntu1.6"]
+      # Package["${libruby_package_name}"],
     ]
   }
 
@@ -637,7 +670,6 @@ class jekyll::ubuntu::bionic::ruby {
       Package["${ruby2_5_doc_package_name}"],
     ]
   }
-
 
   $ruby_full_package_name = "${jekyll::ubuntu::bionic::ruby_full_package_name}"
   $ruby_full_file_name = "${jekyll::ubuntu::bionic::ruby_full_file_name}"

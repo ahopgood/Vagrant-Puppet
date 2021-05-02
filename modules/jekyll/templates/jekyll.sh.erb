@@ -2,7 +2,7 @@
 
 start() {
   echo "Starting Jekyll..."
-  jekyll serve --host <%= @blog_host_address %> -s <%= @blog_source_directory %> -d <%= @blog_output_directory %> --watch <%= @drafts %> --force_polling 
+  jekyll serve --host <%= @blog_host_address %> -s <%= @blog_source_directory %> -d <%= @blog_output_directory %> --watch <%= @drafts %> <%= @future %> --force_polling
 }
 
 stop() {
