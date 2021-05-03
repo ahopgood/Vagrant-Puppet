@@ -589,18 +589,8 @@ class jekyll::ubuntu::bionic::ruby {
     ],
     before => [
       Package["${ruby2_5_dev_package_name}"],
-      # Package["${libruby_package_name}"],
     ]
   }
-
-  # package { "${libruby_package_name}":
-  #   ensure   => present,
-  #   provider => dpkg,
-  #   source   => "${local_install_dir}${libruby_file_name}",
-  #   require  => [
-  #     File["${libruby_file_name}"]
-  #   ]
-  # }
 
   $ruby2_5_dev_file_name = "ruby2.5-dev_2.5.1-1ubuntu1.6_amd64.deb"
 
