@@ -3,6 +3,7 @@ class jekyll (
   $blog_output_directory = "/published_blog/",
   $blog_host_address = "192.168.33.25",
   $showDrafts = "false",
+  $showFuture = "false"
 ) {
   $local_install_path = "/etc/puppet/"
   $local_install_dir = "${local_install_path}installers/"
@@ -285,6 +286,11 @@ class jekyll (
     $drafts = "--drafts"
   } else {
     $drafts = ""
+  }
+  if ("${showFuture}" == "true"){
+    $future = "--future"
+  } else {
+    $future = ""
   }
 
   #  exec {"stop-jekyll":
