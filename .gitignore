@@ -19,3 +19,4 @@
 /modules/*/files/*.zip
 
 /modules/hiera/files/keys/*.pem
+/modules/jenkins/backup/
