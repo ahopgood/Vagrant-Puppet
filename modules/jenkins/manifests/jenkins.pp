@@ -80,6 +80,13 @@ jenkins::credentials::ssh{"jenkins-ssh":
 ->
 jenkins::credentials::dockerRegistryCredentials{"docker-registry-creds":}
 ->
+jenkins::credentials::dockerRegistryCredentials{"docker-hub-registry-creds":
+  registryPassword => hiera('jenkins::dockerHubRegistry::credentials::password','test-hub-password'),
+  registryUsername => hiera('jenkins::dockerHubRegistry::credentials::username','test-hub-username'),
+  credentialsName => "docker-hub",
+  registryAddress => hiera('jenkins::dockerHubRegistry::address', 'test-hub-address')
+}
+->
 jenkins::seed_job{"seed-dsl":
   github_credentials_name => "github_token",
   github_dsl_job_url => "https://github.com/ahopgood/jenkins-ci.git"
@@ -148,7 +155,7 @@ class {"dos2unix":}
 jenkins::global::reload::config{"set labels":
   password => "admin"
 }
-# # ->
-# # jenkins::global::restart{"restart":
-# #   password => "admin"
-# # }
+# ->
+# jenkins::global::restart{"restart":
+#   password => "admin"
+# }

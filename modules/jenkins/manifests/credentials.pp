@@ -97,24 +97,25 @@ define jenkins::credentials::dockerRegistryCredentials(
   include jenkins::credentials
   realize(File["${jenkins::credentials::credentials_file}"])
   realize(Augeas["jenkins_credentials_config"])
-
-  $context = '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[2]/'
-  augeas { 'jenkins_docker_registry_credentials_config ${credentialsName}':
+  $subContext = '/files/var/lib/jenkins/credentials.xml/com.cloudbees.plugins.credentials.SystemCredentialsProvider/domainCredentialsMap/entry/java.util.concurrent.CopyOnWriteArrayList/'
+  $context = "${subContext}com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last()]/"
+  augeas { "jenkins_docker_registry_credentials_config ${credentialsName}":
     show_diff => true,
     incl      => "${jenkins::credentials::credentials_file}",
     lens      => 'Xml.lns',
-    context   => "${context}",
+    context   => "${subContext}",
     onlyif   => "get ${context}/password/#text != ${registryPassword}",
+    # onlyif   => "get ${subContext}/com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[.]/password/#text != ${registryPassword}",
     require   => [File["${jenkins::credentials::credentials_file}"],
       Augeas["jenkins_credentials_config"],
       Package["jenkins"]
     ],
     changes   => [
-      "set scope/#text \"GLOBAL\"",
-      "set id/#text \"${credentialsName}\"",
-      "set description/#text \"${registryAddress}\"",
-      "set username/#text \"${registryUsername}\"",
-      "set password/#text \"${registryPassword}\"",
+      "set com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last() + 1]/scope/#text \"GLOBAL\"",
+      "set com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last()]/id/#text \"${credentialsName}\"",
+      "set com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last()]/description/#text \"${registryAddress}\"",
+      "set com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last()]/username/#text \"${registryUsername}\"",
+      "set com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl[last()]/password/#text \"${registryPassword}\"",
     ]
   }
   ->
