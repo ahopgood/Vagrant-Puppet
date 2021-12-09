@@ -29,6 +29,6 @@ maven::repository::settings::server::password: ENC[PKCS7,MIIBuQYJKoZIhvcNAQcDoII
 maven::repository::settings::security::master_password: ENC[PKCS7,MIIBuQYJKoZIhvcNAQcDoIIBqjCCAaYCAQAxggEhMIIBHQIBADAFMAACAQEwDQYJKoZIhvcNAQEBBQAEggEANyNXfmau5zFfs9wdIHiPBGhXqHd0bcNnDg41xkDM97nAvyHRstZ8rfKw/8ar6AA7x/02P22Hxq97UvsPFhNPzvPQOauXDRp51EaV3EfQrZdD+r5G6JMoEQIVfvbg9G6RJO23eAuXyAbMcQYSydtax31tkwqWRY2JIG7gIeuTFqV7OmZFwvYMLYNCM+yqHZGlAy3Rpuc6Ox/IfNqAlINKIyQqHTuQaKc5psZJlsVUJjS7Sij8yz8jSs+b5BLOleByIgBc/qr6MiJUvWsrDQgvmXXl/YjJTtXEO2w8i5d/Ka42flVWtmUiWqluQa8XX7l19VI7gMZ71e73PLDdgWY4GjB8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBDYwjyYA6nlx2TR+hMQtpAIgFC5KEiUgmDZ/quOpciSkaZjaYpXOuCMY2aOS1XdwiF6plcI0JgMd9r2NCQ5u8x+OIfCgJJalT3LcpZV+NrTBjkhsleB4Cwow6+oU0xV6al6UQ==]
 
 jenkins::dockerHubRegistry::credentials::name: docker-hub
-jenkins::dockerHubRegistry::credentials::username: altairbob@gmail.com
+jenkins::dockerHubRegistry::credentials::username: altairbob
 jenkins::dockerHubRegistry::credentials::password: fakefakey
 jenkins::dockerHubRegistry::address: hub.docker.com
