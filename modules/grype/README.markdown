@@ -16,7 +16,7 @@ Tested to work on the following operating systems:
 [Ubuntu Known Issues](#Ubuntu_known_issues)
 
 ## Usage 
-/tests/init.pp:
+/tests/init.pp to user default version:
 ```
 $local_install_path = "/etc/puppet/"
 $local_install_dir  = "${local_install_path}installers/"
@@ -27,6 +27,22 @@ file {
 
 include grype
 ```
+/tests/versioned.pp to override default versions:
+```
+$local_install_path = "/etc/puppet/"
+$local_install_dir  = "${local_install_path}installers/"
+file {
+  "${local_install_dir}":
+    ensure => directory,
+}
+
+class { "grype":
+  major_version => "0",
+  minor_version => "29",
+  patch_version => "0"
+}
+```
+
 Running via puppet:
 ```
 sudo puppet apply --modulepath=/etc/puppet/modules/ /tests/init.pp
