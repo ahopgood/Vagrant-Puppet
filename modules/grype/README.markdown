@@ -16,7 +16,7 @@ Tested to work on the following operating systems:
 [Ubuntu Known Issues](#Ubuntu_known_issues)
 
 ## Usage 
-init.pp:
+/tests/init.pp:
 ```
 $local_install_path = "/etc/puppet/"
 $local_install_dir  = "${local_install_path}installers/"
@@ -29,7 +29,7 @@ include grype
 ```
 Running via puppet:
 ```
-sudo puppet apply --module_path=/etc/puppet/modules/ init.pp
+sudo puppet apply --modulepath=/etc/puppet/modules/ /tests/init.pp
 ```
 
 ## Dependencies
