@@ -58,7 +58,7 @@ Vagrant.configure(2) do |config|
     ubuntu.vm.network "private_network", ip: "192.168.33.28"
     ubuntu.vm.hostname = "jenkins.ubuntu.vm"
     ubuntu.vm.box_version = "0.0.2021-03-01-2051"
-    ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
+    ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/support/"
     ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
     ubuntu.vm.provision "shell", inline: <<-SHELL
     	echo "Running shell provisioner"
@@ -66,7 +66,7 @@ Vagrant.configure(2) do |config|
         sudo resize2fs  /dev/ubuntu-vg/ubuntu-lv
     	sudo sed -i "2i192.168.2.4 artifactory.alexanderhopgood.com" /etc/hosts
     	# Docker Setup
-    	sudo sed -i "2i192.168.2.4 registry.test.alexanderhopgood.com" /etc/hosts
+    	sudo sed -i "2i192.168.2.5 registry.test.alexanderhopgood.com" /etc/hosts
     	sudo cp /usr/local/bin/fakelerootx1.crt /usr/local/share/ca-certificates/
         sudo update-ca-certificates
         sudo systemctl restart docker

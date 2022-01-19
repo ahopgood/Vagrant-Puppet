@@ -147,10 +147,12 @@ pandoc::texlive_latex_extra{"texlive-latex-extra":}
 pandoc::lmodern{"lmodern":}
 ->
 Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker"
+  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker Grype"
 }
 ->
 class {"dos2unix":}
+->
+class {"grype" : }
 ->
 jenkins::global::reload::config{"set labels":
   password => "admin"

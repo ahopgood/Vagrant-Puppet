@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+    config.vm.box = "base"
+    config.vm.box_check_update = false
+
+    config.ssh.insert_key = false
+    config.vm.synced_folder "../", "/etc/puppet/modules"
+
+    config.vm.define "Ubuntu_16_test" do |ubuntu|
+        ubuntu.vm.box_check_update = true
+        ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+        ubuntu.vm.box = "reclusive/xenial64-puppet"
+        ubuntu.vm.network "private_network", ip: "192.168.33.26"
+        ubuntu.vm.hostname = "grype.ubuntu.vm"
+        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/support/"
+    end
+
+    config.vm.define "Ubuntu_18_test" do |ubuntu|
+        ubuntu.vm.box_check_update = true
+        ubuntu.ssh.private_key_path = "~/.vagrant.d/20170926_vagrant_private_key"
+        ubuntu.vm.box = "reclusive/bionic64-puppet"
+        ubuntu.vm.network "private_network", ip: "192.168.33.28"
+        ubuntu.vm.hostname = "ubuntu-18"
+        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/support/"
+    end
+end
