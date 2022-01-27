@@ -129,6 +129,7 @@ Currently there is no enforced naming conventions beyond the following:
 `jenkins_<major-version>_<minor-version>-<patch-version>_all.deb`.
 ### Adding compatibility for other Ubuntu versions
 ### Adding new major versions of Jenkins
+Download the `.deb` installer you require from [https://pkg.jenkins.io/debian-stable/direct/](https://pkg.jenkins.io/debian-stable/direct/)
 
 ### Useful to know
 [Job/Script security](https://github.com/jenkinsci/job-dsl-plugin/wiki/Script-Security) with the Jobs DSL

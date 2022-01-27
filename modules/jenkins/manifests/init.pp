@@ -202,22 +202,37 @@ class jenkins (
       }
     } #End admin user version check
 
-    # Mark Jenkins as an existing running service to avoid going through the setup wizard
-    augeas { 'jenkins-config':
-      show_diff => true,
-      incl      => '/var/lib/jenkins/config.xml',
-      lens      => 'Xml.lns',
-      context   => '/files/var/lib/jenkins/config.xml/',
-      changes   => [
-        "set hudson/installStateName/#text RUNNING"
-      ],
-      # before    => Exec["Restore plugins"],
-      require   => [
-        Package["jenkins"],
-        Service["jenkins"],
-        Exec["wait"],
-        Exec["Restore plugins"],
-      ]
+    if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.277.1") >= 0) {
+      # Mark Jenkins as an existing running service to avoid going through the setup wizard
+      file {'/var/lib/jenkins/jenkins.install.UpgradeWizard.state':
+        content => "${major_version}.${minor_version}.${patch_version}",
+        mode => "755",
+        ensure => "file",
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+          Exec["Restore plugins"],
+        ]
+      }
+    } else {
+      # Mark Jenkins as an existing running service to avoid going through the setup wizard
+      augeas { 'jenkins-config':
+        show_diff => true,
+        incl      => '/var/lib/jenkins/config.xml',
+        lens      => 'Xml.lns',
+        context   => '/files/var/lib/jenkins/config.xml/',
+        changes   => [
+          "set hudson/installStateName/#text RUNNING"
+        ],
+        # before    => Exec["Restore plugins"],
+        require   => [
+          Package["jenkins"],
+          Service["jenkins"],
+          Exec["wait"],
+          Exec["Restore plugins"],
+        ]
+      }
     }
 
     if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.121.1") >= 0) {
