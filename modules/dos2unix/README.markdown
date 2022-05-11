@@ -1,4 +1,4 @@
-# dos2uniz
+# dos2unix
 
 This is the dos2uniz module. It provides... [dos2uniz ]()
 
