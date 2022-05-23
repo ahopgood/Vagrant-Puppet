@@ -46,7 +46,8 @@ define nomad::levant (
     exec {"unzip ${levant_file_name}":
       cwd => "${local_install_dir}",
       path => "/usr/bin/",
-      command => "unzip ${local_install_dir}${levant_file_name} -d /usr/bin",
+      command => "unzip -o ${local_install_dir}${levant_file_name} -d /usr/bin",
+      unless => "levant -version | /bin/grep v${major_version}.${minor_version}.${patch_version}",
       require => [
         File["${levant_file_name}"]
       ]
