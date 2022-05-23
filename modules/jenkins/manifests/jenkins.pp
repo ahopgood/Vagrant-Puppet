@@ -150,7 +150,7 @@ pandoc::texlive_latex_extra{"texlive-latex-extra":}
 pandoc::lmodern{"lmodern":}
 ->
 Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker Grype"
+  labels => "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker Grype Nomad Levant"
 }
 ->
 class {"dos2unix":}
