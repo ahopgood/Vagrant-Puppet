@@ -32,3 +32,5 @@ jenkins::dockerHubRegistry::credentials::name: docker-hub
 jenkins::dockerHubRegistry::credentials::username: altairbob
 jenkins::dockerHubRegistry::credentials::password: fakefakey
 jenkins::dockerHubRegistry::address: hub.docker.com
+
+jenkins::nomad::address: nomad.test.alexanderhopgood.com
