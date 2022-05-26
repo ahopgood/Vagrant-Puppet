@@ -33,26 +33,34 @@ class{'augeas':}
 ->
 class{"augeas::xmlstarlet":}
 ->
-# jenkins::docker::global{"docker-global-setup":}
+jenkins::docker::global{"docker-global-setup":}
+
+$envHash = {
+  "DOCKER_REGISTRY" => hiera('jenkins::dockerRegistry::address', 'test-address'),
+  "NOMAD" => "http://nomad.com"
+}
+jenkins::global::env::var{"set-environmental-variables":
+  envValuesHash => $envHash
+}
 # ->
-jenkins::docker::workflow{"docker-workflow-setup":}
+# jenkins::docker::workflow{"docker-workflow-setup":}
 
-class { "nomad":
-  major_version => "1",
-  minor_version => "2",
-  patch_version => "6"
-}
-->
-nomad::levant{"levant-install":
-  major_version => "0",
-  minor_version => "3",
-  patch_version => "1"
-}
-
-Jenkins::Global::Labels { "labels":
-  labels => "Java6 Java7 Java8 Java11 Docker Grype Nomad Levant"
-}
-->
-jenkins::global::reload::config{"set labels":
-  password => "admin"
-}
+# class { "nomad":
+#   major_version => "1",
+#   minor_version => "2",
+#   patch_version => "6"
+# }
+# ->
+# nomad::levant{"levant-install":
+#   major_version => "0",
+#   minor_version => "3",
+#   patch_version => "1"
+# }
+#
+# Jenkins::Global::Labels { "labels":
+#   labels => "Java6 Java7 Java8 Java11 Docker Grype Nomad Levant"
+# }
+# ->
+# jenkins::global::reload::config{"set labels":
+#   password => "admin"
+# }

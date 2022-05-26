@@ -79,30 +79,6 @@ define jenkins::docker::global {
   augeas::formatXML{"format ${docker_tool_file} jenkins_docker_global_tool_config":
     filepath => "${docker_tool_file}"
   }
-
-  $registry_address = hiera('jenkins::dockerRegistry::address', 'test-address')
-  $changes = [
-    "rm globalNodeProperties",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/#attribute/serialization \"custom\"",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/unserializable-parents #empty",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator  #empty",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator/#attribute/class \"hudson.util.CaseInsensitiveComparator\"",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/int/#text \"1\"",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/string[1]/#text \"DOCKER_REGISTRY\"",
-    "set globalNodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/string[2]/#text  \"${registry_address}\"",
-  ]
-
-  augeas { "jenkins_general_config_env_var_docker_registry":
-    show_diff => true,
-    incl      => '/var/lib/jenkins/config.xml',
-    lens      => 'Xml.lns',
-    context   => '/files/var/lib/jenkins/config.xml/hudson/',
-    changes   => $changes,
-  }
-  ->
-  augeas::formatXML { "format /var/lib/jenkins/config.xml docker-registry":
-    filepath => "/var/lib/jenkins/config.xml"
-  }
 }
 
 define jenkins::docker::group {
