@@ -37,7 +37,7 @@ jenkins::docker::global{"docker-global-setup":}
 
 $envHash = {
   "DOCKER_REGISTRY" => hiera('jenkins::dockerRegistry::address', 'test-address'),
-  "NOMAD" => "http://nomad.com"
+  "NOMAD" => hiera('jenkins::nomad::address', 'test-address')
 }
 jenkins::global::env::var{"set-environmental-variables":
   envValuesHash => $envHash

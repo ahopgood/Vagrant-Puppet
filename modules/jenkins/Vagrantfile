@@ -72,6 +72,7 @@ Vagrant.configure(2) do |config|
     	sudo cp /usr/local/bin/support/fakelerootx1.crt /usr/local/share/ca-certificates/
         sudo update-ca-certificates
         sudo systemctl restart docker
+        sudo sed -i "2i192.168.2.4 nomad.alexanderhopgood.com" /etc/hosts
         # External Module Setup
         sudo mkdir -p /home/vagrant/.puppet/etc/code/modules/stdlib/
         sudo tar -xzf /home/vagrant/external-modules/puppetlabs-stdlib-5.2.0.tar.gz -C /home/vagrant/.puppet/etc/code/modules/stdlib/ --strip-components 1
