@@ -49,6 +49,12 @@ class{httpd::centos":
   httpd_group => "httpd",
 }
 ```
+
+### Puppet Command
+```
+sudo puppet apply --parser=future --modulepath=/etc/puppet/modules /vagrant/tests/virtual_host_httpd.pp
+
+```
 ## Dependencies
 ### CentOS
 * iptables module is required [raw readme here](../iptables/README.markdown)
