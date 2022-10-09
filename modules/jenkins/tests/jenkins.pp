@@ -48,7 +48,7 @@ jenkins::global::clouds::nomad{"setup-nomad-cloud":
   agentImage => 'altairbob/nomad-agent-docker-cli:20220915-130920',
   dockerInDockerImage => 'docker:dind',
   jenkinsHost => "192.168.1.30",
-  labels => "Java6 Java7 Java8 Java9 Java10 Java11 Java12 Java13 Java14 Java15 Java16 Java17 docker"
+  labels => "Java6 Java7 Java8 Java9 Java10 Java11 Java12 Java13 Java14 Java15 Java16 Java17 Pandoc Dos2Unix Docker Grype Nomad Levant"
 }
 # ->
 # jenkins::docker::workflow{"docker-workflow-setup":}
