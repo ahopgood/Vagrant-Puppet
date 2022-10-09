@@ -1,0 +1,192 @@
+/files/var/lib/jenkins/config.xml
+/files/var/lib/jenkins/config.xml/#declaration
+/files/var/lib/jenkins/config.xml/#declaration/#attribute
+/files/var/lib/jenkins/config.xml/#declaration/#attribute/version = "1.1"
+/files/var/lib/jenkins/config.xml/#declaration/#attribute/encoding = "UTF-8"
+/files/var/lib/jenkins/config.xml/hudson
+/files/var/lib/jenkins/config.xml/hudson/#text[1] = "\n  "
+/files/var/lib/jenkins/config.xml/hudson/disabledAdministrativeMonitors = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/version
+/files/var/lib/jenkins/config.xml/hudson/version/#text = "2.319.2"
+/files/var/lib/jenkins/config.xml/hudson/#text[3] = "  "
+/files/var/lib/jenkins/config.xml/hudson/numExecutors
+/files/var/lib/jenkins/config.xml/hudson/numExecutors/#text = "6"
+/files/var/lib/jenkins/config.xml/hudson/#text[4] = "  "
+/files/var/lib/jenkins/config.xml/hudson/mode
+/files/var/lib/jenkins/config.xml/hudson/mode/#text = "NORMAL"
+/files/var/lib/jenkins/config.xml/hudson/#text[5] = "  "
+/files/var/lib/jenkins/config.xml/hudson/useSecurity
+/files/var/lib/jenkins/config.xml/hudson/useSecurity/#text = "true"
+/files/var/lib/jenkins/config.xml/hudson/#text[6] = "  "
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/#attribute
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/#attribute/class = "hudson.security.FullControlOnceLoggedInAuthorizationStrategy"
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/denyAnonymousReadAccess
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/denyAnonymousReadAccess/#text = "true"
+/files/var/lib/jenkins/config.xml/hudson/authorizationStrategy/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[7] = "  "
+/files/var/lib/jenkins/config.xml/hudson/securityRealm
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/#attribute
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/#attribute/class = "hudson.security.HudsonPrivateSecurityRealm"
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/disableSignup
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/disableSignup/#text = "true"
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/#text[2] = "    "
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/enableCaptcha
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/enableCaptcha/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/securityRealm/#text[3] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[8] = "  "
+/files/var/lib/jenkins/config.xml/hudson/disableRememberMe
+/files/var/lib/jenkins/config.xml/hudson/disableRememberMe/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/#text[9] = "  "
+/files/var/lib/jenkins/config.xml/hudson/projectNamingStrategy = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/projectNamingStrategy/#attribute
+/files/var/lib/jenkins/config.xml/hudson/projectNamingStrategy/#attribute/class = "jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"
+/files/var/lib/jenkins/config.xml/hudson/#text[10] = "  "
+/files/var/lib/jenkins/config.xml/hudson/workspaceDir
+/files/var/lib/jenkins/config.xml/hudson/workspaceDir/#text = "${JENKINS_HOME}/workspace/${ITEM_FULL_NAME}"
+/files/var/lib/jenkins/config.xml/hudson/#text[11] = "  "
+/files/var/lib/jenkins/config.xml/hudson/buildsDir
+/files/var/lib/jenkins/config.xml/hudson/buildsDir/#text = "${ITEM_ROOTDIR}/builds"
+/files/var/lib/jenkins/config.xml/hudson/#text[12] = "  "
+/files/var/lib/jenkins/config.xml/hudson/jdks
+/files/var/lib/jenkins/config.xml/hudson/jdks/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/#text[1] = "\n      "
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/name
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/name/#text = "1.11.0_6"
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/#text[2] = "      "
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/home
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/home/#text = "/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64/"
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/#text[3] = "      "
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/properties = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/jdks/jdk/#text[4] = "    "
+/files/var/lib/jenkins/config.xml/hudson/jdks/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[13] = "  "
+/files/var/lib/jenkins/config.xml/hudson/viewsTabBar = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/viewsTabBar/#attribute
+/files/var/lib/jenkins/config.xml/hudson/viewsTabBar/#attribute/class = "hudson.views.DefaultViewsTabBar"
+/files/var/lib/jenkins/config.xml/hudson/#text[14] = "  "
+/files/var/lib/jenkins/config.xml/hudson/myViewsTabBar = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/myViewsTabBar/#attribute
+/files/var/lib/jenkins/config.xml/hudson/myViewsTabBar/#attribute/class = "hudson.views.DefaultMyViewsTabBar"
+/files/var/lib/jenkins/config.xml/hudson/#text[15] = "  "
+/files/var/lib/jenkins/config.xml/hudson/clouds
+/files/var/lib/jenkins/config.xml/hudson/clouds/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#attribute
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#attribute/plugin = "nomad@0.9.3"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[1] = "\n      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/name
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/name/#text = "Nomad"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[2] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/instanceCap
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/instanceCap/#text = "2147483647"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[3] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/nomadUrl
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/nomadUrl/#text = "https://nomad.alexanderhopgood.com"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[4] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/nomadACLCredentialsId
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[5] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/prune
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/prune/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[6] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/tlsEnabled
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/tlsEnabled/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[7] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/clientCertificate
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[8] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/clientPassword
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/clientPassword/#text = "{AQAAABAAAAAQPks6BsCbkggm5jwZPxagxwA/JuVDhnRG4xxPpYDdekA=}"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[9] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/serverCertificate
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[10] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/serverPassword
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/serverPassword/#text = "{AQAAABAAAAAQOH0z1zU3NQ2j/OaG/S4JytiL17di1ysmBtElK4mhwGQ=}"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[11] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/workerTimeout
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/workerTimeout/#text = "1"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[12] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/#text[1] = "\n        "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[1] = "\n          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/prefix
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/prefix/#text = "jenkins-nomad"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[2] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/idleTerminationInMinutes
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/idleTerminationInMinutes/#text = "10"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[3] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/reusable
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/reusable/#text = "true"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[4] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/numExecutors
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/numExecutors/#text = "1"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[5] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/labels
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/labels/#text = "Java6 Java7 Java8 Java9 Java10 Java11 Java12 Java13 Java14 Java15 Java16 Java17"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[6] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/jobTemplate
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/jobTemplate/#text = "job &quot;%WORKER_NAME%&quot; {\n  region = &quot;global&quot;\n  datacenters = [&quot;dc1&quot;]\n  type = &quot;batch&quot;\n\n  group &quot;jenkins-worker-dind-taskgroup&quot; {\n    network {\n      mode = &quot;bridge&quot;\n    \n      port &quot;tcp&quot; {\n        to     = 2376\n      }\n    }\n    \n    task &quot;jenkins-worker&quot; {\n      driver = &quot;docker&quot;\n\n      env {\n        DOCKER_TLS_CERTDIR = &quot;/certs&quot;\n        JENKINS_URL = &quot;http://192.168.56.10:8080&quot;\n        JENKINS_AGENT_NAME = &quot;%WORKER_NAME%&quot;\n        JENKINS_SECRET = &quot;%WORKER_SECRET%&quot;\n        JENKINS_TUNNEL = &quot;192.168.56.10:50000&quot;\n        DOCKER_CERT_PATH = &quot;/certs/client&quot;\n        DOCKER_TLS_VERIFY =  &quot;1&quot;\n        DOCKER_HOST = &quot;tcp://127.0.0.1:${NOMAD_PORT_tcp}&quot;\n      }\n\n      config {\n        image = &quot;altairbob/nomad-agent-docker-cli:latest&quot;\n        volumes = [\n          &quot;/vagrant/volumes/jenkins-docker-certs:/certs/client:ro&quot;,\n        ]\n      } # end config\n      resources {\n        cpu    = 500\n        memory = 256\n      } # end resources\n    } # end task\n    \n    task &quot;jenkins-dind-worker&quot; {\n      driver = &quot;docker&quot;\n\n      env {\n        DOCKER_TLS_CERTDIR = &quot;/certs&quot;\n      }\n\n      config {\n        image = &quot;docker:dind&quot;\n        privileged = true\n        volumes = [\n          &quot;/vagrant/volumes/jenkins-docker-certs:/certs/client&quot;,\n          &quot;/vagrant/volumes/jenkins-docker-certs-ca:/certs/ca&quot;\n        ]\n      } # end config\n      resources {\n      \tcpu    = 500\n      \tmemory = 256\n      } # end resources\n    } # end task\n    ephemeral_disk {\n      migrate = true\n      size    = 500\n      sticky  = true\n    } # end ephemeral disk\n  } # end group\n}"
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[7] = "          "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/remoteFs
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/org.jenkinsci.plugins.nomad.NomadWorkerTemplate/#text[8] = "        "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/templates/#text[2] = "      "
+/files/var/lib/jenkins/config.xml/hudson/clouds/org.jenkinsci.plugins.nomad.NomadCloud/#text[13] = "    "
+/files/var/lib/jenkins/config.xml/hudson/clouds/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[16] = "  "
+/files/var/lib/jenkins/config.xml/hudson/quietPeriod
+/files/var/lib/jenkins/config.xml/hudson/quietPeriod/#text = "5"
+/files/var/lib/jenkins/config.xml/hudson/#text[17] = "  "
+/files/var/lib/jenkins/config.xml/hudson/scmCheckoutRetryCount
+/files/var/lib/jenkins/config.xml/hudson/scmCheckoutRetryCount/#text = "0"
+/files/var/lib/jenkins/config.xml/hudson/#text[18] = "  "
+/files/var/lib/jenkins/config.xml/hudson/views
+/files/var/lib/jenkins/config.xml/hudson/views/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[1] = "\n      "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/owner = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/owner/#attribute
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/owner/#attribute/class = "hudson"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/owner/#attribute/reference = "../../.."
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[2] = "      "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/name
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/name/#text = "all"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[3] = "      "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/filterExecutors
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/filterExecutors/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[4] = "      "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/filterQueue
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/filterQueue/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[5] = "      "
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/properties = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/properties/#attribute
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/properties/#attribute/class = "hudson.model.View$PropertyList"
+/files/var/lib/jenkins/config.xml/hudson/views/hudson.model.AllView/#text[6] = "    "
+/files/var/lib/jenkins/config.xml/hudson/views/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[19] = "  "
+/files/var/lib/jenkins/config.xml/hudson/primaryView
+/files/var/lib/jenkins/config.xml/hudson/primaryView/#text = "all"
+/files/var/lib/jenkins/config.xml/hudson/#text[20] = "  "
+/files/var/lib/jenkins/config.xml/hudson/slaveAgentPort
+/files/var/lib/jenkins/config.xml/hudson/slaveAgentPort/#text = "-1"
+/files/var/lib/jenkins/config.xml/hudson/#text[21] = "  "
+/files/var/lib/jenkins/config.xml/hudson/label
+/files/var/lib/jenkins/config.xml/hudson/label/#text = "Java6 Java7 Java8 Java11 Pandoc Dos2Unix Docker Grype Nomad Levant"
+/files/var/lib/jenkins/config.xml/hudson/#text[22] = "  "
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/#attribute
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/#attribute/class = "hudson.security.csrf.DefaultCrumbIssuer"
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/#text[1] = "\n    "
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/excludeClientIPFromCrumb
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/excludeClientIPFromCrumb/#text = "false"
+/files/var/lib/jenkins/config.xml/hudson/crumbIssuer/#text[2] = "  "
+/files/var/lib/jenkins/config.xml/hudson/#text[23] = "  "
+/files/var/lib/jenkins/config.xml/hudson/nodeProperties = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/#text[24] = "  "
+/files/var/lib/jenkins/config.xml/hudson/globalNodeProperties = "#empty"
+/files/var/lib/jenkins/config.xml/hudson/#text[25] = "  "
+/files/var/lib/jenkins/config.xml/hudson/nodeRenameMigrationNeeded
+/files/var/lib/jenkins/config.xml/hudson/nodeRenameMigrationNeeded/#text = "false"

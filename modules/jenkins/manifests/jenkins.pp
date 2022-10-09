@@ -65,7 +65,7 @@ class {'jenkins':
   minor_version => "319",
   patch_version => "2",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/2021-02-07-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/2022-09-28-1201-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
@@ -156,10 +156,10 @@ Jenkins::Global::Labels { "labels":
 class {"dos2unix":}
 ->
 class {"grype" : }
-->
-jenkins::global::reload::config{"set labels":
-  password => "admin"
-}
+# ->
+# jenkins::global::reload::config{"set labels":
+#   password => "admin"
+# }
 # ->
 # jenkins::global::restart{"restart":
 #   password => "admin"
