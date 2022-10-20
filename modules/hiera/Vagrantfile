@@ -53,7 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.hostname = "jenkins.ubuntu.vm"
     ubuntu.vm.box_version = "0.0.2020-12-01-0200"
     ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
-    #ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
-    ubuntu.vm.synced_folder "files/keys/", 	"/etc/puppet/hieradata/keys/"
+    ubuntu.vm.synced_folder "C:/Users/Alexander/Dropbox/Projects/puppet/keys/", 	"/etc/puppet/hieradata/keys/"
+    #ubuntu.vm.synced_folder "files/keys/", 	"/etc/puppet/hieradata/keys/"
   end
 end

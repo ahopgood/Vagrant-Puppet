@@ -10,6 +10,10 @@ Currently the module needs to be run twice when being used by another module to 
 `puppet apply --hiera-config=/etc/puppet/hiera.yaml` with our specified hiera.yaml configuration file.
 
 ```
+sudo puppet apply /vagrant/tests/eyaml.pp --modulepath=/etc/puppet/modules/
+```
+
+```
 class{"hiera::eyaml":
   private_key_file => "private_key.pkcs7.pem",
   public_key_file => "public_key.pkcs7.pem",
