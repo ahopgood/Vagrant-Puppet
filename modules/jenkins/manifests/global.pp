@@ -179,7 +179,9 @@ define jenkins::global::clouds::nomad(
   $jenkinsHost = undef,
   $labels = undef,
   $masterExecutors = "2",
-  $memory = "256"
+  $memory = "256",
+  $nomadTaskExecutors = "1",
+  $nomadWorkerTimeout = "1"
 ) {
 
   $subContext = "clouds/org.jenkinsci.plugins.nomad.NomadCloud"
@@ -202,11 +204,11 @@ define jenkins::global::clouds::nomad(
     "set ${subContext}/clientPassword/#text {AQAAABAAAAAQPks6BsCbkggm5jwZPxagxwA/JuVDhnRG4xxPpYDdekA=}",
     "touch ${subContext}/serverCertificate",
     "set ${subContext}/serverPassword/#text {AQAAABAAAAAQOH0z1zU3NQ2j/OaG/S4JytiL17di1ysmBtElK4mhwGQ=}",
-    "set ${subContext}/workerTimeout/#text 1",
+    "set ${subContext}/workerTimeout/#text ${nomadWorkerTimeout}",
     "set ${templateContext}/prefix/#text jenkins-nomad",
     "set ${templateContext}/idleTerminationInMinutes/#text 10",
     "set ${templateContext}/reusable/#text true",
-    "set ${templateContext}/numExecutors/#text 1",
+    "set ${templateContext}/numExecutors/#text ${nomadTaskExecutors}",
     "set ${templateContext}/labels/#text '${labels}'",
     "set ${templateContext}/jobTemplate/#text '${jobTemplate}'",
     "touch ${templateContext}/remoteFs"
