@@ -17,13 +17,17 @@ file {["/vagrant/","/vagrant/backup/","/vagrant/backup/jenkins/"]:
 }
 class {'jenkins':
   # major_version => "2",
-  # minor_version => "73",
-  # patch_version => "1",
+  # minor_version => "387",
+  # patch_version => "3",
+
   major_version => "2",
-  minor_version => "319",
-  patch_version => "2",
+  minor_version => "440",
+  patch_version => "3",
+  # major_version => "2",
+  # minor_version => "319",
+  # patch_version => "2",
   perform_manual_setup => false,
-  plugin_backup_location => "/vagrant/backup/plugins/2022-09-28-1201-plugins/",
+  plugin_backup_location => "/vagrant/backup/plugins/2024-12-19-0630-plugins/",
   java_major_version => "${java_major_version}",
   java_update_version => "${java_update_version}",
   job_backup_location => "/vagrant/backup/jobs/",
@@ -32,24 +36,24 @@ class {'jenkins':
 class{'augeas':}
 ->
 class{"augeas::xmlstarlet":}
-->
-jenkins::docker::global{"docker-global-setup":}
+# ->
+# jenkins::docker::global{"docker-global-setup":}
 
-$envHash = {
-  "DOCKER_REGISTRY" => hiera('jenkins::dockerRegistry::address', 'test-address'),
-  "NOMAD" => hiera('jenkins::nomad::address', 'test-address')
-}
-jenkins::global::env::var{"set-environmental-variables":
-  envValuesHash => $envHash
-}
-->
-jenkins::global::clouds::nomad{"setup-nomad-cloud":
-  nomadHost => "https://nomad.test.alexanderhopgood.com",
-  agentImage => 'altairbob/nomad-agent-docker-cli:20220915-130920',
-  dockerInDockerImage => 'docker:dind',
-  jenkinsHost => "192.168.1.30",
-  labels => "Java6 Java7 Java8 Java9 Java10 Java11 Java12 Java13 Java14 Java15 Java16 Java17 Pandoc Dos2Unix Docker Grype Nomad Levant"
-}
+# $envHash = {
+#   "DOCKER_REGISTRY" => hiera('jenkins::dockerRegistry::address', 'test-address'),
+#   "NOMAD" => hiera('jenkins::nomad::address', 'test-address')
+# }
+# jenkins::global::env::var{"set-environmental-variables":
+#   envValuesHash => $envHash
+# }
+# ->
+# jenkins::global::clouds::nomad{"setup-nomad-cloud":
+#   nomadHost => "https://nomad.test.alexanderhopgood.com",
+#   agentImage => 'altairbob/nomad-agent-docker-cli:20220915-130920',
+#   dockerInDockerImage => 'docker:dind',
+#   jenkinsHost => "192.168.1.30",
+#   labels => "Java6 Java7 Java8 Java9 Java10 Java11 Java12 Java13 Java14 Java15 Java16 Java17 Pandoc Dos2Unix Docker Grype Nomad Levant"
+# }
 # ->
 # jenkins::docker::workflow{"docker-workflow-setup":}
 
@@ -68,7 +72,7 @@ jenkins::global::clouds::nomad{"setup-nomad-cloud":
 # Jenkins::Global::Labels { "labels":
 #   labels => "Java6 Java7 Java8 Java11 Docker Grype Nomad Levant"
 # }
-# ->
-# jenkins::global::reload::config{"set labels":
-#   password => "admin"
-# }
+->
+jenkins::global::reload::config{"set labels":
+  password => "admin"
+}

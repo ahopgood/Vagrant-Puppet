@@ -155,18 +155,20 @@ class jenkins (
     }
   } else {
     if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.138.4") < 0) {
-      augeas{ 'jenkins_admin_config':
+      augeas { 'jenkins_admin_config':
         show_diff => true,
-        incl => '/var/lib/jenkins/users/admin/config.xml',
-        lens => 'Xml.lns',
-        context => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
-        changes => [
+        incl      => '/var/lib/jenkins/users/admin/config.xml',
+        lens      => 'Xml.lns',
+        context   => '/files/var/lib/jenkins/users/admin/config.xml/user/properties/',
+        changes   => [
           "set hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash/#text #jbcrypt:${password_bcrypt_hash}"
         ],
-        before => File["${restore_plugin_script}"],
-        require => [Package["jenkins"],Service["jenkins"], Exec["wait"]]
+        before    => File["${restore_plugin_script}"],
+        require   => [Package["jenkins"], Service["jenkins"], Exec["wait"]]
       }
-    } else {
+    }
+    elsif (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.138.4") > 0)
+      and (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.332.1") < 0) {
       file {"/var/lib/jenkins/users/":
         ensure => directory,
         owner => "jenkins",
@@ -187,10 +189,13 @@ class jenkins (
         source => "puppet:///${puppet_file_dir}setAdminPassword.sh",
         require => [
           Package["jenkins"],
+          Service["jenkins"],
           File["/var/lib/jenkins/users/"],
+          File["/var/lib/jenkins/jenkins.install.UpgradeWizard.state"],
+          Exec["wait"],
         ]
       }
-
+      ->
       exec {"jenkins_admin_config":
         path => ["/usr/local/bin/", "/bin/", "/usr/bin/"],
         user => "root",
@@ -200,19 +205,65 @@ class jenkins (
           File["/usr/local/bin/setAdminPassword.sh"],
         ]
       }
+    } else {
+      file{"/var/lib/jenkins/init.groovy.d/":
+        ensure => directory,
+        mode => "777",
+        owner => "jenkins",
+        group => "jenkins",
+        require => [
+          File["${local_install_dir}"],
+          Package["jenkins"],
+          # Exec["wait"]
+        ],
+        before => [
+          Service["jenkins"],
+        ]
+      }
+      ->
+      file {"/var/lib/jenkins/init.groovy.d/basic-security.groovy":
+        ensure => present,
+        mode => "755",
+        owner => "jenkins",
+        group => "jenkins",
+        require => [
+          File["${local_install_dir}"],
+          Package["jenkins"],
+          File["/var/lib/jenkins/jenkins.install.UpgradeWizard.state"],
+          # Exec["wait"]
+        ],
+        source => "puppet:///${puppet_file_dir}basic-security.groovy",
+        path => "/var/lib/jenkins/init.groovy.d/basic-security.groovy",
+      }
+      ->
+      file_line { "add hashed password":
+        path => "/var/lib/jenkins/init.groovy.d/basic-security.groovy",
+        line => "hudsonRealm.createAccountWithHashedPassword('admin','#jbcrypt:${password_bcrypt_hash}')",
+        match => "^hudsonRealm\.createAccountWithHashedPassword\('admin','PASSWORD_PLACEHOLDER'\)"
+      }
+      ->
+      exec {"Restart Jenkins for password reset":
+        path => ["/bin/"],
+        command => "systemctl restart jenkins",
+      }
+      #   Need a restart for this to stick?
     } #End admin user version check
 
     if (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.277.1") >= 0) {
+      # and (versioncmp("${major_version}.${minor_version}.${patch_version}", "2.387.3") < 0) {
+      # version 2.387 onwards does this via the groovy init script
       # Mark Jenkins as an existing running service to avoid going through the setup wizard
       file {'/var/lib/jenkins/jenkins.install.UpgradeWizard.state':
         content => "${major_version}.${minor_version}.${patch_version}",
         mode => "755",
         ensure => "file",
+        owner => "jenkins",
+        group => "jenkins",
         require   => [
           Package["jenkins"],
           Service["jenkins"],
           Exec["wait"],
-          Exec["Restore plugins"],
+          # Exec["Restore plugins"],
         ]
       }
     } else {
@@ -279,6 +330,26 @@ class jenkins (
       require => [File["${local_install_dir}"],Package["jenkins"], Exec["wait"]],
       content => "$major_version.$minor_version.$patch_version",
       path => "/var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion",
+    }
+    ->
+    file {"jenkins.install.runSetupWizard":
+      ensure => present,
+      mode => "755",
+      owner => "jenkins",
+      group => "jenkins",
+      require => [
+        File["${local_install_dir}"],
+        Package["jenkins"],
+        # Exec["wait"]
+      ],
+      content => "false",
+      path => "/var/lib/jenkins/jenkins.install.runSetupWizard",
+    }
+    ->
+    file_line { "disable setup wizard":
+      path => "/etc/default/jenkins",
+      line => 'JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT -Djenkins.install.runSetupWizard=false"',
+      match => '^JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT"$'
     }
     ->
     file {"${restore_plugin_script}":

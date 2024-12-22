@@ -58,12 +58,12 @@ class{"hiera::eyaml":
 }
 ->
 class {'jenkins':
-  # major_version => "2",
-  # minor_version => "263",
-  # patch_version => "3",
   major_version => "2",
-  minor_version => "319",
-  patch_version => "2",
+  minor_version => "479",
+  patch_version => "1",
+  # major_version => "2",
+  # minor_version => "319",
+  # patch_version => "2",
   perform_manual_setup => false,
   plugin_backup_location => "/vagrant/backup/plugins/2022-09-28-1201-plugins/",
   java_major_version => "${java_major_version}",
