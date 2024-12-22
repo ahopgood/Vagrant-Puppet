@@ -26,8 +26,15 @@ do
   PLUGIN_VERSION=$(echo $line | awk -F ':' '{ print $2 }')
   PLUGIN_HASH=$(echo $line | awk -F ':' '{ print $3 }')
   # How do we know the local version is correct?
-  PLUGIN_LOCATION=$(find ${BACKUP_LOCATION} \( -name "${PLUGIN_NAME}.jpi" -o -name "${PLUGIN_NAME}.hpi" \))
-  
+#  PLUGIN_LOCATION=$(find ${BACKUP_LOCATION} \( -name "${PLUGIN_NAME}.jpi" -o -name "${PLUGIN_NAME}.hpi" \))
+
+  PLUGIN_LOCATION=$(find ${BACKUP_LOCATION} \( -name "${PLUGIN_NAME}.jpi" \))
+  # fallback to checking for hpi plugin if jpi not found
+  if [ -z ${PLUGIN_LOCATION} ];then
+    echo "plugin not found for $PLUGIN_NAME"
+    PLUGIN_LOCATION=$(find ${BACKUP_LOCATION} \( -name "${PLUGIN_NAME}.hpi" \))
+  fi
+
   if [ ! -z ${PLUGIN_LOCATION} ];then
       echo "${PREFIX} Found backed up plugin [${PLUGIN_LOCATION}]"
       if [ ! -z ${PLUGIN_HASH} ];then

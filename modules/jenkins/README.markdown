@@ -24,6 +24,8 @@ Modules supported/available:
 ## Current Status / Support
 Supports:
 * Ubuntu 15.10 (wily)
+* Ubuntu 16.04 (xenial)
+* Ubuntu 18.04 (bionic)
 
 ### Known Issues
 **64-bit support only**  
@@ -251,7 +253,7 @@ jenkins::global::reload::config{"set labels":
 ## ToDo
 ### CentOS
 ### Ubuntu
-* Create a credentials.xml file for adding our github token. Need to provide a credentials version from our plugin file
+* **done** Create a credentials.xml file for adding our github token. Need to provide a credentials version from our plugin file
 * **done** Create a directory for the seed job in the jobs folder where the folder name is the job name
 * **done** Create a config.xml file
 * **done** xmlstarlet -> create a definition for pretty_print to allow for reuse.
