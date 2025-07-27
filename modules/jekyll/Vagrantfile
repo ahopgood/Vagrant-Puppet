@@ -87,7 +87,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ubuntu.vm.network "private_network", ip: "192.168.33.28"
         ubuntu.vm.hostname = "ubuntu-18"
 #        ubuntu.vm.synced_folder "../../support-scripts/", 	"/usr/local/bin/"
-        ubuntu.vm.synced_folder "C:\\Git Checkouts\\ahopgood.github.io", "/blog"
+        ubuntu.vm.synced_folder "~/IdeaProjects/ahopgood.github.io", "/blog"
+        # ubuntu.vm.synced_folder "~/IdeaProjects/ahopgood.github.io/published_blog", "/published_blog"
         ubuntu.vm.synced_folder "published_blog", "/published_blog"
+
     end
 end
