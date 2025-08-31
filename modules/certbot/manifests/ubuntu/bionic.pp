@@ -354,8 +354,6 @@ define certbot::ubuntu::bionic::apache::reinstall(
 --redirect \
 --uir \
 --hsts \
---staple-ocsp \
---must-staple \
 --reinstall"
 
   $virtual_host_ssl_config = "${server_name}-le-ssl.conf"
